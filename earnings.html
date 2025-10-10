@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earnings | KabaleOnline</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-primary: #0d2857;
+            --bg-secondary: #10336d;
+            --bg-card: #1e293b;
+            --text-primary: #ffffff;
+            --text-secondary: #a7c0e8;
+            --accent-primary: #007bff;
+            --accent-success: #28a745;
+            --border-color: #1f4287;
+            --font-family: 'Poppins', sans-serif;
+        }
+
+        body.light-mode {
+            --bg-primary: #f0f4f9;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --text-primary: #0d2857;
+            --text-secondary: #6c757d;
+            --border-color: #e9ecef;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-primary);
+            color: var(--text-secondary);
+        }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 15px; }
+
+        .header {
+            position: sticky; top: 0; left: 0; width: 100%; z-index: 1000;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 0;
+        }
+        .navbar { display: flex; justify-content: space-between; align-items: center; max-width:1200px; margin: 0 auto; padding: 0 15px; }
+        .nav-logo { font-size: 1.8rem; font-weight: 800; color: var(--accent-primary); text-decoration: none; }
+        .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; }
+        
+        .main-content { padding: 40px 0; }
+        .page-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .page-header h1 { font-size: 2.2rem; color: var(--text-primary); }
+        .btn-back {
+            display: inline-flex; align-items: center; gap: 8px;
+            background-color: var(--bg-secondary); color: var(--text-primary);
+            padding: 10px 20px; border-radius: 8px; text-decoration: none;
+            font-weight: 500; border: 1px solid var(--border-color);
+        }
+        
+        .content-section {
+            background-color: var(--bg-secondary);
+            border-radius: 16px; padding: 30px;
+            margin-bottom: 30px; border: 1px solid var(--border-color);
+        }
+        .section-title {
+            font-size: 1.5rem; font-weight: 600; color: var(--text-primary);
+            margin-bottom: 25px;
+        }
+        
+        /* Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        .summary-card {
+            background-color: var(--bg-primary);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid var(--border-color);
+        }
+        .summary-card .label { font-size: 1rem; margin-bottom: 10px; }
+        .summary-card .value { font-size: 2.2rem; font-weight: 700; color: var(--text-primary); }
+        .summary-card.available .value { color: var(--accent-success); }
+
+        /* Withdrawal Section */
+        .withdrawal-section {
+            display: flex; flex-direction: column; align-items: flex-start;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .withdrawal-section { flex-direction: row; justify-content: space-between; align-items: center; }
+        }
+        .btn-withdraw {
+            padding: 12px 30px; background-color: var(--accent-success);
+            color: #ffffff; border: none; border-radius: 8px; font-size: 1rem;
+            font-weight: 600; cursor: pointer;
+        }
+
+        /* Transaction History Table */
+        .table-wrapper { overflow-x: auto; }
+        .transaction-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .transaction-table th, .transaction-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .transaction-table th { font-weight: 600; font-size: 0.9rem; text-transform: uppercase; }
+        .transaction-table td .service { font-weight: 600; color: var(--text-primary); }
+        .transaction-table td .client { font-size: 0.9rem; }
+        .status-badge {
+            padding: 4px 10px; border-radius: 50px; font-weight: 600;
+            font-size: 0.8rem; background-color: var(--bg-primary);
+        }
+        .status-badge.cleared { color: var(--accent-success); }
+        .status-badge.pending { color: #ffc107; }
+
+        footer {
+            margin-top: 40px; text-align: center; padding: 40px 15px;
+            background-color: var(--bg-secondary); border-top: 1px solid var(--border-color);
+            font-size: 0.9rem; color: var(--text-secondary);
+        }
+        footer a { color: var(--accent-primary); text-decoration: none; }
+    </style>
+</head>
+<body class="dark-mode">
+
+    <header class="header">
+        <div class="navbar container">
+            <a href="https://services.kabaleonline.com" class="nav-logo">KabaleOnline</a>
+            <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1>Earnings</h1>
+                <a href="provider-dashboard.html" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+
+            <div class="content-section">
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="label">Total Earned (All Time)</div>
+                        <div class="value">UGX 1,250,000</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="label">Pending Clearance</div>
+                        <div class="value">UGX 300,000</div>
+                    </div>
+                    <div class="summary-card available">
+                        <div class="label">Available for Withdrawal</div>
+                        <div class="value">UGX 950,000</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-section withdrawal-section">
+                <div>
+                    <h2 class="section-title" style="margin-bottom: 5px;">Withdraw Funds</h2>
+                    <p>Withdrawals are processed via Mobile Money within 24 hours.</p>
+                </div>
+                <button class="btn-withdraw">Withdraw UGX 950,000</button>
+            </div>
+            
+            <div class="content-section">
+                <h2 class="section-title">Transaction History</h2>
+                <div class="table-wrapper">
+                    <table class="transaction-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Service</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Oct 05, 2025</td>
+                                <td>
+                                    <div class="service">Custom Website Design</div>
+                                    <div class="client">For Hope K.</div>
+                                </td>
+                                <td>UGX 500,000</td>
+                                <td><span class="status-badge cleared">Cleared</span></td>
+                            </tr>
+                            <tr>
+                                <td>Sep 28, 2025</td>
+                                <td>
+                                    <div class="service">Event Photography</div>
+                                    <div class="client">For Peter A.</div>
+                                </td>
+                                <td>UGX 450,000</td>
+                                <td><span class="status-badge cleared">Cleared</span></td>
+                            </tr>
+                            <tr>
+                                <td>Oct 09, 2025</td>
+                                <td>
+                                    <div class="service">Laptop Repair</div>
+                                    <div class="client">For Jane D.</div>
+                                </td>
+                                <td>UGX 300,000</td>
+                                <td><span class="status-badge pending">Pending</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 KabaleOnline. All Rights Reserved. <a href="#">Terms of Service</a></p>
+    </footer>
+
+    <script src="theme.js" defer></script>
+</body>
+</html>
