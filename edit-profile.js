@@ -1,89 +1,118 @@
-document.addEventListener('DOMContentLoaded', () => {
+import { app } from './firebase-init.js';
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { uploadToCloudinary } from './cloudinary-upload.js';
 
-    // --- MOCK USER DATA ---
-    // In a real app, this would be fetched from Firebase.
-    const mockUser = {
-        name: 'Samuel Ampeire',
-        email: 'samuel@example.com',
-        profilePic: 'https://placehold.co/100x100/10336d/a7c0e8?text=S.A',
-        telephone: '0712345678',
-        location: 'Kabale Town',
-        businessName: 'Sam Tech Solutions',
-        role: 'provider' // 'provider' or 'seeker'
-    };
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-    // --- ELEMENT SELECTORS ---
-    const photoInput = document.getElementById('profile-photo-input');
-    const photoPreview = document.getElementById('photo-preview');
-    const fullNameInput = document.getElementById('full-name');
-    const emailInput = document.getElementById('email');
-    const telephoneInput = document.getElementById('telephone');
-    const locationInput = document.getElementById('location');
-    const businessNameGroup = document.getElementById('business-name-group');
-    const businessNameInput = document.getElementById('business-name');
-    const editProfileForm = document.getElementById('edit-profile-form');
-    const backToDashboardBtn = document.querySelector('.btn-back');
+// --- ELEMENT SELECTORS ---
+const photoInput = document.getElementById('profile-photo-input');
+const photoPreview = document.getElementById('photo-preview');
+const fullNameInput = document.getElementById('full-name');
+const emailInput = document.getElementById('email');
+const telephoneInput = document.getElementById('telephone');
+const locationInput = document.getElementById('location');
+const businessNameGroup = document.getElementById('business-name-group');
+const businessNameInput = document.getElementById('business-name');
+const editProfileForm = document.getElementById('edit-profile-form');
+const backToDashboardBtn = document.getElementById('back-to-dashboard-btn');
+const submitBtn = document.getElementById('submit-btn');
 
-    // --- FUNCTION to populate form with user data ---
-    function populateForm() {
-        photoPreview.src = mockUser.profilePic;
-        fullNameInput.value = mockUser.name;
-        emailInput.value = mockUser.email;
-        telephoneInput.value = mockUser.telephone || '';
-        locationInput.value = mockUser.location || '';
+let currentUser = null;
 
-        // Only show business name field for providers
-        if (mockUser.role === 'provider') {
-            businessNameGroup.style.display = 'block';
-            businessNameInput.value = mockUser.businessName || '';
+// --- AUTHENTICATION & DATA FETCHING ---
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        currentUser = user;
+        // Fetch and populate the form with existing user data
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            populateForm(userData);
         } else {
-            businessNameGroup.style.display = 'none';
+            console.error("No profile document found for this user.");
+            alert("Could not load your profile data.");
         }
-        
-        // Dynamically set the "Back" button link
-        if (mockUser.role === 'provider') {
-            backToDashboardBtn.href = 'provider-dashboard.html';
-        } else {
-            backToDashboardBtn.href = 'seeker-dashboard.html';
-        }
+    } else {
+        // Not logged in, redirect
+        window.location.href = 'auth.html';
     }
+});
 
-    // --- EVENT LISTENERS ---
-    
-    // Photo Preview Logic
-    photoInput.addEventListener('change', () => {
-        if (photoInput.files && photoInput.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                photoPreview.src = e.target.result;
-            };
-            reader.readAsDataURL(photoInput.files[0]);
-        }
-    });
-    
-    // Form Submission Logic
-    editProfileForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        // In a real app, you would gather the data and send it to Firebase here.
+// --- FUNCTION to populate form with user data ---
+function populateForm(userData) {
+    photoPreview.src = userData.profilePicUrl || `https://placehold.co/100x100/10336d/a7c0e8?text=${(userData.name || 'U').charAt(0)}`;
+    fullNameInput.value = userData.name || '';
+    emailInput.value = userData.email || '';
+    telephoneInput.value = userData.telephone || '';
+    locationInput.value = userData.location || '';
+
+    // Dynamically show/hide business name and set back button
+    if (userData.role === 'provider') {
+        businessNameGroup.style.display = 'block';
+        businessNameInput.value = userData.businessName || '';
+        backToDashboardBtn.href = 'provider-dashboard.html';
+    } else {
+        businessNameGroup.style.display = 'none';
+        backToDashboardBtn.href = 'seeker-dashboard.html';
+    }
+}
+
+// --- EVENT LISTENERS ---
+
+// Photo Preview Logic
+photoInput.addEventListener('change', () => {
+    if (photoInput.files && photoInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            photoPreview.src = e.target.result;
+        };
+        reader.readAsDataURL(photoInput.files[0]);
+    }
+});
+
+// Form Submission Logic
+editProfileForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!currentUser) return;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Saving...';
+
+    try {
         const updatedData = {
             name: fullNameInput.value,
             telephone: telephoneInput.value,
             location: locationInput.value,
-            businessName: businessNameInput.value,
-            // You would also handle uploading the new profile picture to Firebase Storage.
         };
+
+        // If the user is a provider, also update the business name
+        if (businessNameGroup.style.display === 'block') {
+            updatedData.businessName = businessNameInput.value;
+        }
         
-        console.log('Saving data:', updatedData);
-        
-        // Simulate a successful save
+        // Check if a new photo was uploaded
+        const photoFile = photoInput.files[0];
+        if (photoFile) {
+            // Upload the new image to Cloudinary and get the URL
+            const imageUrl = await uploadToCloudinary(photoFile);
+            updatedData.profilePicUrl = imageUrl;
+        }
+
+        // Update the user's document in Firestore
+        const userDocRef = doc(db, "users", currentUser.uid);
+        await updateDoc(userDocRef, updatedData);
+
         alert('Profile updated successfully!');
         
-        // Optionally redirect back to the dashboard
-        // window.location.href = backToDashboardBtn.href;
-    });
-
-    // --- INITIALIZATION ---
-    populateForm();
-
+    } catch (error) {
+        console.error("Error updating profile:", error);
+        alert("There was an error updating your profile. Please try again.");
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Save Changes';
+    }
 });
