@@ -55,7 +55,6 @@ const showVerificationView = () => {
 showSignupLink.addEventListener('click', showSignupView);
 showLoginLink.addEventListener('click', showLoginView);
 
-// Role selection UI logic
 const handleRoleSelection = () => {
     const isProvider = document.querySelector('input[name="role"]:checked').value === 'provider';
     providerFields.classList.toggle('visible', isProvider);
@@ -65,7 +64,7 @@ const handleRoleSelection = () => {
     providerLabel.classList.toggle('selected', isProvider);
 };
 roleRadios.forEach(radio => radio.addEventListener('change', handleRoleSelection));
-handleRoleSelection(); // Run once on load to set initial state
+handleRoleSelection();
 
 photoInput.addEventListener('change', () => {
     if (photoInput.files && photoInput.files[0]) {
@@ -93,7 +92,6 @@ signupForm.addEventListener('submit', async (e) => {
             userProfile.location = document.getElementById('signup-location').value;
             userProfile.telephone = document.getElementById('signup-tel').value;
             userProfile.businessName = document.getElementById('signup-bname').value || '';
-            // Note: Cloudinary upload would happen here in a real scenario
             userProfile.profilePicUrl = ''; 
         }
         await setDoc(doc(db, "users", user.uid), userProfile);
