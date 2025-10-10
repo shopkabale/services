@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics | KabaleOnline</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Chart.js for beautiful charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --bg-primary: #0d2857;
+            --bg-secondary: #10336d;
+            --bg-card: #1e293b;
+            --text-primary: #ffffff;
+            --text-secondary: #a7c0e8;
+            --accent-primary: #007bff;
+            --border-color: #1f4287;
+            --font-family: 'Poppins', sans-serif;
+        }
+
+        body.light-mode {
+            --bg-primary: #f0f4f9;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --text-primary: #0d2857;
+            --text-secondary: #6c757d;
+            --border-color: #e9ecef;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-primary);
+            color: var(--text-secondary);
+        }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 15px; }
+
+        .header {
+            position: sticky; top: 0; left: 0; width: 100%; z-index: 1000;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 0;
+        }
+        .navbar { display: flex; justify-content: space-between; align-items: center; max-width:1200px; margin: 0 auto; padding: 0 15px; }
+        .nav-logo { font-size: 1.8rem; font-weight: 800; color: var(--accent-primary); text-decoration: none; }
+        .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; }
+        
+        .main-content { padding: 40px 0; }
+        .page-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .page-header h1 { font-size: 2.2rem; color: var(--text-primary); }
+        .btn-back {
+            display: inline-flex; align-items: center; gap: 8px;
+            background-color: var(--bg-secondary); color: var(--text-primary);
+            padding: 10px 20px; border-radius: 8px; text-decoration: none;
+            font-weight: 500; border: 1px solid var(--border-color);
+        }
+        
+        .content-section {
+            background-color: var(--bg-secondary);
+            border-radius: 16px; padding: 30px;
+            margin-bottom: 30px; border: 1px solid var(--border-color);
+        }
+        .section-title {
+            font-size: 1.5rem; font-weight: 600; color: var(--text-primary);
+            margin-bottom: 25px;
+        }
+        
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .kpi-card {
+            background-color: var(--bg-primary);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid var(--border-color);
+        }
+        .kpi-card .label { font-size: 1rem; margin-bottom: 10px; }
+        .kpi-card .value { font-size: 2.5rem; font-weight: 700; color: var(--text-primary); }
+        .kpi-card .change { margin-top: 10px; font-weight: 500; }
+        .kpi-card .change.positive { color: #28a745; }
+        .kpi-card .change.negative { color: #dc3545; }
+        
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+        }
+
+        /* Top Services List */
+        .service-list-item {
+            display: flex; align-items: center; gap: 20px;
+            padding: 15px 0; border-bottom: 1px solid var(--border-color);
+        }
+        .service-list-item:last-child { border-bottom: none; }
+        .service-list-item .rank {
+            font-size: 1.2rem; font-weight: 700; color: var(--text-secondary);
+            width: 30px; text-align: center;
+        }
+        .service-list-item .details { flex-grow: 1; }
+        .service-list-item .title { font-weight: 600; color: var(--text-primary); }
+        .service-list-item .stats { display: flex; gap: 20px; font-size: 0.9rem; margin-top: 5px; }
+        
+        footer {
+            margin-top: 40px; text-align: center; padding: 40px 15px;
+            background-color: var(--bg-secondary); border-top: 1px solid var(--border-color);
+            font-size: 0.9rem; color: var(--text-secondary);
+        }
+        footer a { color: var(--accent-primary); text-decoration: none; }
+    </style>
+</head>
+<body class="dark-mode">
+
+    <header class="header">
+        <div class="navbar container">
+            <a href="https://services.kabaleonline.com" class="nav-logo">KabaleOnline</a>
+            <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1>Performance Analytics</h1>
+                <a href="provider-dashboard.html" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+
+            <div class="content-section">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="label">Profile Views</div>
+                        <div class="value">1,284</div>
+                        <div class="change positive"><i class="fas fa-arrow-up"></i> 15% vs last 30 days</div>
+                    </div>
+                     <div class="kpi-card">
+                        <div class="label">Contact Requests</div>
+                        <div class="value">97</div>
+                        <div class="change positive"><i class="fas fa-arrow-up"></i> 8% vs last 30 days</div>
+                    </div>
+                     <div class="kpi-card">
+                        <div class="label">Conversion Rate</div>
+                        <div class="value">7.5%</div>
+                        <div class="change negative"><i class="fas fa-arrow-down"></i> 1.2% vs last 30 days</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <h2 class="section-title">Profile Views (Last 30 Days)</h2>
+                <div class="chart-container">
+                    <canvas id="viewsChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h2 class="section-title">Top Performing Services</h2>
+                <div class="service-list-item">
+                    <div class="rank">#1</div>
+                    <div class="details">
+                        <div class="title">Custom Website Design</div>
+                        <div class="stats">
+                            <span><i class="fas fa-eye"></i> 580 Views</span>
+                            <span><i class="fas fa-envelope"></i> 45 Contacts</span>
+                        </div>
+                    </div>
+                </div>
+                 <div class="service-list-item">
+                    <div class="rank">#2</div>
+                    <div class="details">
+                        <div class="title">Event Photography</div>
+                         <div class="stats">
+                            <span><i class="fas fa-eye"></i> 312 Views</span>
+                            <span><i class="fas fa-envelope"></i> 28 Contacts</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 KabaleOnline. All Rights Reserved. <a href="#">Terms of Service</a></p>
+    </footer>
+
+    <script src="theme.js" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('viewsChart').getContext('2d');
+            
+            // Check current theme to set chart colors
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const gridColor = isDarkMode ? 'rgba(167, 192, 232, 0.1)' : 'rgba(222, 226, 230, 0.5)';
+            const labelColor = isDarkMode ? '#a7c0e8' : '#6c757d';
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Sep 10', 'Sep 15', 'Sep 20', 'Sep 25', 'Sep 30', 'Oct 05', 'Oct 10'],
+                    datasets: [{
+                        label: 'Profile Views',
+                        data: [22, 35, 30, 48, 42, 55, 60],
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        borderColor: 'rgba(0, 123, 255, 1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointBackgroundColor: 'rgba(0, 123, 255, 1)',
+                        pointRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: gridColor },
+                            ticks: { color: labelColor }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: labelColor }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
