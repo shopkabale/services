@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inbox | KabaleOnline</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-primary: #0d2857;
+            --bg-secondary: #10336d;
+            --bg-card: #1e293b;
+            --text-primary: #ffffff;
+            --text-secondary: #a7c0e8;
+            --accent-primary: #007bff;
+            --border-color: #1f4287;
+            --font-family: 'Poppins', sans-serif;
+        }
+
+        body.light-mode {
+            --bg-primary: #f0f4f9;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --text-primary: #0d2857;
+            --text-secondary: #6c757d;
+            --border-color: #e9ecef;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-primary);
+            color: var(--text-secondary);
+            overflow: hidden; /* Prevent body scroll */
+        }
+        
+        .header {
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .navbar { display: flex; justify-content: space-between; align-items: center; max-width:1200px; margin: 0 auto; padding: 15px; }
+        .nav-logo { font-size: 1.8rem; font-weight: 800; color: var(--accent-primary); text-decoration: none; }
+        .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; }
+
+        .inbox-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            height: 100vh;
+            padding-top: 71px; /* Height of header */
+        }
+
+        /* Conversation List (Left Panel) */
+        .conversations-panel {
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex; flex-direction: column;
+        }
+        .panel-header { padding: 20px; border-bottom: 1px solid var(--border-color); }
+        .panel-header h1 { font-size: 1.5rem; color: var(--text-primary); }
+        .conversation-list { flex-grow: 1; overflow-y: auto; }
+        .conversation {
+            display: flex; align-items: center; gap: 15px;
+            padding: 15px 20px; cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .conversation:hover { background-color: var(--bg-primary); }
+        .conversation.active { background-color: var(--accent-primary); }
+        .convo-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+        .convo-details { flex-grow: 1; overflow: hidden; }
+        .convo-name { font-weight: 600; color: var(--text-primary); }
+        .convo-preview { font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .conversation.active .convo-name, .conversation.active .convo-preview { color: #fff; }
+        
+        /* Chat Panel (Right Panel) */
+        .chat-panel {
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-primary);
+        }
+        .chat-header {
+            padding: 15px 20px;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; gap: 15px;
+            flex-shrink: 0;
+        }
+        .chat-header-avatar { width: 40px; height: 40px; border-radius: 50%; }
+        .chat-header-name { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); }
+        
+        .message-area { flex-grow: 1; overflow-y: auto; padding: 20px; }
+        .message { display: flex; gap: 10px; margin-bottom: 15px; max-width: 80%; }
+        .message-avatar { width: 35px; height: 35px; border-radius: 50%; }
+        .message-bubble { padding: 12px 18px; border-radius: 18px; }
+        .message.sent { margin-left: auto; flex-direction: row-reverse; }
+        .message.received .message-bubble { background-color: var(--bg-card); }
+        .message.sent .message-bubble { background-color: var(--accent-primary); color: #fff; }
+
+        .chat-input-area {
+            padding: 20px;
+            background-color: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            display: flex; gap: 15px;
+        }
+        .chat-input {
+            flex-grow: 1; padding: 12px 18px;
+            background-color: var(--bg-primary); border: 1px solid var(--border-color);
+            border-radius: 50px; color: var(--text-primary); font-size: 1rem;
+        }
+        .chat-input:focus { outline: none; border-color: var(--accent-primary); }
+        .btn-send {
+            background-color: var(--accent-primary); color: #fff;
+            border: none; border-radius: 50%; width: 50px; height: 50px;
+            font-size: 1.2rem; cursor: pointer; flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            .inbox-layout { grid-template-columns: 1fr; }
+            .conversations-panel { display: none; } /* Simplified for demo, would require JS toggle */
+        }
+    </style>
+</head>
+<body class="dark-mode">
+
+    <header class="header">
+        <div class="navbar">
+            <a href="https://services.kabaleonline.com" class="nav-logo">KabaleOnline</a>
+            <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
+        </div>
+    </header>
+
+    <div class="inbox-layout">
+        <div class="conversations-panel">
+            <div class="panel-header"><h1>Inbox</h1></div>
+            <div class="conversation-list">
+                <div class="conversation active">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Avatar" class="convo-avatar">
+                    <div class="convo-details">
+                        <div class="convo-name">David Musinguzi</div>
+                        <p class="convo-preview">Okay, that sounds great. I can start...</p>
+                    </div>
+                </div>
+                <div class="conversation">
+                    <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Avatar" class="convo-avatar">
+                    <div class="convo-details">
+                        <div class="convo-name">Hope K.</div>
+                        <p class="convo-preview">Yes, I am available on Saturday.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="chat-panel">
+            <div class="chat-header">
+                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Avatar" class="chat-header-avatar">
+                <span class="chat-header-name">David Musinguzi</span>
+            </div>
+            <div class="message-area">
+                <div class="message received">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Avatar" class="message-avatar">
+                    <p class="message-bubble">Hello! I saw your job post for a website. I'm a local developer and would love to help.</p>
+                </div>
+                <div class="message sent">
+                     <img src="https://placehold.co/35x35/10336d/a7c0e8?text=ME" alt="Avatar" class="message-avatar">
+                    <p class="message-bubble">Hi David, thanks for reaching out. Can you tell me more about your experience?</p>
+                </div>
+                 <div class="message received">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Avatar" class="message-avatar">
+                    <p class="message-bubble">Okay, that sounds great. I can start on the project next week.</p>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" class="chat-input" placeholder="Type a message...">
+                <button class="btn-send"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="theme.js" defer></script>
+</body>
+</html>
