@@ -4,165 +4,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inbox | KabaleOnline</title>
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
     <style>
         :root {
-            --bg-primary: #0d2857;
-            --bg-secondary: #10336d;
-            --text-primary: #ffffff;
-            --text-secondary: #a7c0e8;
-            --accent-primary: #007bff;
-            --border-color: #1f4287;
+            --bg-primary: #0d2857; --bg-secondary: #10336d; --text-primary: #ffffff;
+            --text-secondary: #a7c0e8; --accent-primary: #007bff; --border-color: #1f4287;
             --font-family: 'Poppins', sans-serif;
         }
-
         body.light-mode {
-            --bg-primary: #f0f4f9;
-            --bg-secondary: #ffffff;
-            --text-primary: #0d2857;
-            --text-secondary: #6c757d;
-            --border-color: #e9ecef;
+            --bg-primary: #f0f4f9; --bg-secondary: #ffffff; --text-primary: #0d2857;
+            --text-secondary: #6c757d; --border-color: #e9ecef;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: var(--font-family);
-            background-color: var(--bg-primary);
-            color: var(--text-secondary);
-        }
+        body { font-family: var(--font-family); background-color: var(--bg-primary); color: var(--text-secondary); }
         .container { max-width: 800px; margin: 0 auto; padding: 0 15px; }
-
-        .header {
-            position: sticky; top: 0; left: 0; width: 100%; z-index: 1000;
-            background-color: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-color);
-            padding: 15px 0;
-        }
+        .header { position: sticky; top: 0; z-index: 1000; background-color: var(--bg-secondary); border-bottom: 1px solid var(--border-color); padding: 15px 0; }
         .navbar { display: flex; justify-content: space-between; align-items: center; max-width:1200px; margin: 0 auto; padding: 0 15px; }
         .nav-logo { font-size: 1.8rem; font-weight: 800; color: var(--accent-primary); text-decoration: none; }
         .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; }
-
         .main-content { padding: 40px 0; }
-        .page-header {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 30px;
-        }
+        .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; }
         .page-header h1 { font-size: 2.2rem; color: var(--text-primary); }
-        .btn-back {
-            display: inline-flex; align-items: center; gap: 8px;
-            background-color: var(--bg-secondary); color: var(--text-primary);
-            padding: 10px 20px; border-radius: 8px; text-decoration: none;
-            font-weight: 500; border: 1px solid var(--border-color);
+        .btn-back { display: inline-flex; align-items: center; gap: 8px; background-color: var(--bg-secondary); color: var(--text-primary); padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 500; border: 1px solid var(--border-color); }
+        .group-chat-card {
+            background-color: var(--bg-secondary); border-radius: 16px; padding: 20px; border: 1px solid var(--border-color);
+            margin-bottom: 20px; display: flex; align-items: center; gap: 20px; text-decoration: none;
         }
-        
-        .conversation-list {
-            background-color: var(--bg-secondary);
-            border-radius: 16px;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-        }
-        .conversation {
-            display: flex; align-items: center; gap: 15px;
-            padding: 15px; border-radius: 12px;
-            text-decoration: none;
-            transition: background-color 0.2s ease;
-        }
+        .group-chat-card .icon { font-size: 2rem; color: var(--accent-primary); }
+        .group-chat-card h2 { font-size: 1.2rem; color: var(--text-primary); margin-bottom: 4px; }
+        .group-chat-card p { font-size: 0.9rem; color: var(--text-secondary); }
+        .conversation-list { background-color: var(--bg-secondary); border-radius: 16px; padding: 10px; border: 1px solid var(--border-color); min-height: 200px; }
+        .conversation { display: flex; align-items: center; gap: 15px; padding: 15px; border-radius: 12px; text-decoration: none; }
         .conversation:not(:last-child) { border-bottom: 1px solid var(--border-color); }
         .conversation:hover { background-color: var(--bg-primary); }
-        
         .convo-avatar { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
         .convo-details { flex-grow: 1; overflow: hidden; }
         .convo-header { display: flex; justify-content: space-between; align-items: baseline; }
         .convo-name { font-weight: 600; color: var(--text-primary); font-size: 1.1rem; }
         .convo-time { font-size: 0.8rem; color: var(--text-secondary); }
-        .convo-preview {
-            font-size: 0.95rem; color: var(--text-secondary);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .unread .convo-preview { color: var(--text-primary); font-weight: 500; }
-        .unread-dot {
-            width: 10px; height: 10px; background-color: var(--accent-primary);
-            border-radius: 50%; flex-shrink: 0; align-self: center;
-        }
-
-        footer {
-            margin-top: 40px; text-align: center; padding: 40px 15px;
-            background-color: var(--bg-secondary); border-top: 1px solid var(--border-color);
-            font-size: 0.9rem; color: var(--text-secondary);
-        }
-        footer a { color: var(--accent-primary); text-decoration: none; }
+        .convo-preview { font-size: 0.95rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     </style>
 </head>
 <body class="dark-mode">
-
-    <header class="header">
-        <div class="navbar">
-            <a href="index.html" class="nav-logo">KabaleOnline</a>
-            <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
-        </div>
-    </header>
-
+    <header class="header"><div class="navbar"><a href="index.html" class="nav-logo">KabaleOnline</a><button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button></div></header>
     <main class="main-content">
         <div class="container">
             <div class="page-header">
                 <h1>Inbox</h1>
-                <a href="provider-dashboard.html" class="btn-back">
-                    <i class="fas fa-arrow-left"></i> Back to Dashboard
-                </a>
+                <a href="provider-dashboard.html" id="back-button" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
             </div>
-
-            <div class="conversation-list">
-                <!-- Unread Conversation -->
-                <a href="chat.html" class="conversation unread">
-                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Avatar" class="convo-avatar">
-                    <div class="convo-details">
-                        <div class="convo-header">
-                            <span class="convo-name">David Musinguzi</span>
-                            <span class="convo-time">10:04 AM</span>
-                        </div>
-                        <p class="convo-preview">Okay, that sounds great. I can start on the project next week.</p>
-                    </div>
-                    <div class="unread-dot"></div>
-                </a>
-                
-                <!-- Read Conversation -->
-                <a href="chat.html" class="conversation">
-                    <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Avatar" class="convo-avatar">
-                    <div class="convo-details">
-                        <div class="convo-header">
-                            <span class="convo-name">Hope K.</span>
-                            <span class="convo-time">Yesterday</span>
-                        </div>
-                        <p class="convo-preview">Yes, I am available on Saturday.</p>
-                    </div>
-                </a>
-                
-                <!-- Read Conversation -->
-                <a href="chat.html" class="conversation">
-                    <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="Avatar" class="convo-avatar">
-                    <div class="convo-details">
-                        <div class="convo-header">
-                            <span class="convo-name">Peter Ayebare</span>
-                            <span class="convo-time">Oct 8</span>
-                        </div>
-                        <p class="convo-preview">Thank you for the amazing photos!</p>
-                    </div>
-                </a>
+            <a href="group-chat.html" class="group-chat-card">
+                <div class="icon"><i class="fas fa-users"></i></div>
+                <div><h2>Community Group Chat</h2><p>Join the public conversation with all KabaleOnline users.</p></div>
+            </a>
+            <div class="conversation-list" id="conversation-list">
+                <!-- Conversations will be loaded here by inbox.js -->
             </div>
         </div>
     </main>
-    
-    <footer>
-        <p>&copy; 2025 KabaleOnline. All Rights Reserved. <a href="#">Terms of Service</a></p>
-    </footer>
-
     <script src="theme.js" defer></script>
+    <script src="inbox.js" type="module"></script>
 </body>
 </html>
-
