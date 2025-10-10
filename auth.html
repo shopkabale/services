@@ -34,12 +34,15 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; }
+        html { height: 100%; }
         body {
             font-family: var(--font-family);
             background-color: var(--bg-primary);
             color: var(--text-secondary);
             transition: background-color var(--transition-speed), color var(--transition-speed);
+            display: flex;
+            flex-direction: column;
+            min-height: 100%;
         }
 
         /* --- HEADER --- */
@@ -62,7 +65,9 @@
         /* --- MAIN CONTAINER --- */
         .main-container {
             display: flex; align-items: center; justify-content: center;
-            width: 100%; min-height: 100vh; padding: 100px 20px 40px;
+            width: 100%;
+            flex-grow: 1; /* Allows main to take up available space */
+            padding: 120px 20px 40px; /* Added more top padding */
         }
 
         /* --- AUTH & DASHBOARD WRAPPERS --- */
@@ -137,11 +142,14 @@
         .btn-action { background: none; border: 2px solid var(--border-color); color: var(--text-secondary); padding: 10px 25px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; font-size: 1rem; }
         .btn-action:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
         
-        /* --- FOOTER --- */
+        /* --- FOOTER (FIXED) --- */
         footer {
-            position: absolute; bottom: 0; width: 100%;
-            text-align: center; padding: 20px;
-            font-size: 0.9rem; color: var(--text-secondary);
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            /* Removed position: absolute */
         }
         footer a { color: var(--accent-primary); text-decoration: none; }
     </style>
