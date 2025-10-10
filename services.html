@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Local Services in Kabale | KabaleOnline</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        /* --- THEME COLORS & GLOBAL STYLES --- */
+        :root {
+            --bg-primary: #0d2857;
+            --bg-secondary: #10336d;
+            --text-primary: #ffffff;
+            --text-secondary: #a7c0e8;
+            --accent-primary: #007bff;
+            --accent-secondary: #ffc107;
+            --border-color: #1f4287;
+            --font-family: 'Poppins', sans-serif;
+            --transition-speed: 0.3s;
+            --shadow-color: rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-mode {
+            --bg-primary: #f0f4f9;
+            --bg-secondary: #ffffff;
+            --text-primary: #0d2857;
+            --text-secondary: #6c757d;
+            --border-color: #dee2e6;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-primary);
+            color: var(--text-secondary);
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
+
+        /* --- HEADER --- */
+        .header {
+            position: sticky; top: 0; left: 0; width: 100%; z-index: 1000;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 0;
+        }
+        .navbar { display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { font-size: 1.8rem; font-weight: 800; color: var(--accent-primary); text-decoration: none; }
+        .nav-menu { display: flex; align-items: center; gap: 20px; }
+        .btn-header {
+            padding: 8px 20px; background-color: var(--accent-primary);
+            color: #ffffff; border-radius: 50px; text-decoration: none;
+            font-weight: 600; border: 2px solid var(--accent-primary);
+            transition: all var(--transition-speed);
+        }
+        .btn-header:hover { background-color: transparent; color: var(--accent-primary); }
+        .theme-toggle {
+            background: none; border: none; color: var(--text-primary);
+            font-size: 1.5rem; cursor: pointer; transition: transform 0.3s ease;
+        }
+        .theme-toggle:hover { transform: scale(1.2) rotate(15deg); }
+
+        /* --- PAGE HEADER & FILTERS --- */
+        .page-header {
+            padding: 80px 15px 60px;
+            text-align: center;
+        }
+        .page-header h1 { font-size: 3rem; color: var(--text-primary); margin-bottom: 15px; }
+        .page-header p { font-size: 1.2rem; max-width: 600px; margin: 0 auto 30px; }
+        .search-container {
+            display: flex; max-width: 700px; margin: 0 auto;
+            background-color: var(--bg-secondary); border-radius: 50px;
+            border: 1px solid var(--border-color);
+        }
+        .search-container input {
+            flex-grow: 1; border: none; background: transparent;
+            padding: 15px 25px; font-size: 1rem; color: var(--text-primary);
+        }
+        .search-container input:focus { outline: none; }
+        .search-container button {
+            background-color: var(--accent-primary); color: #fff; border: none;
+            border-radius: 0 50px 50px 0; padding: 0 30px;
+            font-size: 1rem; cursor: pointer;
+        }
+        .filter-categories { margin-top: 30px; }
+        .filter-btn {
+            background-color: var(--bg-secondary); color: var(--text-secondary);
+            border: 1px solid var(--border-color); border-radius: 50px;
+            padding: 10px 20px; margin: 5px; cursor: pointer;
+            font-weight: 500; transition: all var(--transition-speed);
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background-color: var(--accent-primary);
+            color: #fff; border-color: var(--accent-primary);
+        }
+
+        /* --- SERVICES GRID --- */
+        .services-section { padding: 0 15px 80px; }
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        .service-card {
+            background-color: var(--bg-secondary);
+            border-radius: 16px; border: 1px solid var(--border-color);
+            overflow: hidden; text-decoration: none;
+            box-shadow: 0 5px 15px var(--shadow-color);
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+        }
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px var(--shadow-color);
+        }
+        .card-image { height: 200px; background-size: cover; background-position: center; }
+        .card-content { padding: 20px; }
+        .provider-info { display: flex; align-items: center; margin-bottom: 15px; }
+        .provider-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            object-fit: cover; margin-right: 12px;
+            border: 2px solid var(--bg-primary);
+        }
+        .provider-name { font-weight: 600; color: var(--text-primary); font-size: 1rem; }
+        .service-title {
+            font-size: 1.3rem; font-weight: 700; color: var(--text-primary);
+            margin-bottom: 10px; line-height: 1.4;
+        }
+        .service-location {
+            color: var(--text-secondary); margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        .service-location i { margin-right: 5px; }
+        .card-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-top: 15px; border-top: 1px solid var(--border-color);
+        }
+        .rating { color: var(--accent-secondary); font-weight: 600; }
+        .rating i { margin-right: 4px; }
+        .rating-count { font-weight: 400; color: var(--text-secondary); font-size: 0.9rem; margin-left: 5px; }
+        .price { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+        .price span { font-size: 0.9rem; font-weight: 400; color: var(--text-secondary); }
+
+        /* --- FOOTER --- */
+        footer {
+            text-align: center; padding: 40px 15px;
+            background-color: var(--bg-secondary); border-top: 1px solid var(--border-color);
+            font-size: 0.9rem; color: var(--text-secondary);
+        }
+        footer a { color: var(--accent-primary); text-decoration: none; }
+
+    </style>
+</head>
+<body class="dark-mode">
+
+    <header class="header">
+        <div class="container navbar">
+            <a href="https://services.kabaleonline.com" class="nav-logo">KabaleOnline</a>
+            <div class="nav-menu">
+                <a href="auth.html" class="btn-header">Login / Sign Up</a>
+                <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h1>Find Local Services in Kabale</h1>
+                <p>From plumbers to programmers, discover talented professionals in our community ready to help you with your next project.</p>
+                <div class="search-container">
+                    <input type="text" placeholder="What service are you looking for? (e.g., 'event catering')">
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </div>
+                <div class="filter-categories">
+                    <button class="filter-btn active">All</button>
+                    <button class="filter-btn">Home</button>
+                    <button class="filter-btn">Creative</button>
+                    <button class="filter-btn">Professional</button>
+                    <button class="filter-btn">Events</button>
+                    <button class="filter-btn">Technical</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="services-section">
+            <div class="container">
+                <div class="services-grid">
+                    <!-- Service Card Example 1 -->
+                    <a href="#" class="service-card">
+                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=800&auto=format&fit=crop');"></div>
+                        <div class="card-content">
+                            <div class="provider-info">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Provider Avatar" class="provider-avatar">
+                                <span class="provider-name">David Musinguzi</span>
+                            </div>
+                            <h3 class="service-title">Custom Website Design & Development</h3>
+                            <p class="service-location"><i class="fas fa-map-marker-alt"></i> Kabale Town</p>
+                            <div class="card-footer">
+                                <div class="rating">
+                                    <i class="fas fa-star"></i> 4.9 <span class="rating-count">(32)</span>
+                                </div>
+                                <div class="price"><span>From </span>UGX 500,000</div>
+                            </div>
+                        </div>
+                    </a>
+                    <!-- Service Card Example 2 -->
+                    <a href="#" class="service-card">
+                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1558611848-73f7eb4001a1?q=80&w=800&auto=format&fit=crop');"></div>
+                        <div class="card-content">
+                            <div class="provider-info">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Provider Avatar" class="provider-avatar">
+                                <span class="provider-name">Hope Catering Services</span>
+                            </div>
+                            <h3 class="service-title">Event & Party Catering</h3>
+                            <p class="service-location"><i class="fas fa-map-marker-alt"></i> Mbarara Road, Kabale</p>
+                            <div class="card-footer">
+                                <div class="rating">
+                                    <i class="fas fa-star"></i> 5.0 <span class="rating-count">(18)</span>
+                                </div>
+                                <div class="price"><span>Per Plate </span>UGX 15,000</div>
+                            </div>
+                        </div>
+                    </a>
+                    <!-- Service Card Example 3 -->
+                    <a href="#" class="service-card">
+                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1516116216624-53e6973bea12?q=80&w=800&auto=format&fit=crop');"></div>
+                        <div class="card-content">
+                            <div class="provider-info">
+                                <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="Provider Avatar" class="provider-avatar">
+                                <span class="provider-name">Peter Ayebare</span>
+                            </div>
+                            <h3 class="service-title">Professional Photography & Videography</h3>
+                            <p class="service-location"><i class="fas fa-map-marker-alt"></i> Kabale University Area</p>
+                            <div class="card-footer">
+                                <div class="rating">
+                                    <i class="fas fa-star"></i> 4.8 <span class="rating-count">(45)</span>
+                                </div>
+                                <div class="price"><span>Per Hour </span>UGX 80,000</div>
+                            </div>
+                        </div>
+                    </a>
+                    <!-- More cards below -->
+                     <a href="#" class="service-card">
+                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=800&auto=format&fit=crop');"></div>
+                        <div class="card-content">
+                            <div class="provider-info">
+                                <img src="https://randomuser.me/api/portraits/men/56.jpg" alt="Provider Avatar" class="provider-avatar">
+                                <span class="provider-name">John's Plumbing Works</span>
+                            </div>
+                            <h3 class="service-title">Residential & Commercial Plumbing</h3>
+                            <p class="service-location"><i class="fas fa-map-marker-alt"></i> Central Division</p>
+                            <div class="card-footer">
+                                <div class="rating">
+                                    <i class="fas fa-star"></i> 4.9 <span class="rating-count">(51)</span>
+                                </div>
+                                <div class="price"><span>Call-out </span>UGX 30,000</div>
+                            </div>
+                        </div>
+                    </a>
+                     <a href="#" class="service-card">
+                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=800&auto=format&fit=crop');"></div>
+                        <div class="card-content">
+                            <div class="provider-info">
+                                <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Provider Avatar" class="provider-avatar">
+                                <span class="provider-name">Sarah Kansiime</span>
+                            </div>
+                            <h3 class="service-title">Laptop & Phone Repair Specialist</h3>
+                            <p class="service-location"><i class="fas fa-map-marker-alt"></i> Computer Lane, Kabale</p>
+                            <div class="card-footer">
+                                <div class="rating">
+                                    <i class="fas fa-star"></i> 4.7 <span class="rating-count">(29)</span>
+                                </div>
+                                <div class="price"><span>From </span>UGX 25,000</div>
+                            </div>
+                        </div>
+                    </a>
+                     <a href="#" class="service-card">
+                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=800&auto=format&fit=crop');"></div>
+                        <div class="card-content">
+                            <div class="provider-info">
+                                <img src="https://randomuser.me/api/portraits/men/78.jpg" alt="Provider Avatar" class="provider-avatar">
+                                <span class="provider-name">Tutor Sam</span>
+                            </div>
+                            <h3 class="service-title">Mathematics & Physics Tutoring</h3>
+                            <p class="service-location"><i class="fas fa-map-marker-alt"></i> Online & In-person</p>
+                            <div class="card-footer">
+                                <div class="rating">
+                                    <i class="fas fa-star"></i> 5.0 <span class="rating-count">(12)</span>
+                                </div>
+                                <div class="price"><span>Per Hour </span>UGX 20,000</div>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="#" class="service-card">
+                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1600585152220-90363fe7e115?q=80&w=800&auto=format&fit=crop');"></div>
+                        <div class="card-content">
+                            <div class="provider-info">
+                                <img src="https://randomuser.me/api/portraits/men/81.jpg" alt="Provider Avatar" class="provider-avatar">
+                                <span class="provider-name">Kigezi Carpenters</span>
+                            </div>
+                            <h3 class="service-title">Custom Furniture & Carpentry</h3>
+                            <p class="service-location"><i class="fas fa-map-marker-alt"></i> Kigongi</p>
+                            <div class="card-footer">
+                                <div class="rating">
+                                    <i class="fas fa-star"></i> 4.8 <span class="rating-count">(22)</span>
+                                </div>
+                                <div class="price"><span>Quote</span></div>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="#" class="service-card">
+                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=800&auto=format&fit=crop');"></div>
+                        <div class="card-content">
+                            <div class="provider-info">
+                                <img src="https://randomuser.me/api/portraits/women/81.jpg" alt="Provider Avatar" class="provider-avatar">
+                                <span class="provider-name">Anna's Graphics</span>
+                            </div>
+                            <h3 class="service-title">Graphic Design & Branding</h3>
+                            <p class="service-location"><i class="fas fa-map-marker-alt"></i> Remote</p>
+                            <div class="card-footer">
+                                <div class="rating">
+                                    <i class="fas fa-star"></i> 5.0 <span class="rating-count">(25)</span>
+                                </div>
+                                <div class="price"><span>From </span>UGX 100,000</div>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="#" class="service-card">
+                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1519449556851-57222640f48c?q=80&w=800&auto=format&fit=crop');"></div>
+                        <div class="card-content">
+                            <div class="provider-info">
+                                <img src="https://randomuser.me/api/portraits/men/11.jpg" alt="Provider Avatar" class="provider-avatar">
+                                <span class="provider-name">Boda Boda Express Repair</span>
+                            </div>
+                            <h3 class="service-title">Motorcycle (Boda) Repair</h3>
+                            <p class="service-location"><i class="fas fa-map-marker-alt"></i> Esso Corner</p>
+                            <div class="card-footer">
+                                <div class="rating">
+                                    <i class="fas fa-star"></i> 4.7 <span class="rating-count">(68)</span>
+                                </div>
+                                <div class="price"><span>Varies</span></div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 KabaleOnline. All Rights Reserved. <a href="#">Terms of Service</a></p>
+    </footer>
+    
+    <script src="theme.js" defer></script>
+</body>
+</html>
