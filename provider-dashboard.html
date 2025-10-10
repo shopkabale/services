@@ -19,12 +19,8 @@
             --text-primary: #ffffff;
             --text-secondary: #a7c0e8;
             --accent-primary: #007bff;
-            --accent-secondary: #ffc107;
-            --accent-success: #28a745;
             --border-color: #1f4287;
             --font-family: 'Poppins', sans-serif;
-            --transition-speed: 0.3s;
-            --shadow-color: rgba(0, 0, 0, 0.2);
         }
 
         body.light-mode {
@@ -34,7 +30,6 @@
             --text-primary: #0d2857;
             --text-secondary: #6c757d;
             --border-color: #e9ecef;
-            --shadow-color: rgba(0, 0, 0, 0.08);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -42,11 +37,9 @@
             font-family: var(--font-family);
             background-color: var(--bg-primary);
             color: var(--text-secondary);
-            transition: background-color var(--transition-speed), color var(--transition-speed);
         }
         .container { max-width: 800px; margin: 0 auto; padding: 0 15px; }
 
-        /* --- HEADER --- */
         .header {
             position: sticky; top: 0; left: 0; width: 100%; z-index: 1000;
             background-color: var(--bg-secondary);
@@ -55,14 +48,8 @@
         }
         .navbar { display: flex; justify-content: space-between; align-items: center; max-width:1200px; margin: 0 auto; padding: 0 15px; }
         .nav-logo { font-size: 1.8rem; font-weight: 800; color: var(--accent-primary); text-decoration: none; }
-        .nav-menu { display: flex; align-items: center; gap: 20px; }
-        .theme-toggle {
-            background: none; border: none; color: var(--text-primary);
-            font-size: 1.5rem; cursor: pointer; transition: transform 0.3s ease;
-        }
-        .theme-toggle:hover { transform: scale(1.2) rotate(15deg); }
-
-        /* --- DASHBOARD LAYOUT --- */
+        .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; }
+        
         .dashboard { padding: 40px 0; }
         .profile-header { text-align: center; margin-bottom: 40px; }
         .profile-picture {
@@ -94,12 +81,10 @@
         
         .btn-logout {
             display: block; width: 100%; padding: 15px; border-radius: 8px; text-align: center;
-            text-decoration: none; font-size: 1.1rem; font-weight: 600; transition: all 0.3s ease;
+            text-decoration: none; font-size: 1.1rem; font-weight: 600;
             background-color: #dc3545; color: #fff; border: none;
         }
-        .btn-logout:hover { background-color: #c82333; }
         
-        /* --- FOOTER --- */
         footer {
             text-align: center; padding: 40px 15px;
             background-color: var(--bg-secondary); border-top: 1px solid var(--border-color);
@@ -113,18 +98,16 @@
     <header class="header">
         <div class="navbar">
             <a href="https://services.kabaleonline.com" class="nav-logo">KabaleOnline</a>
-            <div class="nav-menu">
-                <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
-            </div>
+            <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
         </div>
     </header>
 
     <main class="dashboard">
         <div class="container">
             <div class="profile-header">
-                <img src="https://placehold.co/120x120/10336d/a7c0e8?text=S.A" alt="Profile Picture" class="profile-picture">
-                <h1 class="profile-name">Samuel Ampeire</h1>
-                <p class="welcome-message">Welcome to your provider dashboard!</p>
+                <img src="https://placehold.co/120x120/10336d/a7c0e8?text=S.A" alt="Profile Picture" class="profile-picture" id="profile-picture">
+                <h1 class="profile-name" id="profile-name"></h1>
+                <p class="welcome-message" id="welcome-message"></p>
             </div>
 
             <div class="dashboard-section">
@@ -138,19 +121,19 @@
                         <div class="icon"><i class="fas fa-th-list"></i></div>
                         <span class="label">My Services</span>
                     </a>
-                    <a href="#" class="menu-item">
+                    <a href="inbox.html" class="menu-item">
                         <div class="icon"><i class="fas fa-inbox"></i></div>
                         <span class="label">Inbox</span>
                     </a>
-                    <a href="#" class="menu-item">
+                    <a href="edit-profile.html" class="menu-item">
                         <div class="icon"><i class="fas fa-user-edit"></i></div>
                         <span class="label">Edit Profile</span>
                     </a>
-                    <a href="#" class="menu-item">
+                    <a href="analytics.html" class="menu-item">
                         <div class="icon"><i class="fas fa-chart-line"></i></div>
                         <span class="label">Analytics</span>
                     </a>
-                    <a href="#" class="menu-item">
+                    <a href="earnings.html" class="menu-item">
                         <div class="icon"><i class="fas fa-wallet"></i></div>
                         <span class="label">Earnings</span>
                     </a>
@@ -166,5 +149,7 @@
     </footer>
 
     <script src="theme.js" defer></script>
+    <script src="provider-dashboard.js" defer></script>
 </body>
 </html>
+
