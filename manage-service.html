@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Your Services | KabaleOnline</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        /* --- THEME COLORS & GLOBAL STYLES --- */
+        :root {
+            --bg-primary: #0d2857;
+            --bg-secondary: #10336d;
+            --text-primary: #ffffff;
+            --text-secondary: #a7c0e8;
+            --accent-primary: #007bff;
+            --accent-secondary: #ffc107;
+            --border-color: #1f4287;
+            --font-family: 'Poppins', sans-serif;
+            --transition-speed: 0.3s;
+            --shadow-color: rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-mode {
+            --bg-primary: #f0f4f9;
+            --bg-secondary: #ffffff;
+            --text-primary: #0d2857;
+            --text-secondary: #6c757d;
+            --border-color: #dee2e6;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-primary);
+            color: var(--text-secondary);
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
+
+        /* --- HEADER --- */
+        .header {
+            position: sticky; top: 0; left: 0; width: 100%; z-index: 1000;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 0;
+        }
+        .navbar { display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { font-size: 1.8rem; font-weight: 800; color: var(--accent-primary); text-decoration: none; }
+        .nav-menu { display: flex; align-items: center; gap: 20px; }
+        .btn-header {
+            padding: 8px 20px; background-color: transparent;
+            color: var(--text-primary); border-radius: 50px; text-decoration: none;
+            font-weight: 600; border: 2px solid var(--border-color);
+            transition: all var(--transition-speed);
+        }
+        .btn-header:hover { background-color: var(--accent-primary); border-color: var(--accent-primary); color: #fff;}
+        .theme-toggle {
+            background: none; border: none; color: var(--text-primary);
+            font-size: 1.5rem; cursor: pointer; transition: transform 0.3s ease;
+        }
+        .theme-toggle:hover { transform: scale(1.2) rotate(15deg); }
+
+        /* --- MAIN CONTENT LAYOUT --- */
+        .main-content {
+            padding: 60px 0;
+        }
+        .manage-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+        }
+        @media (min-width: 992px) {
+            .manage-layout {
+                grid-template-columns: 1fr 450px;
+            }
+        }
+
+        /* --- MY SERVICES LIST --- */
+        .my-services {
+            background-color: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+        }
+        .my-services h2 {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: var(--text-primary);
+        }
+        .service-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .service-item:last-child { border-bottom: none; }
+        .service-item-img {
+            width: 80px; height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .service-item-details { flex-grow: 1; }
+        .service-item-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        .service-item-status {
+            font-size: 0.9rem;
+            color: #28a745; /* Green for active */
+        }
+        .service-item-actions button {
+            background: none; border: 1px solid var(--border-color);
+            color: var(--text-secondary); cursor: pointer;
+            padding: 8px 12px; border-radius: 6px;
+            margin-left: 10px; transition: all var(--transition-speed);
+        }
+        .service-item-actions button:hover {
+            background-color: var(--accent-primary);
+            color: #fff;
+            border-color: var(--accent-primary);
+        }
+        .service-item-actions button.delete:hover {
+            background-color: #dc3545; /* Red for delete */
+            border-color: #dc3545;
+        }
+
+        /* --- ADD/EDIT SERVICE FORM --- */
+        .service-form-card {
+            background-color: var(--bg-secondary);
+            border-radius: 16px; padding: 30px;
+            border: 1px solid var(--border-color);
+            position: sticky; top: 100px; /* Make form sticky on desktop */
+        }
+        .service-form-card h2 {
+            font-size: 1.8rem; margin-bottom: 25px; color: var(--text-primary);
+        }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-secondary); }
+        .form-control, .form-select {
+            width: 100%; padding: 12px 15px; background-color: var(--bg-primary);
+            border: 1px solid var(--border-color); border-radius: 8px;
+            color: var(--text-primary); font-size: 1rem; font-family: var(--font-family);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        textarea.form-control { min-height: 120px; resize: vertical; }
+        .form-control:focus, .form-select:focus {
+            outline: none; border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+        .pricing-group { display: flex; gap: 15px; }
+        #cover-image-preview {
+            width: 100%; height: 180px; border-radius: 8px;
+            object-fit: cover; border: 2px dashed var(--border-color);
+            background-color: var(--bg-primary);
+            margin-bottom: 15px; display: block; cursor: pointer;
+        }
+        #cover-image-input { display: none; }
+        .btn-submit {
+            width: 100%; padding: 15px; background-color: var(--accent-primary);
+            color: #ffffff; border: none; border-radius: 8px; font-size: 1.1rem;
+            font-weight: 600; cursor: pointer; transition: all 0.3s;
+        }
+        .btn-submit:hover { background-color: #0069d9; }
+        
+        /* --- FOOTER --- */
+        footer {
+            text-align: center; padding: 40px 15px;
+            background-color: var(--bg-secondary); border-top: 1px solid var(--border-color);
+            font-size: 0.9rem; color: var(--text-secondary);
+        }
+        footer a { color: var(--accent-primary); text-decoration: none; }
+
+    </style>
+</head>
+<body class="dark-mode">
+
+    <header class="header">
+        <div class="container navbar">
+            <a href="https://services.kabaleonline.com" class="nav-logo">KabaleOnline</a>
+            <div class="nav-menu">
+                <a href="auth.html#logout" class="btn-header">My Dashboard</a>
+                <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="manage-layout">
+                <!-- Left Side: My Services List -->
+                <div class="my-services">
+                    <h2>My Listed Services</h2>
+                    
+                    <!-- Service Item Example 1 -->
+                    <div class="service-item">
+                        <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=200&auto=format&fit=crop" alt="Service Image" class="service-item-img">
+                        <div class="service-item-details">
+                            <h3 class="service-item-title">Custom Website Design</h3>
+                            <p class="service-item-status">Active</p>
+                        </div>
+                        <div class="service-item-actions">
+                            <button title="Edit"><i class="fas fa-pencil-alt"></i></button>
+                            <button class="delete" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Service Item Example 2 -->
+                    <div class="service-item">
+                        <img src="https://images.unsplash.com/photo-1516116216624-53e6973bea12?q=80&w=200&auto=format&fit=crop" alt="Service Image" class="service-item-img">
+                        <div class="service-item-details">
+                            <h3 class="service-item-title">Event Photography</h3>
+                            <p class="service-item-status">Active</p>
+                        </div>
+                        <div class="service-item-actions">
+                            <button title="Edit"><i class="fas fa-pencil-alt"></i></button>
+                            <button class="delete" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Add more service items here -->
+
+                </div>
+
+                <!-- Right Side: Add/Edit Form -->
+                <div class="service-form-card">
+                    <h2>Add a New Service</h2>
+                    <form id="service-form">
+                        <fieldset>
+                            <legend style="display:none;">Service Details</legend>
+                            <div class="form-group">
+                                <label for="service-title">Service Title</label>
+                                <input type="text" id="service-title" class="form-control" placeholder="e.g., Professional Plumbing Services" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="service-description">Service Description</label>
+                                <textarea id="service-description" class="form-control" placeholder="Describe what you offer in detail..." required></textarea>
+                            </div>
+                             <div class="form-group">
+                                <label for="service-category">Category</label>
+                                <select id="service-category" class="form-select" required>
+                                    <option value="">Select a category...</option>
+                                    <option value="home">Home Services</option>
+                                    <option value="creative">Creative & Media</option>
+                                    <option value="technical">Technical & IT</option>
+                                    <option value="professional">Professional Services</option>
+                                    <option value="events">Events</option>
+                                    <option value="lessons">Lessons & Tutoring</option>
+                                </select>
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend style="display:none;">Pricing</legend>
+                             <div class="form-group">
+                                <label>Pricing</label>
+                                <div class="pricing-group">
+                                    <input type="number" id="service-price" class="form-control" placeholder="e.g., 50000" required>
+                                    <select id="price-unit" class="form-select" required>
+                                        <option value="per-hour">Per Hour</option>
+                                        <option value="per-project">Per Project</option>
+                                        <option value="per-item">Per Item</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend style="display:none;">Media</legend>
+                             <div class="form-group">
+                                <label for="cover-image-input">Cover Image</label>
+                                <label for="cover-image-input">
+                                    <img src="https://placehold.co/600x400/10336d/a7c0e8?text=Click+to+Upload" alt="Cover image preview" id="cover-image-preview">
+                                </label>
+                                <input type="file" id="cover-image-input" accept="image/*">
+                             </div>
+                        </fieldset>
+
+                        <button type="submit" class="btn-submit">Publish Service</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 KabaleOnline. All Rights Reserved. <a href="#">Terms of Service</a></p>
+    </footer>
+
+    <script src="theme.js" defer></script>
+    <script>
+        // JavaScript for image preview
+        document.addEventListener('DOMContentLoaded', () => {
+            const imageInput = document.getElementById('cover-image-input');
+            const imagePreview = document.getElementById('cover-image-preview');
+
+            imageInput.addEventListener('change', () => {
+                if (imageInput.files && imageInput.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        imagePreview.src = e.target.result;
+                    };
+                    reader.readAsDataURL(imageInput.files[0]);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
