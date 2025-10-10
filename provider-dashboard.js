@@ -1,6 +1,7 @@
 // --- Import Firebase Services & Initialized App ---
 import { app } from './firebase-init.js';
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+// Import 'signOut' to handle logging out
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 const auth = getAuth(app);
@@ -10,6 +11,7 @@ const db = getFirestore(app);
 const profilePictureEl = document.getElementById('profile-picture');
 const profileNameEl = document.getElementById('profile-name');
 const welcomeMessageEl = document.getElementById('welcome-message');
+const logoutBtn = document.getElementById('logout-btn'); // Get the logout button
 
 // --- AUTHENTICATION & DATA FETCHING ---
 onAuthStateChanged(auth, async (user) => {
@@ -34,12 +36,9 @@ onAuthStateChanged(auth, async (user) => {
             profileNameEl.textContent = userData.name || 'Provider';
             welcomeMessageEl.textContent = 'Welcome to your provider dashboard!';
             
-            // --- THIS PART NOW WORKS ---
-            // If a profile picture URL exists in the database, display it.
             if (userData.profilePicUrl) {
                 profilePictureEl.src = userData.profilePicUrl;
             } else {
-                // Otherwise, show a placeholder with their initial.
                 profilePictureEl.src = `https://placehold.co/120x120/10336d/a7c0e8?text=${(userData.name || 'P').charAt(0)}`;
             }
 
@@ -53,5 +52,26 @@ onAuthStateChanged(auth, async (user) => {
         // User is signed out, redirect to login page.
         console.log("User is not logged in. Redirecting...");
         window.location.href = 'auth.html';
+    }
+});
+
+// --- NEW: LOGOUT LOGIC ---
+logoutBtn.addEventListener('click', async (e) => {
+    // Prevent the link from navigating immediately
+    e.preventDefault(); 
+    
+    try {
+        // Use Firebase to sign the user out
+        await signOut(auth);
+        
+        // After successful sign out, the onAuthStateChanged listener above
+        // will automatically trigger and redirect to auth.html.
+        // We can also redirect manually for a faster experience.
+        console.log("User signed out successfully.");
+        window.location.href = 'auth.html';
+
+    } catch (error) {
+        console.error("Error signing out:", error);
+        alert("Could not log out. Please try again.");
     }
 });
