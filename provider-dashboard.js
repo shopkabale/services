@@ -25,7 +25,6 @@ onAuthStateChanged(auth, async (user) => {
             const userData = userDoc.data();
 
             // Security Check: Ensure the user is a provider.
-            // If they are a seeker, redirect them to the correct dashboard.
             if (userData.role !== 'provider') {
                 window.location.href = 'seeker-dashboard.html';
                 return; 
@@ -35,21 +34,23 @@ onAuthStateChanged(auth, async (user) => {
             profileNameEl.textContent = userData.name || 'Provider';
             welcomeMessageEl.textContent = 'Welcome to your provider dashboard!';
             
-            // Update profile picture if it exists in the database.
+            // --- THIS PART NOW WORKS ---
+            // If a profile picture URL exists in the database, display it.
             if (userData.profilePicUrl) {
                 profilePictureEl.src = userData.profilePicUrl;
+            } else {
+                // Otherwise, show a placeholder with their initial.
+                profilePictureEl.src = `https://placehold.co/120x120/10336d/a7c0e8?text=${(userData.name || 'P').charAt(0)}`;
             }
 
         } else {
-            // This case might happen if the user's profile wasn't created correctly.
             console.error("No profile document found for this user.");
             profileNameEl.textContent = 'Provider';
             welcomeMessageEl.textContent = 'Welcome to your provider dashboard!';
         }
 
     } else {
-        // User is signed out.
-        // Redirect them to the login page.
+        // User is signed out, redirect to login page.
         console.log("User is not logged in. Redirecting...");
         window.location.href = 'auth.html';
     }
