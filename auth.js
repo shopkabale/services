@@ -29,6 +29,10 @@ const googleLoginBtn = document.getElementById('google-login-btn');
 const googleSignupBtn = document.getElementById('google-signup-btn');
 const providerFields = document.getElementById('provider-fields');
 const roleRadios = document.querySelectorAll('input[name="role"]');
+const photoInput = document.getElementById('profile-photo-input');
+const photoPreview = document.getElementById('photo-preview');
+const seekerLabel = document.getElementById('role-seeker-label');
+const providerLabel = document.getElementById('role-provider-label');
 
 const showLoginView = (e) => {
     if (e) e.preventDefault();
@@ -49,17 +53,26 @@ const showVerificationView = () => {
 };
 
 showSignupLink.addEventListener('click', showSignupView);
-showLoginLink.addEventListener('click', showSignupView); // Both links on signup form now go to login
-document.querySelectorAll('#show-login-link').forEach(el => el.addEventListener('click', showLoginView));
+showLoginLink.addEventListener('click', showLoginView);
 
+// Role selection UI logic
+const handleRoleSelection = () => {
+    const isProvider = document.querySelector('input[name="role"]:checked').value === 'provider';
+    providerFields.classList.toggle('visible', isProvider);
+    document.getElementById('signup-location').required = isProvider;
+    document.getElementById('signup-tel').required = isProvider;
+    seekerLabel.classList.toggle('selected', !isProvider);
+    providerLabel.classList.toggle('selected', isProvider);
+};
+roleRadios.forEach(radio => radio.addEventListener('change', handleRoleSelection));
+handleRoleSelection(); // Run once on load to set initial state
 
-roleRadios.forEach(radio => {
-    radio.addEventListener('change', (e) => {
-        const isProvider = e.target.value === 'provider';
-        providerFields.classList.toggle('visible', isProvider);
-        document.getElementById('signup-location').required = isProvider;
-        document.getElementById('signup-tel').required = isProvider;
-    });
+photoInput.addEventListener('change', () => {
+    if (photoInput.files && photoInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => { photoPreview.src = e.target.result; };
+        reader.readAsDataURL(photoInput.files[0]);
+    }
 });
 
 signupForm.addEventListener('submit', async (e) => {
@@ -72,16 +85,16 @@ signupForm.addEventListener('submit', async (e) => {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-
+        
         await sendEmailVerification(user);
 
-        const userProfile = {
-            uid: user.uid, name, email, role, createdAt: new Date()
-        };
+        const userProfile = { uid: user.uid, name, email, role, createdAt: new Date() };
         if (role === 'provider') {
             userProfile.location = document.getElementById('signup-location').value;
             userProfile.telephone = document.getElementById('signup-tel').value;
             userProfile.businessName = document.getElementById('signup-bname').value || '';
+            // Note: Cloudinary upload would happen here in a real scenario
+            userProfile.profilePicUrl = ''; 
         }
         await setDoc(doc(db, "users", user.uid), userProfile);
         
@@ -102,7 +115,7 @@ loginForm.addEventListener('submit', async (e) => {
         const user = userCredential.user;
 
         if (!user.emailVerified) {
-            alert("Please verify your email address before logging in. Check your inbox for a verification link.");
+            alert("Please verify your email address before logging in. Check your inbox.");
             return;
         }
 
@@ -124,21 +137,15 @@ const handleGoogleSignIn = async () => {
 
         const userDocRef = doc(db, "users", user.uid);
         const userDoc = await getDoc(userDocRef);
-
-        let userRole = 'seeker'; // Default role
+        let userRole = 'seeker'; 
 
         if (!userDoc.exists()) {
-            // New user, create their profile
             const userProfile = {
-                uid: user.uid,
-                name: user.displayName,
-                email: user.email,
-                role: 'seeker', // New Google sign-ups default to seeker
-                createdAt: new Date()
+                uid: user.uid, name: user.displayName, email: user.email,
+                role: 'seeker', createdAt: new Date()
             };
             await setDoc(userDocRef, userProfile);
         } else {
-            // Existing user, get their role
             userRole = userDoc.data().role;
         }
         
