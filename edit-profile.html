@@ -21,7 +21,6 @@
             --accent-primary: #007bff;
             --border-color: #1f4287;
             --font-family: 'Poppins', sans-serif;
-            --transition-speed: 0.3s;
         }
 
         body.light-mode {
@@ -38,11 +37,9 @@
             font-family: var(--font-family);
             background-color: var(--bg-primary);
             color: var(--text-secondary);
-            transition: background-color var(--transition-speed), color var(--transition-speed);
         }
         .container { max-width: 800px; margin: 0 auto; padding: 0 15px; }
 
-        /* --- HEADER --- */
         .header {
             position: sticky; top: 0; left: 0; width: 100%; z-index: 1000;
             background-color: var(--bg-secondary);
@@ -51,14 +48,8 @@
         }
         .navbar { display: flex; justify-content: space-between; align-items: center; max-width:1200px; margin: 0 auto; padding: 0 15px; }
         .nav-logo { font-size: 1.8rem; font-weight: 800; color: var(--accent-primary); text-decoration: none; }
-        .nav-menu { display: flex; align-items: center; gap: 20px; }
-        .theme-toggle {
-            background: none; border: none; color: var(--text-primary);
-            font-size: 1.5rem; cursor: pointer; transition: transform 0.3s ease;
-        }
-        .theme-toggle:hover { transform: scale(1.2) rotate(15deg); }
+        .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; }
         
-        /* --- MAIN LAYOUT --- */
         .main-content { padding: 40px 0; }
         .page-header {
             display: flex;
@@ -81,11 +72,6 @@
             text-decoration: none;
             font-weight: 500;
             border: 1px solid var(--border-color);
-            transition: all 0.2s ease;
-        }
-        .btn-back:hover {
-            background-color: var(--bg-card);
-            border-color: var(--accent-primary);
         }
         
         .form-section {
@@ -95,7 +81,6 @@
             border: 1px solid var(--border-color);
         }
         
-        /* --- EDIT PROFILE FORM --- */
         .profile-photo-group {
             display: flex;
             align-items: center;
@@ -117,9 +102,6 @@
             border-radius: 8px;
             margin-bottom: 10px;
         }
-         .photo-upload-actions label:hover {
-            background-color: var(--bg-primary);
-        }
         .photo-upload-actions p { font-size: 0.9rem; }
         #profile-photo-input { display: none; }
         
@@ -130,7 +112,6 @@
         }
         @media (min-width: 768px) {
             .form-grid { grid-template-columns: 1fr 1fr; }
-            .grid-span-2 { grid-column: span 2; }
         }
         
         .form-group { margin-bottom: 0; }
@@ -138,10 +119,9 @@
         .form-control {
             width: 100%; padding: 14px 18px; background-color: var(--bg-primary);
             border: 1px solid var(--border-color); border-radius: 8px;
-            color: var(--text-primary); font-size: 1rem; font-family: var(--font-family);
-            transition: border-color 0.3s, box-shadow 0.3s;
+            color: var(--text-primary); font-size: 1rem;
         }
-        .form-control[readonly] { background-color: var(--bg-card); cursor: not-allowed; }
+        .form-control[readonly] { background-color: var(--bg-card); cursor: not-allowed; opacity: 0.7; }
         .form-control:focus {
             outline: none; border-color: var(--accent-primary);
             box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
@@ -154,11 +134,10 @@
         .btn-submit {
             padding: 12px 30px; background-color: var(--accent-primary);
             color: #ffffff; border: none; border-radius: 8px; font-size: 1rem;
-            font-weight: 600; cursor: pointer; transition: all 0.3s;
+            font-weight: 600; cursor: pointer;
         }
-        .btn-submit:hover { background-color: #0069d9; }
+        .btn-submit:disabled { background-color: #555; cursor: not-allowed; }
         
-        /* --- FOOTER --- */
         footer {
             margin-top: 40px; text-align: center; padding: 40px 15px;
             background-color: var(--bg-secondary); border-top: 1px solid var(--border-color);
@@ -170,11 +149,9 @@
 <body class="dark-mode">
 
     <header class="header">
-        <div class="navbar">
-            <a href="https://services.kabaleonline.com" class="nav-logo">KabaleOnline</a>
-            <div class="nav-menu">
-                <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
-            </div>
+        <div class="navbar container">
+            <a href="index.html" class="nav-logo">KabaleOnline</a>
+            <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
         </div>
     </header>
 
@@ -182,7 +159,7 @@
         <div class="container">
             <div class="page-header">
                 <h1>Edit Profile</h1>
-                <a href="provider-dashboard.html" class="btn-back">
+                <a href="#" id="back-to-dashboard-btn" class="btn-back">
                     <i class="fas fa-arrow-left"></i> Back to Dashboard
                 </a>
             </div>
@@ -190,7 +167,7 @@
             <div class="form-section">
                 <form id="edit-profile-form">
                     <div class="profile-photo-group">
-                        <img src="https://placehold.co/100x100/10336d/a7c0e8?text=S.A" alt="Profile preview" id="photo-preview">
+                        <img src="https://placehold.co/100x100/10336d/a7c0e8?text=..." alt="Profile preview" id="photo-preview">
                         <div class="photo-upload-actions">
                             <label for="profile-photo-input">Upload New Photo</label>
                             <input type="file" id="profile-photo-input" accept="image/*">
@@ -201,28 +178,28 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="full-name">Full Name</label>
-                            <input type="text" id="full-name" class="form-control" required>
+                            <input type="text" id="full-name" class="form-control" required placeholder="Loading...">
                         </div>
                          <div class="form-group">
                             <label for="email">Email Address</label>
-                            <input type="email" id="email" class="form-control" readonly>
+                            <input type="email" id="email" class="form-control" readonly placeholder="Loading...">
                         </div>
                         <div class="form-group">
                             <label for="telephone">Telephone</label>
-                            <input type="tel" id="telephone" class="form-control">
+                            <input type="tel" id="telephone" class="form-control" placeholder="e.g., 07...">
                         </div>
                         <div class="form-group">
                             <label for="location">Location</label>
                             <input type="text" id="location" class="form-control" placeholder="e.g., Kabale Town">
                         </div>
-                         <div class="form-group" id="business-name-group">
+                         <div class="form-group" id="business-name-group" style="display: none;">
                             <label for="business-name">Business Name (Optional)</label>
                             <input type="text" id="business-name" class="form-control">
                         </div>
                     </div>
 
                     <div class="form-actions">
-                        <button type="submit" class="btn-submit">Save Changes</button>
+                        <button type="submit" class="btn-submit" id="submit-btn">Save Changes</button>
                     </div>
                 </form>
             </div>
@@ -234,6 +211,6 @@
     </footer>
 
     <script src="theme.js" defer></script>
-    <script src="edit-profile.js" defer></script>
+    <script src="edit-profile.js" type="module"></script>
 </body>
 </html>
