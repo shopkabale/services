@@ -4,15 +4,23 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebas
 // --- IMPORTANT: REPLACE WITH YOUR ACTUAL FIREBASE CONFIG KEYS ---
 // You get these keys from your Firebase project settings.
 // This is the ONLY place you need to put your keys.
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAsx4bbVcaDm8vAu-KueQ58KvEN8WKmMYY",
-  authDomain: "kabale-services.firebaseapp.com",
-  projectId: "kabale-services",
-  storageBucket: "kabale-services.firebasestorage.app",
-  messagingSenderId: "317102060807",
-  appId: "1:317102060807:web:155589801bb8de546641a2",
-  measurementId: "G-CYVD6FVWFD"
+  apiKey: "AIzaSyAQsTpibEtyPOEztSK8uMWSK97ehJ7J-Bc",
+  authDomain: "kabale-online.firebaseapp.com",
+  projectId: "kabale-online",
+  storageBucket: "kabale-online.firebasestorage.app",
+  messagingSenderId: "773630007249",
+  appId: "1:773630007249:web:99727d36a517b5ff3632f0"
 };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 
 // NOTE: It is okay to have these keys here. These specific Firebase keys are designed 
 // to be public and are necessary for the front-end to connect to your Firebase services. 
