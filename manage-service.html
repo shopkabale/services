@@ -19,11 +19,8 @@
             --text-primary: #ffffff;
             --text-secondary: #a7c0e8;
             --accent-primary: #007bff;
-            --accent-secondary: #ffc107;
             --border-color: #1f4287;
             --font-family: 'Poppins', sans-serif;
-            --transition-speed: 0.3s;
-            --shadow-color: rgba(0, 0, 0, 0.2);
         }
 
         body.light-mode {
@@ -33,7 +30,6 @@
             --text-primary: #0d2857;
             --text-secondary: #6c757d;
             --border-color: #e9ecef;
-            --shadow-color: rgba(0, 0, 0, 0.08);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -41,112 +37,66 @@
             font-family: var(--font-family);
             background-color: var(--bg-primary);
             color: var(--text-secondary);
-            transition: background-color var(--transition-speed), color var(--transition-speed);
         }
         .container { max-width: 800px; margin: 0 auto; padding: 0 15px; }
 
-        /* --- HEADER --- */
         .header {
             position: sticky; top: 0; left: 0; width: 100%; z-index: 1000;
             background-color: var(--bg-secondary);
             border-bottom: 1px solid var(--border-color);
             padding: 15px 0;
         }
-        .navbar { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 0 15px; }
+        .navbar { display: flex; justify-content: space-between; align-items: center; max-width:1200px; margin: 0 auto; padding: 0 15px; }
         .nav-logo { font-size: 1.8rem; font-weight: 800; color: var(--accent-primary); text-decoration: none; }
-        .nav-menu { display: flex; align-items: center; gap: 20px; }
-        .theme-toggle {
-            background: none; border: none; color: var(--text-primary);
-            font-size: 1.5rem; cursor: pointer; transition: transform 0.3s ease;
-        }
-        .theme-toggle:hover { transform: scale(1.2) rotate(15deg); }
+        .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; }
 
-        /* --- MAIN LAYOUT --- */
         .main-content { padding: 40px 0; }
         .page-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            display: flex; align-items: center; justify-content: space-between;
             margin-bottom: 30px;
         }
-        .page-header h1 {
-            font-size: 2.2rem;
-            color: var(--text-primary);
-        }
+        .page-header h1 { font-size: 2.2rem; color: var(--text-primary); }
         .btn-back {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background-color: var(--bg-secondary);
-            color: var(--text-primary);
-            padding: 10px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 500;
-            border: 1px solid var(--border-color);
-            transition: all 0.2s ease;
+            display: inline-flex; align-items: center; gap: 8px;
+            background-color: var(--bg-secondary); color: var(--text-primary);
+            padding: 10px 20px; border-radius: 8px; text-decoration: none;
+            font-weight: 500; border: 1px solid var(--border-color);
         }
-        .btn-back:hover {
-            background-color: var(--bg-card);
-            border-color: var(--accent-primary);
-        }
-
+        
         .content-section {
             background-color: var(--bg-secondary);
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 30px;
-            border: 1px solid var(--border-color);
+            border-radius: 16px; padding: 30px;
+            margin-bottom: 30px; border: 1px solid var(--border-color);
         }
         .section-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--text-primary);
+            font-size: 1.5rem; font-weight: 600; color: var(--text-primary);
             margin-bottom: 25px;
         }
         
-        /* --- MY SERVICES LIST --- */
         .service-item {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            padding: 15px 0;
-            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; gap: 20px;
+            padding: 15px 0; border-bottom: 1px solid var(--border-color);
         }
         .service-item:last-child { border-bottom: none; }
         .service-item-img {
-            width: 60px; height: 60px;
-            object-fit: cover;
+            width: 60px; height: 60px; object-fit: cover;
             border-radius: 8px;
         }
         .service-item-details { flex-grow: 1; }
-        .service-item-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 5px;
-        }
+        .service-item-title { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 5px; }
         .service-item-status { font-size: 0.9rem; color: #28a745; }
         .service-item-actions button {
             background: none; border: 1px solid var(--border-color);
             color: var(--text-secondary); cursor: pointer;
-            padding: 8px 12px; border-radius: 6px;
-            margin-left: 10px; transition: all var(--transition-speed);
+            padding: 8px 12px; border-radius: 6px; margin-left: 10px;
         }
-        .service-item-actions button:hover {
-            background-color: var(--accent-primary); color: #fff;
-            border-color: var(--accent-primary);
-        }
-        .service-item-actions button.delete:hover { background-color: #dc3545; border-color: #dc3545; }
-
-        /* --- ADD/EDIT FORM --- */
+        
         .form-group { margin-bottom: 25px; }
         label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-secondary); }
         .form-control, .form-select {
             width: 100%; padding: 14px 18px; background-color: var(--bg-primary);
             border: 1px solid var(--border-color); border-radius: 8px;
             color: var(--text-primary); font-size: 1rem; font-family: var(--font-family);
-            transition: border-color 0.3s, box-shadow 0.3s;
         }
         textarea.form-control { min-height: 120px; resize: vertical; }
         .form-control:focus, .form-select:focus {
@@ -160,22 +110,20 @@
             object-fit: cover; border: 2px dashed var(--border-color);
             background-color: var(--bg-primary);
             margin-bottom: 15px; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: border-color 0.3s;
+            cursor: pointer;
         }
-        #cover-image-preview:hover { border-color: var(--accent-primary); }
-        #cover-image-preview .placeholder-text { color: var(--text-secondary); }
+        #cover-image-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
         #cover-image-input { display: none; }
 
         .btn-submit {
             width: 100%; padding: 15px; background-color: var(--accent-primary);
             color: #ffffff; border: none; border-radius: 8px; font-size: 1.1rem;
-            font-weight: 600; cursor: pointer; transition: all 0.3s;
+            font-weight: 600; cursor: pointer;
         }
-        .btn-submit:hover { background-color: #0069d9; transform: translateY(-2px); }
+        .btn-submit:disabled { background-color: #555; cursor: not-allowed; }
         
-        /* --- FOOTER --- */
         footer {
-            text-align: center; padding: 40px 15px;
+            margin-top: 40px; text-align: center; padding: 40px 15px;
             background-color: var(--bg-secondary); border-top: 1px solid var(--border-color);
             font-size: 0.9rem; color: var(--text-secondary);
         }
@@ -185,45 +133,28 @@
 <body class="dark-mode">
 
     <header class="header">
-        <div class="navbar">
-            <a href="https://services.kabaleonline.com" class="nav-logo">KabaleOnline</a>
-            <div class="nav-menu">
-                <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
-            </div>
+        <div class="navbar container">
+            <a href="index.html" class="nav-logo">KabaleOnline</a>
+            <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
         </div>
     </header>
 
     <main class="main-content">
         <div class="container">
-
             <div class="page-header">
                 <h1>Manage Services</h1>
-                <a href="dashboard.html" class="btn-back">
+                <a href="provider-dashboard.html" class="btn-back">
                     <i class="fas fa-arrow-left"></i> Back to Dashboard
                 </a>
             </div>
 
-            <!-- My Services List -->
             <div class="content-section">
                 <h2 class="section-title">My Listed Services</h2>
                 <div id="my-services-list">
-                    <!-- Example Service Item -->
-                    <div class="service-item">
-                        <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=200&auto=format&fit=crop" alt="Service Image" class="service-item-img">
-                        <div class="service-item-details">
-                            <h3 class="service-item-title">Custom Website Design</h3>
-                            <p class="service-item-status">Active</p>
-                        </div>
-                        <div class="service-item-actions">
-                            <button title="Edit"><i class="fas fa-pencil-alt"></i></button>
-                            <button class="delete" title="Delete"><i class="fas fa-trash-alt"></i></button>
-                        </div>
-                    </div>
-                    <!-- End Example -->
+                    <!-- Provider's services will be loaded here by JavaScript -->
                 </div>
             </div>
 
-            <!-- Add/Edit Service Form -->
             <div class="content-section">
                 <h2 class="section-title" id="form-title">Add a New Service</h2>
                 <form id="service-form">
@@ -235,17 +166,17 @@
                         <label for="service-category">Category</label>
                         <select id="service-category" class="form-select" required>
                             <option value="" disabled selected>Select a category...</option>
-                            <option value="home">Home Services</option>
-                            <option value="creative">Creative & Media</option>
-                            <option value="technical">Technical & IT</option>
-                            <option value="professional">Professional Services</option>
-                            <option value="events">Events</option>
-                            <option value="lessons">Lessons & Tutoring</option>
+                            <option value="Home">Home Services</option>
+                            <option value="Creative">Creative & Media</option>
+                            <option value="Technical">Technical & IT</option>
+                            <option value="Professional">Professional Services</option>
+                            <option value="Events">Events</option>
+                            <option value="Lessons">Lessons & Tutoring</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="service-description">Service Description</label>
-                        <textarea id="service-description" class="form-control" placeholder="Describe what you offer, your experience, and what makes your service special..." required></textarea>
+                        <textarea id="service-description" class="form-control" placeholder="Describe what you offer, your experience..." required></textarea>
                     </div>
                      <div class="form-group">
                         <label for="service-location">Your Location</label>
@@ -276,7 +207,6 @@
                     <button type="submit" class="btn-submit">Publish Service</button>
                 </form>
             </div>
-
         </div>
     </main>
     
@@ -285,29 +215,6 @@
     </footer>
 
     <script src="theme.js" defer></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const imageInput = document.getElementById('cover-image-input');
-            const imagePreview = document.getElementById('cover-image-preview');
-
-            imageInput.addEventListener('change', () => {
-                if (imageInput.files && imageInput.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        // Replace the placeholder with an img element
-                        imagePreview.innerHTML = '';
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        img.style.width = '100%';
-                        img.style.height = '100%';
-                        img.style.objectFit = 'cover';
-                        imagePreview.appendChild(img);
-                    };
-                    reader.readAsDataURL(imageInput.files[0]);
-                }
-            });
-        });
-    </script>
+    <script src="manage-service.js" type="module"></script>
 </body>
 </html>
-
