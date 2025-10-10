@@ -91,7 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- EVENT LISTENERS ---
-    switchViewBtn.addEventListener('click', () => {
+    switchViewBtn.addEventListener('click', (event) => {
+        // FIX: Prevent the browser's default click action (which causes the scroll to top).
+        event.preventDefault();
+        
         // Toggle the current view
         currentUser.currentView = currentUser.currentView === 'provider' ? 'seeker' : 'provider';
         
@@ -103,3 +106,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // This function runs once when the page loads to set the initial state.
     updateDashboardView();
 });
+
