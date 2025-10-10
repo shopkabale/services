@@ -5,12 +5,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebas
 // You get these keys from your Firebase project settings.
 // This is the ONLY place you need to put your keys.
 const firebaseConfig = {
-  apiKey: "AIzaSy...YOUR_API_KEY", // Replace with your key
-  authDomain: "your-project-id.firebaseapp.com", // Replace with your domain
-  projectId: "your-project-id", // Replace with your project ID
-  storageBucket: "your-project-id.appspot.com", // Replace with your storage bucket
-  messagingSenderId: "1234567890", // Replace with your sender ID
-  appId: "1:1234567890:web:abcdef123456" // Replace with your App ID
+  apiKey: "AIzaSyAsx4bbVcaDm8vAu-KueQ58KvEN8WKmMYY",
+  authDomain: "kabale-services.firebaseapp.com",
+  projectId: "kabale-services",
+  storageBucket: "kabale-services.firebasestorage.app",
+  messagingSenderId: "317102060807",
+  appId: "1:317102060807:web:155589801bb8de546641a2",
+  measurementId: "G-CYVD6FVWFD"
 };
 
 // NOTE: It is okay to have these keys here. These specific Firebase keys are designed 
