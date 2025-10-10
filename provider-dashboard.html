@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provider Dashboard | KabaleOnline</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-primary: #0d2857;
+            --bg-secondary: #10336d;
+            --bg-card: #1e293b;
+            --text-primary: #ffffff;
+            --text-secondary: #a7c0e8;
+            --accent-primary: #007bff;
+            --accent-secondary: #ffc107;
+            --accent-success: #28a745;
+            --border-color: #1f4287;
+            --font-family: 'Poppins', sans-serif;
+            --transition-speed: 0.3s;
+            --shadow-color: rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-mode {
+            --bg-primary: #f0f4f9;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --text-primary: #0d2857;
+            --text-secondary: #6c757d;
+            --border-color: #e9ecef;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-primary);
+            color: var(--text-secondary);
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 15px; }
+
+        /* --- HEADER --- */
+        .header {
+            position: sticky; top: 0; left: 0; width: 100%; z-index: 1000;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 0;
+        }
+        .navbar { display: flex; justify-content: space-between; align-items: center; max-width:1200px; margin: 0 auto; padding: 0 15px; }
+        .nav-logo { font-size: 1.8rem; font-weight: 800; color: var(--accent-primary); text-decoration: none; }
+        .nav-menu { display: flex; align-items: center; gap: 20px; }
+        .theme-toggle {
+            background: none; border: none; color: var(--text-primary);
+            font-size: 1.5rem; cursor: pointer; transition: transform 0.3s ease;
+        }
+        .theme-toggle:hover { transform: scale(1.2) rotate(15deg); }
+
+        /* --- DASHBOARD LAYOUT --- */
+        .dashboard { padding: 40px 0; }
+        .profile-header { text-align: center; margin-bottom: 40px; }
+        .profile-picture {
+            width: 120px; height: 120px; border-radius: 50%;
+            object-fit: cover; border: 4px solid var(--accent-primary);
+            margin-bottom: 15px; background-color: var(--bg-secondary);
+        }
+        .profile-name { font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .welcome-message { font-size: 1.1rem; }
+        .dashboard-section {
+            background-color: var(--bg-secondary); border-radius: 16px;
+            padding: 25px; margin-bottom: 30px; border: 1px solid var(--border-color);
+        }
+        .section-title {
+            font-size: 1.5rem; font-weight: 600; color: var(--text-primary);
+            margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color);
+        }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 20px; }
+        .menu-item {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background-color: var(--bg-primary); border-radius: 12px; padding: 20px;
+            text-decoration: none; color: var(--text-primary); text-align: center;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+            border: 1px solid var(--border-color);
+        }
+        .menu-item:hover { transform: translateY(-5px); background-color: var(--bg-card); }
+        .menu-item .icon { font-size: 2.5rem; color: var(--accent-primary); margin-bottom: 15px; }
+        .menu-item .label { font-weight: 500; font-size: 1rem; }
+        
+        .btn-logout {
+            display: block; width: 100%; padding: 15px; border-radius: 8px; text-align: center;
+            text-decoration: none; font-size: 1.1rem; font-weight: 600; transition: all 0.3s ease;
+            background-color: #dc3545; color: #fff; border: none;
+        }
+        .btn-logout:hover { background-color: #c82333; }
+        
+        /* --- FOOTER --- */
+        footer {
+            text-align: center; padding: 40px 15px;
+            background-color: var(--bg-secondary); border-top: 1px solid var(--border-color);
+            font-size: 0.9rem; color: var(--text-secondary);
+        }
+        footer a { color: var(--accent-primary); text-decoration: none; }
+    </style>
+</head>
+<body class="dark-mode">
+
+    <header class="header">
+        <div class="navbar">
+            <a href="https://services.kabaleonline.com" class="nav-logo">KabaleOnline</a>
+            <div class="nav-menu">
+                <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard">
+        <div class="container">
+            <div class="profile-header">
+                <img src="https://placehold.co/120x120/10336d/a7c0e8?text=S.A" alt="Profile Picture" class="profile-picture">
+                <h1 class="profile-name">Samuel Ampeire</h1>
+                <p class="welcome-message">Welcome to your provider dashboard!</p>
+            </div>
+
+            <div class="dashboard-section">
+                <h2 class="section-title">Provider Menu</h2>
+                <div class="menu-grid">
+                    <a href="manage-service.html" class="menu-item">
+                        <div class="icon"><i class="fas fa-plus-circle"></i></div>
+                        <span class="label">Add Service</span>
+                    </a>
+                    <a href="manage-service.html" class="menu-item">
+                        <div class="icon"><i class="fas fa-th-list"></i></div>
+                        <span class="label">My Services</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <div class="icon"><i class="fas fa-inbox"></i></div>
+                        <span class="label">Inbox</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <div class="icon"><i class="fas fa-user-edit"></i></div>
+                        <span class="label">Edit Profile</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <div class="icon"><i class="fas fa-chart-line"></i></div>
+                        <span class="label">Analytics</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <div class="icon"><i class="fas fa-wallet"></i></div>
+                        <span class="label">Earnings</span>
+                    </a>
+                </div>
+            </div>
+
+            <a href="auth.html" class="btn-logout">Logout</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 KabaleOnline. All Rights Reserved. <a href="#">Terms of Service</a></p>
+    </footer>
+
+    <script src="theme.js" defer></script>
+</body>
+</html>
