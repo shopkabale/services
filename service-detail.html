@@ -22,10 +22,7 @@
             --accent-secondary: #ffc107;
             --border-color: #1f4287;
             --font-family: 'Poppins', sans-serif;
-            --transition-speed: 0.3s;
-            --shadow-color: rgba(0, 0, 0, 0.2);
         }
-
         body.light-mode {
             --bg-primary: #f0f4f9;
             --bg-secondary: #ffffff;
@@ -33,268 +30,83 @@
             --text-primary: #0d2857;
             --text-secondary: #6c757d;
             --border-color: #e9ecef;
-            --shadow-color: rgba(0, 0, 0, 0.08);
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: var(--font-family);
-            background-color: var(--bg-primary);
-            color: var(--text-secondary);
-            transition: background-color var(--transition-speed), color var(--transition-speed);
-        }
+        body { font-family: var(--font-family); background-color: var(--bg-primary); color: var(--text-secondary); }
         .container { max-width: 1100px; margin: 0 auto; padding: 0 15px; }
-
-        /* --- HEADER --- */
         .header {
-            position: sticky; top: 0; left: 0; width: 100%; z-index: 1000;
+            position: sticky; top: 0; z-index: 1000;
             background-color: var(--bg-secondary);
             border-bottom: 1px solid var(--border-color);
             padding: 15px 0;
         }
         .navbar { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 0 15px; }
         .nav-logo { font-size: 1.8rem; font-weight: 800; color: var(--accent-primary); text-decoration: none; }
-        .nav-menu { display: flex; align-items: center; gap: 20px; }
-        .theme-toggle {
-            background: none; border: none; color: var(--text-primary);
-            font-size: 1.5rem; cursor: pointer; transition: transform 0.3s ease;
-        }
-        .theme-toggle:hover { transform: scale(1.2) rotate(15deg); }
-        .btn-header {
-            padding: 8px 20px; background-color: var(--accent-primary);
-            color: #ffffff; border-radius: 50px; text-decoration: none;
-            font-weight: 600; border: 2px solid var(--accent-primary);
-            transition: all var(--transition-speed);
-        }
-        .btn-header:hover { background-color: transparent; color: var(--accent-primary); }
-
-        /* --- SERVICE DETAIL LAYOUT --- */
+        .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; }
+        .btn-header { padding: 8px 20px; background-color: var(--accent-primary); color: #ffffff; border-radius: 50px; text-decoration: none; font-weight: 600; border: 2px solid var(--accent-primary); }
         .main-content { padding: 40px 0; }
-        .service-layout {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 40px;
-        }
+        .service-layout { display: grid; grid-template-columns: 1fr; gap: 40px; }
         @media (min-width: 992px) {
-            .service-layout {
-                grid-template-columns: 1fr 350px;
-            }
-            .provider-sidebar {
-                position: sticky;
-                top: 100px;
-            }
+            .service-layout { grid-template-columns: 1fr 350px; }
+            .provider-sidebar { position: sticky; top: 100px; }
         }
-
-        /* --- MAIN SERVICE CONTENT (LEFT) --- */
-        .service-main-content h1 {
-            font-size: 2.5rem;
-            color: var(--text-primary);
-            margin-bottom: 10px;
-        }
-        .service-category {
-            font-size: 1rem;
-            font-weight: 500;
-            color: var(--accent-primary);
-            margin-bottom: 20px;
-        }
-        .service-cover-image {
-            width: 100%;
-            height: auto;
-            max-height: 450px;
-            object-fit: cover;
-            border-radius: 16px;
-            margin-bottom: 30px;
-        }
-        .content-section {
-            background-color: var(--bg-secondary);
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 30px;
-            border: 1px solid var(--border-color);
-        }
-        .section-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 20px;
-        }
-        .service-description p {
-            line-height: 1.8;
-            margin-bottom: 15px;
-        }
-
-        /* --- REVIEWS SECTION --- */
-        .review {
-            display: flex;
-            gap: 15px;
-            padding: 20px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .review:last-child { border-bottom: none; }
-        .reviewer-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        .review-content { flex-grow: 1; }
-        .review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-        .reviewer-name { font-weight: 600; color: var(--text-primary); }
-        .review-rating { color: var(--accent-secondary); }
-        .review-text { font-size: 0.95rem; }
-
-        /* --- PROVIDER SIDEBAR (RIGHT) --- */
-        .provider-card {
-            background-color: var(--bg-secondary);
-            border-radius: 16px;
-            padding: 30px;
-            border: 1px solid var(--border-color);
-            text-align: center;
-        }
-        .provider-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid var(--accent-primary);
-            margin: 0 auto 15px;
-        }
-        .provider-name {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-        .provider-location {
-            font-size: 1rem;
-            margin-bottom: 15px;
-        }
-        .provider-rating {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 25px;
-            font-size: 1.1rem;
-        }
-        .provider-rating .stars { color: var(--accent-secondary); }
-        
-        .price-display {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 10px;
-        }
-        .price-display span {
-            font-size: 1rem;
-            font-weight: 400;
-            color: var(--text-secondary);
-        }
-        .btn-contact {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            background-color: var(--accent-primary);
-            color: #fff;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 1.1rem;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        .btn-contact:hover { background-color: #0069d9; transform: translateY(-2px); }
-
-        /* --- FOOTER --- */
-        footer {
-            text-align: center; padding: 40px 15px;
-            background-color: var(--bg-secondary); border-top: 1px solid var(--border-color);
-            font-size: 0.9rem; color: var(--text-secondary);
-        }
+        .service-main-content h1 { font-size: 2.5rem; color: var(--text-primary); margin-bottom: 10px; }
+        .service-category { font-size: 1rem; font-weight: 500; color: var(--accent-primary); margin-bottom: 20px; }
+        .service-cover-image { width: 100%; height: auto; max-height: 450px; object-fit: cover; border-radius: 16px; margin-bottom: 30px; background-color: var(--bg-secondary); }
+        .content-section { background-color: var(--bg-secondary); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid var(--border-color); }
+        .section-title { font-size: 1.5rem; font-weight: 600; color: var(--text-primary); margin-bottom: 20px; }
+        .service-description p { line-height: 1.8; margin-bottom: 15px; }
+        .provider-card { background-color: var(--bg-secondary); border-radius: 16px; padding: 30px; border: 1px solid var(--border-color); text-align: center; }
+        .provider-avatar { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid var(--accent-primary); margin: 0 auto 15px; }
+        .provider-name { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); }
+        .provider-location { font-size: 1rem; margin-bottom: 15px; }
+        .price-display { font-size: 1.8rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; }
+        .price-display span { font-size: 1rem; font-weight: 400; color: var(--text-secondary); }
+        .btn-contact { display: block; width: 100%; padding: 15px; background-color: var(--accent-primary); color: #fff; border-radius: 8px; text-decoration: none; font-size: 1.1rem; font-weight: 600; }
+        footer { text-align: center; padding: 40px 15px; background-color: var(--bg-secondary); border-top: 1px solid var(--border-color); font-size: 0.9rem; color: var(--text-secondary); }
         footer a { color: var(--accent-primary); text-decoration: none; }
+        #loading-state { text-align: center; font-size: 1.5rem; padding: 50px; }
     </style>
 </head>
 <body class="dark-mode">
 
     <header class="header">
         <div class="navbar">
-            <a href="https://services.kabaleonline.com" class="nav-logo">KabaleOnline</a>
-            <div class="nav-menu">
-                <a href="auth.html" class="btn-header">Login / Sign Up</a>
+            <a href="index.html" class="nav-logo">KabaleOnline</a>
+            <div>
+                <a href="auth.html" class="btn-header" style="margin-right: 20px;">Login / Sign Up</a>
                 <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
             </div>
         </div>
     </header>
 
     <main class="main-content">
-        <div class="container">
+        <div class="container" id="content-container" style="display: none;">
             <div class="service-layout">
-                
-                <!-- Main Content -->
                 <div class="service-main-content">
-                    <p class="service-category">Technical & IT</p>
-                    <h1>Custom Website Design & Development</h1>
-                    <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1200&auto=format&fit=crop" alt="Service Cover Image" class="service-cover-image">
+                    <p class="service-category" id="service-category"></p>
+                    <h1 id="service-title"></h1>
+                    <img src="https://placehold.co/800x450/10336d/a7c0e8?text=Loading..." alt="Service Cover Image" class="service-cover-image" id="service-cover-image">
                     
                     <div class="content-section service-description">
                         <h2 class="section-title">About This Service</h2>
-                        <p>Are you a small business owner, an artist, or an entrepreneur in Kabale looking for a professional online presence? I create beautiful, modern, and fast websites that work perfectly on any device, from phones to desktop computers.</p>
-                        <p>My services include everything you need to get online, from initial design concepts to a fully functional, live website. I specialize in building sites for local businesses, portfolios, and e-commerce stores.</p>
-                        <p><strong>What you get:</strong></p>
-                        <ul>
-                            <li>A fully responsive design that looks great everywhere.</li>
-                            <li>An easy-to-use content management system (CMS) so you can update your own content.</li>
-                            <li>Basic search engine optimization (SEO) to help customers find you on Google.</li>
-                            <li>1 month of free technical support after launch.</li>
-                        </ul>
-                    </div>
-
-                    <div class="content-section service-reviews">
-                        <h2 class="section-title">What My Clients Say (32 Reviews)</h2>
-                        <div class="review">
-                            <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Reviewer Avatar" class="reviewer-avatar">
-                            <div class="review-content">
-                                <div class="review-header">
-                                    <span class="reviewer-name">Hope K.</span>
-                                    <div class="review-rating">
-                                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                                    </div>
-                                </div>
-                                <p class="review-text">David built a fantastic website for my catering business. He was professional, listened to my ideas, and delivered exactly what I wanted. Highly recommended!</p>
-                            </div>
-                        </div>
-                         <div class="review">
-                            <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="Reviewer Avatar" class="reviewer-avatar">
-                            <div class="review-content">
-                                <div class="review-header">
-                                    <span class="reviewer-name">Peter A.</span>
-                                    <div class="review-rating">
-                                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                                    </div>
-                                </div>
-                                <p class="review-text">Very skilled developer. He helped me fix my old website and made it much faster. Good communication throughout the project.</p>
-                            </div>
-                        </div>
+                        <div id="service-description"></div>
                     </div>
                 </div>
 
-                <!-- Provider Sidebar -->
                 <aside class="provider-sidebar">
                     <div class="provider-card">
-                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Provider Avatar" class="provider-avatar">
-                        <h2 class="provider-name">David Musinguzi</h2>
-                        <p class="provider-location"><i class="fas fa-map-marker-alt"></i> Kabale Town</p>
-                        <div class="provider-rating">
-                            <div class="stars">
-                                <i class="fas fa-star"></i> 4.9
-                            </div>
-                            <span>(32 Reviews)</span>
-                        </div>
-
-                        <div class="price-display">UGX 500,000 <span>/ Per Project</span></div>
-                        <a href="#" class="btn-contact"><i class="fas fa-envelope"></i> Contact Provider</a>
+                        <img src="https://placehold.co/100x100" alt="Provider Avatar" class="provider-avatar" id="provider-avatar">
+                        <h2 class="provider-name" id="provider-name"></h2>
+                        <p class="provider-location" id="provider-location"></p>
+                        <div class="price-display" id="service-price"></div>
+                        <a href="#" id="contact-btn" class="btn-contact"><i class="fas fa-envelope"></i> Contact Provider</a>
                     </div>
                 </aside>
-
             </div>
+        </div>
+        <div class="container" id="loading-state">
+            <p>Loading service details...</p>
         </div>
     </main>
     
@@ -303,5 +115,6 @@
     </footer>
 
     <script src="theme.js" defer></script>
+    <script src="service-detail.js" type="module"></script>
 </body>
 </html>
