@@ -12,17 +12,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
-        /* --- THEME COLORS & GLOBAL STYLES --- */
         :root {
             --bg-primary: #0d2857;
             --bg-secondary: #10336d;
             --text-primary: #ffffff;
             --text-secondary: #a7c0e8;
             --accent-primary: #007bff;
-            --accent-secondary: #ffc107;
             --border-color: #1f4287;
             --font-family: 'Poppins', sans-serif;
-            --transition-speed: 0.3s;
         }
 
         body.light-mode {
@@ -30,7 +27,7 @@
             --bg-secondary: #ffffff;
             --text-primary: #0d2857;
             --text-secondary: #6c757d;
-            --border-color: #dee2e6;
+            --border-color: #e9ecef;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -39,13 +36,11 @@
             font-family: var(--font-family);
             background-color: var(--bg-primary);
             color: var(--text-secondary);
-            transition: background-color var(--transition-speed), color var(--transition-speed);
             display: flex;
             flex-direction: column;
             min-height: 100%;
         }
 
-        /* --- HEADER --- */
         .header {
             position: absolute; top: 0; left: 0; width: 100%;
             padding: 20px 40px; display: flex; justify-content: space-between;
@@ -57,35 +52,23 @@
         }
         .theme-toggle {
             background: none; border: none; color: var(--text-primary);
-            font-size: 1.5rem; cursor: pointer; transition: transform 0.3s ease;
+            font-size: 1.5rem; cursor: pointer;
         }
         body.light-mode .theme-toggle { color: var(--text-primary); }
-        .theme-toggle:hover { transform: scale(1.2) rotate(15deg); }
 
-        /* --- MAIN CONTAINER --- */
         .main-container {
             display: flex; align-items: center; justify-content: center;
             width: 100%;
-            flex-grow: 1; /* Allows main to take up available space */
-            padding: 120px 20px 40px; /* Added more top padding */
+            flex-grow: 1;
+            padding: 120px 20px 40px;
         }
 
-        /* --- AUTH & DASHBOARD WRAPPERS --- */
-        .auth-wrapper, .dashboard-wrapper {
+        .auth-wrapper {
             width: 100%; max-width: 480px;
-            transition: opacity 0.4s ease, transform 0.4s ease;
         }
-        .auth-wrapper.hidden, .dashboard-wrapper.hidden {
-            opacity: 0; transform: scale(0.98);
-            pointer-events: none; position: absolute;
-        }
-        .dashboard-wrapper { max-width: 900px; }
-
-        /* --- FORM STYLES --- */
         .form-container {
             background-color: var(--bg-secondary); padding: 40px;
             border-radius: 16px; border: 1px solid var(--border-color);
-            transition: all var(--transition-speed);
         }
         #signup-form-container { display: none; }
         .form-container h2 { text-align: center; color: var(--text-primary); margin-bottom: 30px; font-size: 2rem; font-weight: 700; }
@@ -93,63 +76,34 @@
         .form-control {
             width: 100%; padding: 14px 18px; background-color: var(--bg-primary);
             border: 1px solid var(--border-color); border-radius: 8px;
-            color: var(--text-primary); font-size: 1rem; font-family: var(--font-family);
-            transition: border-color 0.3s, box-shadow 0.3s;
+            color: var(--text-primary); font-size: 1rem;
         }
-        .form-control::placeholder { color: var(--text-secondary); }
         .form-control:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); }
-        .btn-submit { width: 100%; padding: 15px; background-color: var(--accent-primary); color: #ffffff; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: background-color 0.3s, transform 0.2s; }
-        .btn-submit:hover { background-color: #0069d9; transform: translateY(-2px); }
+        .btn-submit { width: 100%; padding: 15px; background-color: var(--accent-primary); color: #ffffff; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
+        
         .toggle-link { text-align: center; margin-top: 25px; }
         .toggle-link a { color: var(--accent-primary); font-weight: 600; text-decoration: none; cursor: pointer; }
         .toggle-link a:hover { text-decoration: underline; }
 
-        /* --- PROVIDER-SPECIFIC FIELDS --- */
-        .provider-fields {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-in-out, margin-top 0.5s ease-in-out;
-        }
-        .provider-fields.visible {
-            max-height: 500px; /* Adjust as needed */
-            margin-top: 20px;
-        }
+        .provider-fields { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out, margin-top 0.5s ease-in-out; }
+        .provider-fields.visible { max-height: 500px; margin-top: 20px; }
         .profile-photo-group { text-align: center; margin-bottom: 20px; }
         #photo-preview { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--border-color); background-color: var(--bg-primary); display: block; margin: 0 auto 15px; }
         .photo-upload-label { cursor: pointer; color: var(--accent-primary); font-weight: 600; }
         #profile-photo-input { display: none; }
 
-        /* --- ROLE SELECTION --- */
         .role-options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .role-option { padding: 15px; border: 2px solid var(--border-color); border-radius: 8px; text-align: center; cursor: pointer; transition: border-color 0.3s, background-color 0.3s; }
-        .role-option i { font-size: 1.8rem; color: var(--text-secondary); margin-bottom: 8px; transition: color 0.3s; }
-        .role-option span { display: block; font-weight: 600; color: var(--text-primary); transition: color 0.3s; }
+        .role-option { padding: 15px; border: 2px solid var(--border-color); border-radius: 8px; text-align: center; cursor: pointer; }
+        .role-option i { font-size: 1.8rem; color: var(--text-secondary); margin-bottom: 8px; }
+        .role-option span { display: block; font-weight: 600; color: var(--text-primary); }
         .role-option input { display: none; }
         .role-option.selected, .role-option:hover { border-color: var(--accent-primary); background-color: rgba(0, 123, 255, 0.1); }
         .role-option.selected i, .role-option.selected span { color: var(--accent-primary); }
 
-        /* --- DASHBOARD VIEW --- */
-        .dashboard-header { text-align: center; margin-bottom: 40px; }
-        .dashboard-header h1 { font-size: 2.5rem; margin-bottom: 10px; }
-        .dashboard-header p { font-size: 1.2rem; }
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 30px; text-align: left; }
-        .dashboard-card { background: var(--bg-secondary); padding: 30px; border-radius: 16px; border: 1px solid var(--border-color); }
-        .dashboard-card i { font-size: 2rem; color: var(--accent-primary); margin-bottom: 15px; }
-        .dashboard-card h3 { font-size: 1.5rem; margin-bottom: 10px; }
-        .dashboard-card p { font-size: 1rem; line-height: 1.6; margin-bottom: 20px; }
-        .dashboard-card a { color: var(--accent-primary); text-decoration: none; font-weight: 600; }
-        .dashboard-actions { text-align: center; margin-top: 40px; display: flex; justify-content: center; gap: 20px; }
-        .btn-action { background: none; border: 2px solid var(--border-color); color: var(--text-secondary); padding: 10px 25px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; font-size: 1rem; }
-        .btn-action:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
-        
-        /* --- FOOTER (FIXED) --- */
         footer {
-            width: 100%;
-            text-align: center;
-            padding: 20px;
-            font-size: 0.9rem;
+            width: 100%; text-align: center;
+            padding: 20px; font-size: 0.9rem;
             color: var(--text-secondary);
-            /* Removed position: absolute */
         }
         footer a { color: var(--accent-primary); text-decoration: none; }
     </style>
@@ -157,14 +111,12 @@
 <body>
 
     <header class="header">
-        <a href="https://services.kabaleonline.com" class="nav-logo">KabaleOnline</a>
+        <a href="index.html" class="nav-logo">KabaleOnline</a>
         <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
     </header>
 
     <div class="main-container">
-        <!-- AUTHENTICATION VIEW -->
         <div class="auth-wrapper">
-            <!-- Login Form -->
             <div id="login-form-container" class="form-container">
                 <h2>Welcome Back</h2>
                 <form id="login-form">
@@ -176,10 +128,9 @@
                     </div>
                     <button type="submit" class="btn-submit">Login</button>
                 </form>
-                <p class="toggle-link">Don't have an account? <a id="show-signup-link">Sign Up</a></p>
+                <p class="toggle-link">Don't have an account? <a href="#" id="show-signup-link">Sign Up</a></p>
             </div>
 
-            <!-- Sign Up Form -->
             <div id="signup-form-container" class="form-container">
                 <h2>Create Account</h2>
                 <form id="signup-form">
@@ -222,22 +173,7 @@
                     </div>
                     <button type="submit" class="btn-submit">Create Account</button>
                 </form>
-                <p class="toggle-link">Already have an account? <a id="show-login-link">Login</a></p>
-            </div>
-        </div>
-
-        <!-- DASHBOARD VIEW -->
-        <div id="dashboard-wrapper" class="dashboard-wrapper hidden">
-            <div class="dashboard-header">
-                <h1 id="welcome-heading"></h1>
-                <p id="welcome-subheading"></p>
-            </div>
-            <div class="dashboard-grid" id="dashboard-content">
-                <!-- Content injected by JS -->
-            </div>
-            <div class="dashboard-actions">
-                <button id="switch-role-btn" class="btn-action"></button>
-                <button id="logout-btn" class="btn-action">Log Out</button>
+                <p class="toggle-link">Already have an account? <a href="#" id="show-login-link">Login</a></p>
             </div>
         </div>
     </div>
@@ -251,4 +187,3 @@
 
 </body>
 </html>
-
