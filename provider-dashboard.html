@@ -57,7 +57,7 @@
             object-fit: cover; border: 4px solid var(--accent-primary);
             margin-bottom: 15px; background-color: var(--bg-secondary);
         }
-        .profile-name { font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .profile-name { font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; min-height: 48px; }
         .welcome-message { font-size: 1.1rem; }
         .dashboard-section {
             background-color: var(--bg-secondary); border-radius: 16px;
@@ -97,7 +97,7 @@
 
     <header class="header">
         <div class="navbar">
-            <a href="https://services.kabaleonline.com" class="nav-logo">KabaleOnline</a>
+            <a href="index.html" class="nav-logo">KabaleOnline</a>
             <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
         </div>
     </header>
@@ -105,38 +105,20 @@
     <main class="dashboard">
         <div class="container">
             <div class="profile-header">
-                <img src="https://placehold.co/120x120/10336d/a7c0e8?text=S.A" alt="Profile Picture" class="profile-picture" id="profile-picture">
-                <h1 class="profile-name" id="profile-name"></h1>
+                <img src="https://placehold.co/120x120/10336d/a7c0e8?text=..." alt="Profile Picture" class="profile-picture" id="profile-picture">
+                <h1 class="profile-name" id="profile-name">Loading...</h1>
                 <p class="welcome-message" id="welcome-message"></p>
             </div>
 
             <div class="dashboard-section">
                 <h2 class="section-title">Provider Menu</h2>
                 <div class="menu-grid">
-                    <a href="manage-service.html" class="menu-item">
-                        <div class="icon"><i class="fas fa-plus-circle"></i></div>
-                        <span class="label">Add Service</span>
-                    </a>
-                    <a href="manage-service.html" class="menu-item">
-                        <div class="icon"><i class="fas fa-th-list"></i></div>
-                        <span class="label">My Services</span>
-                    </a>
-                    <a href="inbox.html" class="menu-item">
-                        <div class="icon"><i class="fas fa-inbox"></i></div>
-                        <span class="label">Inbox</span>
-                    </a>
-                    <a href="edit-profile.html" class="menu-item">
-                        <div class="icon"><i class="fas fa-user-edit"></i></div>
-                        <span class="label">Edit Profile</span>
-                    </a>
-                    <a href="analytics.html" class="menu-item">
-                        <div class="icon"><i class="fas fa-chart-line"></i></div>
-                        <span class="label">Analytics</span>
-                    </a>
-                    <a href="earnings.html" class="menu-item">
-                        <div class="icon"><i class="fas fa-wallet"></i></div>
-                        <span class="label">Earnings</span>
-                    </a>
+                    <a href="manage-service.html" class="menu-item"><div class="icon"><i class="fas fa-plus-circle"></i></div><span class="label">Add Service</span></a>
+                    <a href="manage-service.html" class="menu-item"><div class="icon"><i class="fas fa-th-list"></i></div><span class="label">My Services</span></a>
+                    <a href="inbox.html" class="menu-item"><div class="icon"><i class="fas fa-inbox"></i></div><span class="label">Inbox</span></a>
+                    <a href="edit-profile.html" class="menu-item"><div class="icon"><i class="fas fa-user-edit"></i></div><span class="label">Edit Profile</span></a>
+                    <a href="analytics.html" class="menu-item"><div class="icon"><i class="fas fa-chart-line"></i></div><span class="label">Analytics</span></a>
+                    <a href="earnings.html" class="menu-item"><div class="icon"><i class="fas fa-wallet"></i></div><span class="label">Earnings</span></a>
                 </div>
             </div>
 
@@ -149,7 +131,6 @@
     </footer>
 
     <script src="theme.js" defer></script>
-    <script src="provider-dashboard.js" defer></script>
+    <script src="provider-dashboard.js" type="module"></script>
 </body>
 </html>
-
