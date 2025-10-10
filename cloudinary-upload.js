@@ -1,9 +1,9 @@
 // This file now acts as the "customer" who goes to the "bank teller" first.
 
 // IMPORTANT: Replace 'YOUR_CLOUD_NAME' with your actual Cloudinary Cloud Name.
-const CLOUDINARY_CLOUD_NAME = 'YOUR_CLOUD_NAME';
+const CLOUDINARY_CLOUD_NAME = 'dzdqzpnmv';
 // IMPORTANT: Replace 'YOUR_API_KEY' with your actual Cloudinary API Key (it's safe to have this one here).
-const CLOUDINARY_API_KEY = 'YOUR_API_KEY';
+const CLOUDINARY_API_KEY = '927694656312358';
 
 const uploadToCloudinary = async (file) => {
     try {
