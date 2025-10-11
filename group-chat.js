@@ -13,21 +13,19 @@ import {
     limit
 } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-// This is the main fix. We wait for the entire HTML page to be ready before running any code.
-document.addEventListener('DOMContentLoaded', () => {
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+const messageArea = document.getElementById('message-area');
+const chatForm = document.getElementById('chat-form');
+const messageInput = document.getElementById('message-input');
+const backButton = document.getElementById('back-button');
 
-    const messageArea = document.getElementById('message-area');
-    const chatForm = document.getElementById('chat-form');
-    const messageInput = document.getElementById('message-input');
-    const backButton = document.getElementById('back-button');
+let currentUser = null;
+let unsubscribe = null; 
 
-    let currentUser = null;
-    let unsubscribe = null; 
-
-    // 1. Check Authentication State
+// This function will handle the entire page logic
+async function initializeChat() {
     onAuthStateChanged(auth, async (user) => {
         if (user && user.emailVerified) {
             const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -38,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     profilePicUrl: userDoc.data().profilePicUrl
                 };
                 
-                // Now it's safe to set the href because we know the button exists.
+                // This is now safe because the script runs at the end of the body
                 backButton.href = 'dashboard.html';
                 
                 listenForMessages();
@@ -49,77 +47,75 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = 'auth.html';
         }
     });
+}
 
-    // 2. Listen for Real-Time Messages
-    function listenForMessages() {
-        const messagesRef = collection(db, "group-chat");
-        const q = query(messagesRef, orderBy("createdAt", "asc"), limit(100));
+function listenForMessages() {
+    const messagesRef = collection(db, "group-chat");
+    const q = query(messagesRef, orderBy("createdAt", "asc"), limit(100));
 
-        unsubscribe = onSnapshot(q, (snapshot) => {
-            snapshot.docChanges().forEach((change) => {
-                if (change.type === "added") {
-                    const messageData = change.doc.data();
-                    renderMessage(messageData);
-                }
-            });
-            // Scroll to the bottom on new message
-            setTimeout(() => {
-                messageArea.scrollTop = messageArea.scrollHeight;
-            }, 100);
-            
-        }, (error) => {
-            console.error("Error fetching messages (Hint: Check Firestore index)", error);
-            messageArea.innerHTML = `<p style="padding: 20px; text-align: center;">Error: Could not load messages.</p>`;
-        });
-    }
-
-    // 3. Render a Single Message to the Screen
-    function renderMessage(data) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = 'message';
-
-        const isOwnMessage = data.userId === currentUser.uid;
-        if (isOwnMessage) {
-            messageDiv.classList.add('own-message');
-        }
-
-        const avatar = data.profilePicUrl || `https://placehold.co/45x45/10336d/a7c0e8?text=${(data.userName || 'U').charAt(0)}`;
-
-        messageDiv.innerHTML = `
-            <img src="${avatar}" alt="${data.userName}" class="message-avatar">
-            <div class="message-content">
-                <div class="message-sender">${data.userName}</div>
-                <p class="message-bubble">${data.text}</p>
-            </div>
-        `;
-        messageArea.appendChild(messageDiv);
-    }
-
-    // 4. Handle Sending a New Message
-    chatForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const messageText = messageInput.value.trim();
-
-        if (messageText && currentUser) {
-            try {
-                await addDoc(collection(db, "group-chat"), {
-                    text: messageText,
-                    userId: currentUser.uid,
-                    userName: currentUser.name,
-                    profilePicUrl: currentUser.profilePicUrl || '',
-                    createdAt: serverTimestamp()
-                });
-                messageInput.value = '';
-            } catch (error) {
-                console.error("Error sending message: ", error);
+    unsubscribe = onSnapshot(q, (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+            if (change.type === "added") {
+                renderMessage(change.doc.data());
             }
-        }
+        });
+        
+        setTimeout(() => {
+            messageArea.scrollTop = messageArea.scrollHeight;
+        }, 100);
+            
+    }, (error) => {
+        console.error("Error fetching messages:", error);
+        messageArea.innerHTML = `<p style="padding: 20px; text-align: center;">Error: Could not load messages.</p>`;
     });
+}
 
-    // Clean up the listener if the user navigates away
-    window.addEventListener('beforeunload', () => {
-        if (unsubscribe) {
-            unsubscribe();
+function renderMessage(data) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message';
+
+    const isOwnMessage = data.userId === currentUser.uid;
+    if (isOwnMessage) {
+        messageDiv.classList.add('own-message');
+    }
+
+    const avatar = data.profilePicUrl || `https://placehold.co/45x45/10336d/a7c0e8?text=${(data.userName || 'U').charAt(0)}`;
+
+    messageDiv.innerHTML = `
+        <img src="${avatar}" alt="${data.userName}" class="message-avatar">
+        <div class="message-content">
+            <div class="message-sender">${data.userName}</div>
+            <p class="message-bubble">${data.text}</p>
+        </div>
+    `;
+    messageArea.appendChild(messageDiv);
+}
+
+chatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const messageText = messageInput.value.trim();
+
+    if (messageText && currentUser) {
+        try {
+            await addDoc(collection(db, "group-chat"), {
+                text: messageText,
+                userId: currentUser.uid,
+                userName: currentUser.name,
+                profilePicUrl: currentUser.profilePicUrl || '',
+                createdAt: serverTimestamp()
+            });
+            messageInput.value = '';
+        } catch (error) {
+            console.error("Error sending message: ", error);
         }
-    });
+    }
 });
+
+window.addEventListener('beforeunload', () => {
+    if (unsubscribe) {
+        unsubscribe();
+    }
+});
+
+// --- Run the main function ---
+initializeChat();
