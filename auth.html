@@ -64,7 +64,71 @@
         .verification-notice i { font-size: 3rem; color: var(--accent-primary); margin-bottom: 20px; }
         .verification-notice p { line-height: 1.7; }
         footer { width: 100%; text-align: center; padding: 20px; font-size: 0.9rem; color: var(--text-secondary); }
-        footer a { color: var(--accent-primary); text-decoration: none; }
+        /* --- NEW: FOOTER STYLES --- */
+footer {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    padding: 60px 0 20px 0;
+    border-top: 1px solid var(--border-color);
+}
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Default to single column on mobile */
+    gap: 40px;
+    margin-bottom: 40px;
+    text-align: center; /* Center text on mobile */
+}
+/* On tablets and larger, switch to a multi-column grid */
+@media (min-width: 768px) {
+    .footer-grid {
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        text-align: left; /* Align left on larger screens */
+    }
+}
+.footer-grid h4 {
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+.footer-about p {
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+}
+.footer-socials a {
+    color: var(--text-primary);
+    font-size: 1.3rem;
+    margin: 0 10px;
+    transition: color 0.3s;
+}
+.footer-socials a:hover {
+    color: var(--accent-primary);
+}
+.footer-links ul {
+    list-style: none;
+    padding: 0;
+}
+.footer-links li {
+    margin-bottom: 12px;
+}
+.footer-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.3s;
+}
+.footer-links a:hover {
+    color: var(--accent-primary);
+    padding-left: 5px;
+}
+.footer-links ul li i {
+    margin-right: 10px;
+    color: var(--accent-primary);
+}
+.footer-bottom {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
     </style>
 </head>
 <body>
@@ -121,7 +185,52 @@
             </div>
         </div>
     </div>
-    <footer><p>&copy; 2025 KabaleOnline. All Rights Reserved. <a href="#">Terms of Service</a></p></footer>
+    <!-- START: New Footer Code -->
+<footer>
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-about">
+                <h4 class="nav-logo" style="font-size: 2rem;">KabaleOnline</h4>
+                <p>Connecting our community by making it easy to find and offer skilled services across the Kigezi region.</p>
+                <div class="footer-socials">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <ul id="footer-quick-links">
+                    <li><a href="services.html">Browse Services</a></li>
+                    <li><a href="browse-jobs.html">Browse Jobs</a></li>
+                    <li><a href="group-chat.html">Community Chat</a></li>
+                    <!-- Dynamic links (Login/Dashboard/Logout) will be added here by global-auth.js -->
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Help & FAQ</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+             <div class="footer-links">
+                <h4>Contact Us</h4>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt"></i> Kabale, Uganda</li>
+                    <li><i class="fas fa-phone-alt"></i> +256 123 456789</li>
+                    <li><i class="fas fa-envelope"></i> help@kabaleonline.com</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 KabaleOnline Services. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
+<!-- END: New Footer Code -->
     <script src="theme.js" defer></script>
     <script src="auth.js" type="module"></script>
 </body>
