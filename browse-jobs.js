@@ -7,24 +7,16 @@ const db = getFirestore(app);
 
 const jobPostsListEl = document.getElementById('job-posts-list');
 
-// --- AUTHENTICATION ---
-// Protect the page: only logged-in users can see the job board.
 onAuthStateChanged(auth, user => {
     if (user) {
-        // User is logged in, fetch the job posts.
         listenForJobPosts();
     } else {
-        // User is not logged in, redirect them.
         window.location.href = 'auth.html';
     }
 });
 
-/**
- * Listens for real-time updates to all 'Open' job posts.
- */
 function listenForJobPosts() {
     const jobPostsRef = collection(db, "job_posts");
-    // Create a query to get all job posts that are 'Open', ordered by most recent first.
     const q = query(jobPostsRef, where("status", "==", "Open"), orderBy("createdAt", "desc"));
     
     jobPostsListEl.innerHTML = '<p style="text-align: center; padding: 20px;">Loading open jobs...</p>';
@@ -39,7 +31,6 @@ function listenForJobPosts() {
         for (const jobDoc of snapshot.docs) {
             const jobPost = { id: jobDoc.id, ...jobDoc.data() };
             
-            // Fetch the profile of the seeker who posted the job
             const userDoc = await getDoc(doc(db, "users", jobPost.seekerId));
             if (userDoc.exists()) {
                 const seekerData = userDoc.data();
@@ -52,11 +43,6 @@ function listenForJobPosts() {
     });
 }
 
-/**
- * Creates the HTML for a single job post card and appends it to the list.
- * @param {object} jobPost The job post data from Firestore.
- * @param {object} seekerData The profile data of the user who posted the job.
- */
 function renderJobPostCard(jobPost, seekerData) {
     const card = document.createElement('div');
     card.className = 'job-post-card';
@@ -82,7 +68,7 @@ function renderJobPostCard(jobPost, seekerData) {
         </div>
         <div class="job-actions">
             <a href="#" class="btn btn-primary">Send Proposal</a>
-            <a href="#" class="btn btn-secondary">View Details</a>
+            <a href="job-post-detail.html?id=${jobPost.id}" class="btn btn-secondary">View Details</a>
         </div>
     `;
 
