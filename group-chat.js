@@ -9,8 +9,7 @@ import {
     addDoc, 
     serverTimestamp,
     doc,
-    getDoc,
-    limit
+    getDoc
 } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 const auth = getAuth(app);
@@ -19,6 +18,7 @@ const db = getFirestore(app);
 const messageArea = document.getElementById('message-area');
 const chatForm = document.getElementById('chat-form');
 const messageInput = document.getElementById('message-input');
+const backButton = document.getElementById('back-button');
 
 let currentUser = null;
 let unsubscribe = null; // To stop the listener when the user leaves
@@ -26,7 +26,6 @@ let unsubscribe = null; // To stop the listener when the user leaves
 // 1. Check Authentication State
 onAuthStateChanged(auth, async (user) => {
     if (user && user.emailVerified) {
-        // User is logged in and verified
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
             currentUser = {
@@ -34,35 +33,32 @@ onAuthStateChanged(auth, async (user) => {
                 name: userDoc.data().name,
                 profilePicUrl: userDoc.data().profilePicUrl
             };
+            backButton.href = userDoc.data().role === 'provider' ? 'provider-dashboard.html' : 'seeker-dashboard.html';
             listenForMessages();
         } else {
              window.location.href = 'auth.html';
         }
     } else {
-        // User is not logged in or not verified, redirect
         window.location.href = 'auth.html';
     }
 });
 
-// 2. Listen for Real-Time Messages
+// 2. Listen for Real-Time Messages (CORRECTED LOGIC)
 function listenForMessages() {
     const messagesRef = collection(db, "group-chat");
-    // Get the last 50 messages to avoid loading the entire history at once
-    const q = query(messagesRef, orderBy("createdAt", "desc"), limit(50));
+    // Get messages ordered by when they were created (oldest first)
+    const q = query(messagesRef, orderBy("createdAt", "asc"));
 
     unsubscribe = onSnapshot(q, (snapshot) => {
-        messageArea.innerHTML = ''; // Clear the area
-        const messages = [];
-        snapshot.forEach(doc => {
-            messages.push(doc.data());
+        // Use docChanges() to see what's new
+        snapshot.docChanges().forEach((change) => {
+            // Only act on messages that were ADDED
+            if (change.type === "added") {
+                const messageData = change.doc.data();
+                renderMessage(messageData);
+            }
         });
-        
-        // Reverse the array to show oldest messages first
-        messages.reverse().forEach(messageData => {
-            renderMessage(messageData);
-        });
-
-        // Scroll to the bottom
+        // Scroll to the bottom every time a new message is added
         messageArea.scrollTop = messageArea.scrollHeight;
     });
 }
@@ -89,7 +85,7 @@ function renderMessage(data) {
     messageArea.appendChild(messageDiv);
 }
 
-// 4. Handle Sending a New Message
+// 4. Handle Sending a New Message (Remains the Same)
 chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const messageText = messageInput.value.trim();
