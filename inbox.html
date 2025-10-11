@@ -12,14 +12,13 @@
         :root {
             --bg-primary: #0d2857; --bg-secondary: #10336d; --text-primary: #ffffff;
             --text-secondary: #a7c0e8; --accent-primary: #007bff; --border-color: #1f4287;
-            --font-family: 'Poppins', sans-serif;
         }
         body.light-mode {
             --bg-primary: #f0f4f9; --bg-secondary: #ffffff; --text-primary: #0d2857;
             --text-secondary: #6c757d; --border-color: #e9ecef;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: var(--font-family); background-color: var(--bg-primary); color: var(--text-secondary); }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-primary); color: var(--text-secondary); }
         .container { max-width: 800px; margin: 0 auto; padding: 0 15px; }
         .header { position: sticky; top: 0; z-index: 1000; background-color: var(--bg-secondary); border-bottom: 1px solid var(--border-color); padding: 15px 0; }
         .navbar { display: flex; justify-content: space-between; align-items: center; max-width:1200px; margin: 0 auto; padding: 0 15px; }
@@ -35,148 +34,125 @@
         }
         .group-chat-card .icon { font-size: 2rem; color: var(--accent-primary); }
         .group-chat-card h2 { font-size: 1.2rem; color: var(--text-primary); margin-bottom: 4px; }
-        .group-chat-card p { font-size: 0.9rem; color: var(--text-secondary); }
         .conversation-list { background-color: var(--bg-secondary); border-radius: 16px; padding: 10px; border: 1px solid var(--border-color); min-height: 200px; }
         .conversation { display: flex; align-items: center; gap: 15px; padding: 15px; border-radius: 12px; text-decoration: none; }
         .conversation:not(:last-child) { border-bottom: 1px solid var(--border-color); }
-        .conversation:hover { background-color: var(--bg-primary); }
-        .convo-avatar { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+        .convo-avatar { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; }
         .convo-details { flex-grow: 1; overflow: hidden; }
         .convo-header { display: flex; justify-content: space-between; align-items: baseline; }
         .convo-name { font-weight: 600; color: var(--text-primary); font-size: 1.1rem; }
         .convo-time { font-size: 0.8rem; color: var(--text-secondary); }
         .convo-preview { font-size: 0.95rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-/* --- NEW: FOOTER STYLES --- */
-footer {
-    background-color: var(--bg-card);
-    color: var(--text-primary);
-    padding: 60px 0 20px 0;
-    border-top: 1px solid var(--border-color);
-}
-.footer-grid {
-    display: grid;
-    grid-template-columns: 1fr; /* Default to single column on mobile */
-    gap: 40px;
-    margin-bottom: 40px;
-    text-align: center; /* Center text on mobile */
-}
-/* On tablets and larger, switch to a multi-column grid */
-@media (min-width: 768px) {
-    .footer-grid {
-        grid-template-columns: 2fr 1fr 1fr 1fr;
-        text-align: left; /* Align left on larger screens */
-    }
-}
-.footer-grid h4 {
-    color: var(--text-primary);
-    font-size: 1.2rem;
-    margin-bottom: 20px;
-}
-.footer-about p {
-    color: var(--text-secondary);
-    margin-bottom: 20px;
-}
-.footer-socials a {
-    color: var(--text-primary);
-    font-size: 1.3rem;
-    margin: 0 10px;
-    transition: color 0.3s;
-}
-.footer-socials a:hover {
-    color: var(--accent-primary);
-}
-.footer-links ul {
-    list-style: none;
-    padding: 0;
-}
-.footer-links li {
-    margin-bottom: 12px;
-}
-.footer-links a {
-    color: var(--text-secondary);
-    text-decoration: none;
-    transition: all 0.3s;
-}
-.footer-links a:hover {
-    color: var(--accent-primary);
-    padding-left: 5px;
-}
-.footer-links ul li i {
-    margin-right: 10px;
-    color: var(--accent-primary);
-}
-.footer-bottom {
-    text-align: center;
-    padding-top: 20px;
-    border-top: 1px solid var(--border-color);
-    color: var(--text-secondary);
-}
     </style>
 </head>
-<body class="dark-mode">
-    <header class="header"><div class="navbar"><a href="index.html" class="nav-logo">KabaleOnline</a><button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button></div></header>
+<body>
+    <header class="header">
+        <div class="navbar">
+            <a href="index.html" class="nav-logo">KabaleOnline</a>
+            <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
+        </div>
+    </header>
     <main class="main-content">
         <div class="container">
-            <div class="page-header">
-                <h1>Inbox</h1>
-                <a href="dashboard.html" id="back-button" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
-            </div>
+            <div class="page-header"><h1>Inbox</h1><a href="dashboard.html" id="back-button" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</a></div>
             <a href="group-chat.html" class="group-chat-card">
                 <div class="icon"><i class="fas fa-users"></i></div>
                 <div><h2>Community Group Chat</h2><p>Join the public conversation with all KabaleOnline users.</p></div>
             </a>
             <div class="conversation-list" id="conversation-list">
-                <!-- Conversations will be loaded here by inbox.js -->
+                 <!-- Conversations will be loaded here by JavaScript -->
             </div>
         </div>
     </main>
-<!-- START: New Footer Code -->
-<footer>
-    <div class="container">
-        <div class="footer-grid">
-            <div class="footer-about">
-                <h4 class="nav-logo" style="font-size: 2rem;">KabaleOnline</h4>
-                <p>Connecting our community by making it easy to find and offer skilled services across the Kigezi region.</p>
-                <div class="footer-socials">
-                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { getFirestore, collection, query, where, orderBy, onSnapshot, getDoc, doc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        
+        const firebaseConfig = {
+          apiKey: "AIzaSy...YOUR_API_KEY",
+          authDomain: "your-project-id.firebaseapp.com",
+          projectId: "your-project-id",
+          storageBucket: "your-project-id.appspot.com",
+          messagingSenderId: "1234567890",
+          appId: "1:1234567890:web:abcdef123456"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const conversationListEl = document.getElementById('conversation-list');
+        
+        onAuthStateChanged(auth, user => {
+            if (user && user.emailVerified) {
+                listenForConversations(user.uid);
+            } else {
+                window.location.href = 'auth.html';
+            }
+        });
+
+        function listenForConversations(userId) {
+            const conversationsRef = collection(db, "conversations");
+            const q = query(conversationsRef, where("participants", "array-contains", userId), orderBy("lastMessageTimestamp", "desc"));
+            
+            conversationListEl.innerHTML = '<p style="padding: 20px; text-align: center;">Loading conversations...</p>';
+
+            onSnapshot(q, async (snapshot) => {
+                if (snapshot.empty) {
+                    conversationListEl.innerHTML = '<p style="padding: 20px; text-align: center;">No conversations yet.</p>';
+                    return;
+                }
+
+                conversationListEl.innerHTML = '';
+                for (const doc of snapshot.docs) {
+                    const convo = { id: doc.id, ...doc.data() };
+                    const otherParticipantId = convo.participants.find(p => p !== userId);
+
+                    if (otherParticipantId) {
+                        const userDoc = await getDoc(doc(db, "users", otherParticipantId));
+                        if (userDoc.exists()) {
+                            renderConversation(convo, userDoc.data());
+                        }
+                    }
+                }
+            }, (error) => {
+                console.error("Error fetching conversations (check Firestore Indexes):", error);
+                conversationListEl.innerHTML = '<p style="padding: 20px; text-align: center; color: #dc3545;">Could not load conversations.</p>';
+            });
+        }
+
+        function renderConversation(convo, otherUser) {
+            const convoLink = document.createElement('a');
+            convoLink.href = `chat.html?recipientId=${otherUser.uid}`;
+            convoLink.className = 'conversation';
+
+            const time = convo.lastMessageTimestamp?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || '';
+
+            convoLink.innerHTML = `
+                <img src="${otherUser.profilePicUrl || `https://placehold.co/55x55/10336d/a7c0e8?text=${otherUser.name.charAt(0)}`}" alt="Avatar" class="convo-avatar">
+                <div class="convo-details">
+                    <div class="convo-header">
+                        <span class="convo-name">${otherUser.name}</span>
+                        <span class="convo-time">${time}</span>
+                    </div>
+                    <p class="convo-preview">${convo.lastMessageText || 'No messages yet.'}</p>
                 </div>
-            </div>
-            <div class="footer-links">
-                <h4>Quick Links</h4>
-                <ul id="footer-quick-links">
-                    <li><a href="services.html">Browse Services</a></li>
-                    <li><a href="browse-jobs.html">Browse Jobs</a></li>
-                    <li><a href="group-chat.html">Community Chat</a></li>
-                    <!-- Dynamic links (Login/Dashboard/Logout) will be added here by global-auth.js -->
-                </ul>
-            </div>
-            <div class="footer-links">
-                <h4>Support</h4>
-                <ul>
-                    <li><a href="#">Contact Us</a></li>
-                    <li><a href="#">Help & FAQ</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Terms of Service</a></li>
-                </ul>
-            </div>
-             <div class="footer-links">
-                <h4>Contact Us</h4>
-                <ul>
-                    <li><i class="fas fa-map-marker-alt"></i> Kabale, Uganda</li>
-                    <li><i class="fas fa-phone-alt"></i> +256 123 456789</li>
-                    <li><i class="fas fa-envelope"></i> help@kabaleonline.com</li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2025 KabaleOnline Services. All Rights Reserved.</p>
-        </div>
-    </div>
-</footer>
-<!-- END: New Footer Code -->
-    <script src="theme.js" defer></script>
-    <script src="inbox.js" type="module"></script>
+            `;
+            conversationListEl.appendChild(convoLink);
+        }
+        
+        // Theme logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const applyTheme = (theme) => {
+            document.body.classList.toggle('light-mode', theme === 'light-mode');
+            localStorage.setItem('theme', theme);
+        };
+        const currentTheme = localStorage.getItem('theme') || 'dark-mode';
+        applyTheme(currentTheme);
+        themeToggle.addEventListener('click', () => {
+            const newTheme = document.body.classList.contains('light-mode') ? 'dark-mode' : 'light-mode';
+            applyTheme(newTheme);
+        });
+    </script>
 </body>
 </html>
