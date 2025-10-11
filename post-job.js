@@ -13,9 +13,10 @@ let currentUserId = null;
 
 // Protect the page: only logged-in users can see this form.
 onAuthStateChanged(auth, user => {
-    if (user) {
+    if (user && user.emailVerified) {
         currentUserId = user.uid;
     } else {
+        // Redirect to login if user is not authenticated or not verified
         window.location.href = 'auth.html';
     }
 });
