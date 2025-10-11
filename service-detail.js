@@ -9,6 +9,7 @@ import {
     where, 
     getDocs, 
     addDoc, 
+    setDoc,
     serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 import { showToast, hideToast } from './notifications.js';
@@ -22,7 +23,7 @@ const contactBtn = document.getElementById('contact-btn');
 const serviceCategoryEl = document.getElementById('service-category');
 const serviceTitleEl = document.getElementById('service-title');
 const serviceCoverImageEl = document.getElementById('service-cover-image');
-const serviceDescriptionEl = document.getElementById('service-description');
+const serviceDescriptionEl = document.getElementById('service-description-text');
 const providerAvatarEl = document.getElementById('provider-avatar');
 const providerNameEl = document.getElementById('provider-name');
 const providerLocationEl = document.getElementById('provider-location');
@@ -102,10 +103,7 @@ contactBtn.addEventListener('click', async (e) => {
     showToast("Finding or creating conversation...", "progress");
 
     try {
-        // 2. Check if a conversation between these two users already exists
-        const conversationsRef = collection(db, "conversations");
-        // Create a unique ID for the conversation room based on the two user IDs
-        // This ensures there is only ever ONE chat room between two people
+        // 2. Create a unique, predictable ID for the conversation room based on the two user IDs
         const conversationId = [currentUserId, providerId].sort().join('_');
         
         const convoDocRef = doc(db, "conversations", conversationId);
