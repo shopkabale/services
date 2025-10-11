@@ -23,7 +23,9 @@ const contactBtn = document.getElementById('contact-btn');
 const serviceCategoryEl = document.getElementById('service-category');
 const serviceTitleEl = document.getElementById('service-title');
 const serviceCoverImageEl = document.getElementById('service-cover-image');
-const serviceDescriptionEl = document.getElementById('service-description-text');
+// --- THIS IS THE FIX ---
+// The ID in the HTML is 'service-description-text', not 'service-description'.
+const serviceDescriptionEl = document.getElementById('service-description-text'); 
 const providerAvatarEl = document.getElementById('provider-avatar');
 const providerNameEl = document.getElementById('provider-name');
 const providerLocationEl = document.getElementById('provider-location');
@@ -32,7 +34,6 @@ const servicePriceEl = document.getElementById('service-price');
 let currentUserId = null;
 let providerId = null;
 
-// Check for logged-in user as soon as the page loads
 onAuthStateChanged(auth, (user) => {
     if (user && user.emailVerified) {
         currentUserId = user.uid;
@@ -55,7 +56,7 @@ const loadServiceDetails = async () => {
             return;
         }
         const serviceData = serviceDoc.data();
-        providerId = serviceData.providerId; // Store the provider's ID globally
+        providerId = serviceData.providerId;
 
         const providerDoc = await getDoc(doc(db, "users", providerId));
         if (!providerDoc.exists()) {
@@ -64,11 +65,11 @@ const loadServiceDetails = async () => {
         }
         const providerData = providerDoc.data();
 
-        // Populate the page with data
         document.title = `${serviceData.title} | KabaleOnline`;
         serviceCategoryEl.textContent = serviceData.category;
         serviceTitleEl.textContent = serviceData.title;
         serviceCoverImageEl.src = serviceData.coverImageUrl;
+        // This line will now work correctly.
         serviceDescriptionEl.innerHTML = `<p>${serviceData.description.replace(/\n/g, '</p><p>')}</p>`;
         providerAvatarEl.src = providerData.profilePicUrl || `https://placehold.co/100x100/10336d/a7c0e8?text=${providerData.name.charAt(0)}`;
         providerNameEl.textContent = providerData.name;
@@ -84,11 +85,9 @@ const loadServiceDetails = async () => {
     }
 };
 
-// --- THIS IS THE NEW, CORRECTED LOGIC ---
 contactBtn.addEventListener('click', async (e) => {
     e.preventDefault();
 
-    // 1. Check if the user is logged in
     if (!currentUserId) {
         showToast("You must be logged in to contact a provider.", "error");
         setTimeout(() => { window.location.href = `auth.html`; }, 2000);
@@ -103,26 +102,20 @@ contactBtn.addEventListener('click', async (e) => {
     showToast("Finding or creating conversation...", "progress");
 
     try {
-        // 2. Create a unique, predictable ID for the conversation room based on the two user IDs
         const conversationId = [currentUserId, providerId].sort().join('_');
-        
         const convoDocRef = doc(db, "conversations", conversationId);
         const convoDoc = await getDoc(convoDocRef);
 
-        // 3. If a conversation exists, redirect to it
         if (convoDoc.exists()) {
             window.location.href = `chat.html?id=${conversationId}`;
         } else {
-            // 4. If not, create the new conversation with the specific ID
             await setDoc(convoDocRef, {
                 participants: [currentUserId, providerId],
                 lastMessageTimestamp: serverTimestamp(),
                 lastMessageText: ''
             });
-            // Redirect to the newly created chat
             window.location.href = `chat.html?id=${conversationId}`;
         }
-
     } catch (error) {
         console.error("Error starting conversation:", error);
         hideToast();
@@ -130,5 +123,4 @@ contactBtn.addEventListener('click', async (e) => {
     }
 });
 
-// Run the main function when the page loads
 loadServiceDetails();
