@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat | KabaleOnline</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <style>
         :root {
             --bg-primary: #0d2857; --bg-secondary: #10336d; --text-primary: #ffffff;
@@ -20,26 +23,62 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; overflow: hidden; }
-        body { font-family: var(--font-family); background-color: var(--bg-primary); display: flex; flex-direction: column; }
-        .chat-header {
-            background-color: var(--bg-secondary); border-bottom: 1px solid var(--border-color); padding: 10px 15px;
-            display: flex; align-items: center; gap: 15px; flex-shrink: 0; position: fixed; top: 0; left: 0; width: 100%; z-index: 100;
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-primary);
+            color: var(--text-secondary);
+            display: flex;
+            flex-direction: column;
         }
-        .back-button { background: none; border: none; font-size: 1.5rem; color: var(--text-primary); cursor: pointer; }
+        .chat-header {
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-shrink: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+        }
+        .back-button {
+            background: none; border: none; font-size: 1.5rem;
+            color: var(--text-primary); cursor: pointer;
+        }
         .chat-header-avatar { width: 45px; height: 45px; border-radius: 50%; }
         .chat-header-info { flex-grow: 1; }
         .chat-header-name { font-size: 1.2rem; font-weight: 600; color: var(--text-primary); }
         .group-chat-link { display: block; color: var(--accent-primary); text-decoration: none; font-size: 0.9rem; font-weight: 500; }
-        .message-area { flex-grow: 1; overflow-y: auto; padding: 95px 15px 20px; }
-        .message { display: flex; gap: 10px; margin-bottom: 15px; max-width: 80%; }
+        .message-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 95px 15px 20px;
+        }
+        .message {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            max-width: 80%;
+        }
         .message-avatar { width: 35px; height: 35px; border-radius: 50%; align-self: flex-end; }
         .message-bubble { padding: 12px 18px; border-radius: 18px; line-height: 1.5; }
         .message.sent { margin-left: auto; flex-direction: row-reverse; }
         .message.received .message-bubble { background-color: var(--bg-secondary); }
         .message.sent .message-bubble { background-color: var(--accent-primary); color: #fff; }
         .chat-input-area {
-            background-color: var(--bg-secondary); border-top: 1px solid var(--border-color); padding: 15px;
-            display: flex; gap: 15px; flex-shrink: 0; position: fixed; bottom: 0; left: 0; width: 100%;
+            background-color: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 15px;
+            display: flex;
+            gap: 15px;
+            flex-shrink: 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
         }
         .chat-input { flex-grow: 1; padding: 12px 18px; background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 50px; color: var(--text-primary); font-size: 1rem; }
         .chat-input:focus { outline: none; border-color: var(--accent-primary); }
@@ -56,7 +95,7 @@
         </div>
     </header>
     <main class="message-area" id="message-area">
-        <!-- Messages will be loaded here by chat.js -->
+        <!-- Messages will be loaded here -->
     </main>
     <footer class="chat-input-area">
         <form id="chat-form" style="display: flex; flex-grow: 1; gap: 15px;">
@@ -64,7 +103,164 @@
             <button type="submit" class="btn-send" aria-label="Send Message"><i class="fas fa-paper-plane"></i></button>
         </form>
     </footer>
-    <script src="theme.js" defer></script>
-    <script src="chat.js" type="module"></script>
+
+    <!-- All JavaScript is now self-contained in this single block -->
+    <script type="module">
+        // --- PART 1: FIREBASE & THEME INITIALIZATION ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        const firebaseConfig = {
+          apiKey: "AIzaSy...YOUR_API_KEY",
+          authDomain: "your-project-id.firebaseapp.com",
+          projectId: "your-project-id",
+          storageBucket: "your-project-id.appspot.com",
+          messagingSenderId: "1234567890",
+          appId: "1:1234567890:web:abcdef123456"
+        };
+        const app = initializeApp(firebaseConfig);
+
+        // Theme logic (assuming theme.js is not used on this page)
+        const themeToggle = document.querySelector('.theme-toggle');
+        if (themeToggle) {
+             const applyTheme = (theme) => {
+                document.body.className = theme;
+                localStorage.setItem('theme', theme);
+                themeToggle.textContent = theme === 'light-mode' ? '☀️' : '🌙';
+            };
+            const currentTheme = localStorage.getItem('theme') || 'dark-mode';
+            applyTheme(currentTheme);
+            themeToggle.addEventListener('click', () => {
+                const newTheme = document.body.classList.contains('light-mode') ? 'dark-mode' : 'light-mode';
+                applyTheme(newTheme);
+            });
+        }
+
+
+        // --- PART 2: CHAT PAGE LOGIC ---
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { getFirestore, collection, doc, getDoc, addDoc, setDoc, query, orderBy, onSnapshot, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const messageArea = document.getElementById('message-area');
+        const chatForm = document.getElementById('chat-form');
+        const messageInput = document.getElementById('message-input');
+        const chatHeaderName = document.getElementById('chat-header-name');
+        const chatHeaderAvatar = document.getElementById('chat-header-avatar');
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const recipientId = urlParams.get('recipientId');
+        let conversationId = urlParams.get('id');
+        let currentUser = null;
+        let unsubscribe = null;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user && user.emailVerified) {
+                currentUser = user;
+                if (recipientId) {
+                    await findOrCreateConversation(recipientId);
+                } else if (conversationId) {
+                    await setupChat(conversationId);
+                } else {
+                    alert("Error: No user or conversation specified.");
+                    window.location.href = 'inbox.html';
+                }
+            } else {
+                window.location.href = 'auth.html';
+            }
+        });
+
+        async function findOrCreateConversation(recipientId) {
+            if (currentUser.uid === recipientId) {
+                alert("You cannot chat with yourself.");
+                window.history.back();
+                return;
+            }
+            
+            const newConversationId = [currentUser.uid, recipientId].sort().join('_');
+            const convoDocRef = doc(db, "conversations", newConversationId);
+            
+            const convoDoc = await getDoc(convoDocRef);
+
+            if (!convoDoc.exists()) {
+                await setDoc(convoDocRef, {
+                    participants: [currentUser.uid, recipientId],
+                    lastMessageTimestamp: serverTimestamp()
+                });
+            }
+            
+            window.location.href = `chat.html?id=${newConversationId}`;
+        }
+
+        async function setupChat(convoId) {
+            const convoDocRef = doc(db, "conversations", convoId);
+            const convoDoc = await getDoc(convoDocRef);
+
+            if (!convoDoc.exists() || !convoDoc.data().participants.includes(currentUser.uid)) {
+                alert("Error: You do not have permission to view this conversation.");
+                window.location.href = 'inbox.html';
+                return;
+            }
+
+            const otherUserId = convoDoc.data().participants.find(p => p !== currentUser.uid);
+            const otherUserDoc = await getDoc(doc(db, "users", otherUserId));
+
+            if (otherUserDoc.exists()) {
+                const otherUser = otherUserDoc.data();
+                chatHeaderName.textContent = otherUser.name;
+                chatHeaderAvatar.src = otherUser.profilePicUrl || `https://placehold.co/45x45/10336d/a7c0e8?text=${otherUser.name.charAt(0)}`;
+            }
+
+            const messagesRef = collection(db, `conversations/${convoId}/messages`);
+            const q = query(messagesRef, orderBy("createdAt", "asc"));
+
+            unsubscribe = onSnapshot(q, (snapshot) => {
+                messageArea.innerHTML = '';
+                snapshot.forEach(doc => {
+                    renderMessage(doc.data());
+                });
+                messageArea.scrollTop = messageArea.scrollHeight;
+            });
+        }
+
+        function renderMessage(data) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message';
+            if (data.senderId === currentUser.uid) {
+                msgDiv.classList.add('sent');
+                msgDiv.innerHTML = `<p class="message-bubble">${data.text}</p>`;
+            } else {
+                msgDiv.classList.add('received');
+                msgDiv.innerHTML = `<p class="message-bubble">${data.text}</p>`;
+            }
+            messageArea.appendChild(msgDiv);
+        }
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = messageInput.value.trim();
+            if (text && currentUser && conversationId) {
+                messageInput.value = '';
+                try {
+                    await addDoc(collection(db, `conversations/${conversationId}/messages`), {
+                        text,
+                        senderId: currentUser.uid,
+                        createdAt: serverTimestamp()
+                    });
+                    await updateDoc(doc(db, "conversations", conversationId), {
+                        lastMessageText: text,
+                        lastMessageTimestamp: serverTimestamp()
+                    });
+                } catch (error) {
+                    console.error("Error sending message:", error);
+                    messageInput.value = text;
+                }
+            }
+        });
+
+        window.addEventListener('beforeunload', () => {
+            if (unsubscribe) unsubscribe();
+        });
+    </script>
 </body>
 </html>
