@@ -45,14 +45,13 @@
         .form-container { background-color: var(--bg-secondary); padding: 40px; border-radius: 16px; border: 1px solid var(--border-color); }
         #signup-form-container, #verification-notice { display: none; }
         .form-container h2 { text-align: center; color: var(--text-primary); margin-bottom: 25px; font-size: 2rem; font-weight: 700; }
-        .form-group { margin-bottom: 20px; }
+        .form-group { margin-bottom: 20px; position: relative; }
         .form-control { width: 100%; padding: 14px 18px; background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 1rem; }
         .form-control:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); }
-        .btn-submit { width: 100%; padding: 15px; background-color: var(--accent-primary); color: #ffffff; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
-        .divider { text-align: center; margin: 25px 0; color: var(--text-secondary); position: relative; }
-        .divider::before, .divider::after { content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background-color: var(--border-color); }
-        .divider::before { left: 0; }
-        .divider::after { right: 0; }
+        .password-toggle { position: absolute; top: 50%; right: 15px; transform: translateY(-50%); background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.2rem; }
+        .btn-submit { width: 100%; padding: 15px; background-color: var(--accent-primary); color: #ffffff; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-submit:disabled { background-color: #0056b3; cursor: not-allowed; }
+        .divider { text-align: center; margin: 25px 0; color: var(--text-secondary); }
         .btn-google { width: 100%; padding: 15px; background-color: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 8px; font-size: 1rem; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-google img { width: 20px; height: 20px; }
         .toggle-link { text-align: center; margin-top: 25px; }
@@ -79,7 +78,10 @@
                 <h2>Welcome Back</h2>
                 <form id="login-form">
                     <div class="form-group"><input type="email" id="login-email" class="form-control" placeholder="Email Address" required></div>
-                    <div class="form-group"><input type="password" id="login-password" class="form-control" placeholder="Password" required></div>
+                    <div class="form-group">
+                        <input type="password" id="login-password" class="form-control" placeholder="Password" required>
+                        <button type="button" class="password-toggle"><i class="fas fa-eye"></i></button>
+                    </div>
                     <button type="submit" class="btn-submit">Login</button>
                 </form>
                 <div class="divider">or</div>
@@ -96,8 +98,14 @@
                     </div>
                     <div class="form-group"><input type="text" id="signup-name" class="form-control" placeholder="Full Name" required></div>
                     <div class="form-group"><input type="email" id="signup-email" class="form-control" placeholder="Email Address" required></div>
-                    <div class="form-group"><input type="password" id="signup-password" class="form-control" placeholder="Password" required></div>
-                    <div class="form-group"><input type="password" id="signup-retype-password" class="form-control" placeholder="Retype Password" required></div>
+                    <div class="form-group">
+                        <input type="password" id="signup-password" class="form-control" placeholder="Password" required>
+                        <button type="button" class="password-toggle"><i class="fas fa-eye"></i></button>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="signup-retype-password" class="form-control" placeholder="Retype Password" required>
+                        <button type="button" class="password-toggle"><i class="fas fa-eye"></i></button>
+                    </div>
                     <div class="form-group"><input type="text" id="signup-location" class="form-control" placeholder="Your Location (e.g., Kabale Town)" required></div>
                     <div class="form-group"><input type="tel" id="signup-tel" class="form-control" placeholder="Telephone (e.g., 07...)" required></div>
                     <button type="submit" class="btn-submit">Create Account</button>
