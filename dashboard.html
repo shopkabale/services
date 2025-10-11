@@ -31,7 +31,7 @@
         .profile-name { font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; min-height: 48px; }
         .welcome-message { font-size: 1.1rem; }
         .dashboard-section { background-color: var(--bg-secondary); border-radius: 16px; padding: 25px; margin-bottom: 30px; border: 1px solid var(--border-color); }
-        .section-title { font-size: 1.5rem; font-weight: 600; color: var(--text-primary); margin-bottom: 10px; }
+        .section-title { font-size: 1.5rem; font-weight: 600; color: var(--text-primary); text-align: center; margin-bottom: 10px; }
         .section-description { text-align: center; margin: -5px 0 25px; font-size: 0.95rem; }
         .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 20px; }
         .menu-item { display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: var(--bg-primary); border-radius: 12px; padding: 20px; text-decoration: none; color: var(--text-primary); text-align: center; transition: all 0.2s ease; border: 1px solid var(--border-color); }
@@ -39,8 +39,6 @@
         .menu-item .icon { font-size: 2.5rem; color: var(--accent-primary); margin-bottom: 15px; }
         .menu-item .label { font-weight: 500; font-size: 1rem; }
         .btn-logout { display: block; width: 100%; padding: 15px; border-radius: 8px; text-align: center; text-decoration: none; font-size: 1.1rem; font-weight: 600; background-color: #dc3545; color: #fff; border: none; cursor: pointer; }
-        footer { text-align: center; padding: 40px 15px; background-color: var(--bg-secondary); border-top: 1px solid var(--border-color); font-size: 0.9rem; color: var(--text-secondary); }
-        footer a { color: var(--accent-primary); text-decoration: none; }
     </style>
 </head>
 <body class="dark-mode">
@@ -55,12 +53,11 @@
             <div class="profile-header">
                 <img src="https://placehold.co/120x120/10336d/a7c0e8?text=..." alt="Profile Picture" class="profile-picture" id="profile-picture">
                 <h1 class="profile-name" id="profile-name">Loading...</h1>
-                <p class="welcome-message" id="welcome-message"></p>
+                <p class="welcome-message" id="welcome-message">Welcome to your dashboard!</p>
             </div>
-
+            
             <div class="dashboard-section">
-                <h2 class="section-title" style="text-align: center;">Quick Navigation</h2>
-                <p class="section-description">Jump to key sections of the website.</p>
+                <h2 class="section-title">Quick Navigation</h2>
                 <div class="menu-grid">
                     <a href="index.html" class="menu-item"><div class="icon"><i class="fas fa-home"></i></div><span class="label">Homepage</span></a>
                     <a href="services.html" class="menu-item"><div class="icon"><i class="fas fa-search"></i></div><span class="label">Find Services</span></a>
@@ -69,7 +66,7 @@
             </div>
 
             <div class="dashboard-section">
-                <h2 class="section-title" style="text-align: center;">Hiring Menu (Seeker Actions)</h2>
+                <h2 class="section-title">Hiring Menu (Seeker Actions)</h2>
                 <p class="section-description">Use these tools to find and hire local professionals.</p>
                 <div class="menu-grid">
                     <a href="my-job-posts.html" class="menu-item"><div class="icon"><i class="fas fa-tasks"></i></div><span class="label">My Job Posts</span></a>
@@ -77,7 +74,7 @@
             </div>
 
             <div class="dashboard-section">
-                <h2 class="section-title" style="text-align: center;">Working Menu (Provider Actions)</h2>
+                <h2 class="section-title">Working Menu (Provider Actions)</h2>
                 <p class="section-description">Offer your skills, manage your services, and track your performance.</p>
                 <div class="menu-grid">
                     <a href="manage-service.html" class="menu-item"><div class="icon"><i class="fas fa-plus-circle"></i></div><span class="label">Add Service</span></a>
@@ -88,8 +85,7 @@
             </div>
 
             <div class="dashboard-section">
-                <h2 class="section-title" style="text-align: center;">Account Management</h2>
-                <p class="section-description">Manage your messages and personal information.</p>
+                <h2 class="section-title">Account Management</h2>
                 <div class="menu-grid">
                     <a href="inbox.html" class="menu-item"><div class="icon"><i class="fas fa-inbox"></i></div><span class="label">My Inbox</span></a>
                     <a href="edit-profile.html" class="menu-item"><div class="icon"><i class="fas fa-user-cog"></i></div><span class="label">Edit Profile</span></a>
@@ -99,7 +95,6 @@
             <button class="btn-logout" id="logout-btn">Logout</button>
         </div>
     </main>
-    <footer><p>&copy; 2025 KabaleOnline. All Rights Reserved. <a href="#">Terms of Service</a></p></footer>
     <script src="theme.js" defer></script>
     <script src="dashboard.js" type="module"></script>
 </body>
