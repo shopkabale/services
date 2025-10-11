@@ -52,22 +52,80 @@
         .chat-header-info { flex-grow: 1; }
         .chat-header-name { font-size: 1.2rem; font-weight: 600; color: var(--text-primary); }
         
+        /* --- NEW, PROFESSIONAL CHAT STYLES --- */
+
         .message-area {
             flex-grow: 1;
             overflow-y: auto;
-            padding: 95px 15px 20px;
+            padding: 95px 15px 20px; /* Top padding = header height + extra space */
         }
+
         .message {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            max-width: 80%;
+            gap: 15px;
+            margin-bottom: 20px;
+            max-width: 85%;
+            align-items: flex-end; /* Align avatar with bottom of bubble */
         }
-        .message-bubble { padding: 12px 18px; border-radius: 18px; line-height: 1.5; }
-        .message.sent { margin-left: auto; }
-        .message.received .message-bubble { background-color: var(--bg-secondary); }
-        .message.sent .message-bubble { background-color: var(--accent-primary); color: #fff; }
 
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            background-color: var(--bg-secondary); /* Placeholder color */
+        }
+
+        .message-content {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .message-sender {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .message-bubble {
+            padding: 12px 18px;
+            border-radius: 20px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        /* --- STYLES FOR RECEIVED MESSAGES (LEFT SIDE) --- */
+        .message.received {
+            /* This is the default state */
+        }
+
+        .message.received .message-bubble {
+            background-color: var(--bg-secondary);
+            border-bottom-left-radius: 5px; /* Creates the "bubble" tail */
+        }
+        
+        /* --- STYLES FOR SENT MESSAGES (RIGHT SIDE) --- */
+        .message.sent {
+            margin-left: auto; /* Pushes the message to the right */
+            flex-direction: row-reverse; /* Flips the order of avatar and content */
+        }
+
+        .message.sent .message-content {
+            align-items: flex-end; /* Aligns the sender name to the right */
+        }
+
+        .message.sent .message-bubble {
+            background-color: var(--accent-primary);
+            color: #fff;
+            border-bottom-right-radius: 5px; /* Creates the "bubble" tail on the other side */
+        }
+
+        .message.sent .message-sender,
+        .message.sent .message-avatar {
+            display: none; /* We don't need to see our own name and avatar */
+        }
         .chat-input-area {
             background-color: var(--bg-secondary);
             border-top: 1px solid var(--border-color);
