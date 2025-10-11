@@ -6,6 +6,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const jobPostsListEl = document.getElementById('job-posts-list');
+const filterButtons = document.querySelectorAll('.filter-btn');
 
 onAuthStateChanged(auth, user => {
     if (user) {
@@ -15,15 +16,21 @@ onAuthStateChanged(auth, user => {
     }
 });
 
-function listenForJobPosts() {
+function listenForJobPosts(categoryFilter = 'All') {
     const jobPostsRef = collection(db, "job_posts");
-    const q = query(jobPostsRef, where("status", "==", "Open"), orderBy("createdAt", "desc"));
+    let q;
+
+    if (categoryFilter === 'All' || !categoryFilter) {
+        q = query(jobPostsRef, where("status", "==", "Open"), orderBy("createdAt", "desc"));
+    } else {
+        q = query(jobPostsRef, where("status", "==", "Open"), where("category", "==", categoryFilter), orderBy("createdAt", "desc"));
+    }
     
     jobPostsListEl.innerHTML = '<p style="text-align: center; padding: 20px;">Loading open jobs...</p>';
 
     onSnapshot(q, async (snapshot) => {
         if (snapshot.empty) {
-            jobPostsListEl.innerHTML = '<p style="text-align: center; padding: 20px;">No open job posts found at the moment.</p>';
+            jobPostsListEl.innerHTML = `<p style="text-align: center; padding: 20px;">No open jobs found in the "${categoryFilter}" category.</p>`;
             return;
         }
 
@@ -74,3 +81,13 @@ function renderJobPostCard(jobPost, seekerData) {
 
     jobPostsListEl.appendChild(card);
 }
+
+// Add event listeners for filter buttons
+filterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        const category = button.textContent;
+        listenForJobPosts(category);
+    });
+});
