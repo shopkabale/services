@@ -32,7 +32,8 @@ onAuthStateChanged(auth, async (user) => {
                 name: userDoc.data().name,
                 profilePicUrl: userDoc.data().profilePicUrl
             };
-            backButton.href = userDoc.data().role === 'provider' ? 'provider-dashboard.html' : 'seeker-dashboard.html';
+            // FIX: Set the back button's href link here, after we know the user's role.
+            backButton.href = 'dashboard.html'; // All users go to the same universal dashboard.
             listenForMessages();
         } else {
              window.location.href = 'auth.html';
@@ -42,28 +43,26 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-// --- THIS FUNCTION HAS BEEN REWRITTEN TO BE MORE ROBUST ---
 function listenForMessages() {
     const messagesRef = collection(db, "group-chat");
-    const q = query(messagesRef, orderBy("createdAt", "asc"));
+    const q = query(messagesRef, orderBy("createdAt", "asc"), limit(100)); // Limit to last 100 messages
 
     unsubscribe = onSnapshot(q, (snapshot) => {
-        // Clear all existing messages first
         messageArea.innerHTML = '';
         
-        // Loop through all documents in the snapshot and render them
         snapshot.forEach((doc) => {
             const messageData = doc.data();
             renderMessage(messageData);
         });
 
-        // Scroll to the bottom after rendering all messages
-        messageArea.scrollTop = messageArea.scrollHeight;
+        // Use a slight delay to ensure the DOM has updated before scrolling
+        setTimeout(() => {
+            messageArea.scrollTop = messageArea.scrollHeight;
+        }, 100);
         
     }, (error) => {
-        // This will now show an error if the index is missing!
-        console.error("Error fetching messages (Hint: Have you created the Firestore index for 'group-chat' collection on 'createdAt' field?)", error);
-        messageArea.innerHTML = `<p style="color: #ffc107; padding: 20px; text-align: center;">Error: Could not load messages. Check the console for details.</p>`;
+        console.error("Error fetching messages (Hint: Have you created the Firestore index?)", error);
+        messageArea.innerHTML = `<p style="padding: 20px; text-align: center;">Error: Could not load messages.</p>`;
     });
 }
 
@@ -76,7 +75,7 @@ function renderMessage(data) {
         messageDiv.classList.add('own-message');
     }
 
-    const avatar = data.profilePicUrl || `https://placehold.co/45x45/10336d/a7c0e8?text=${data.userName.charAt(0)}`;
+    const avatar = data.profilePicUrl || `https://placehold.co/45x45/10336d/a7c0e8?text=${(data.userName || 'U').charAt(0)}`;
 
     messageDiv.innerHTML = `
         <img src="${avatar}" alt="${data.userName}" class="message-avatar">
