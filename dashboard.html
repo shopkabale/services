@@ -39,6 +39,18 @@
         .menu-item .icon { font-size: 2.5rem; color: var(--accent-primary); margin-bottom: 15px; }
         .menu-item .label { font-weight: 500; font-size: 1rem; }
         .btn-logout { display: block; width: 100%; padding: 15px; border-radius: 8px; text-align: center; text-decoration: none; font-size: 1.1rem; font-weight: 600; background-color: #dc3545; color: #fff; border: none; cursor: pointer; }
+        
+        /* New Footer Styles */
+        footer { background-color: var(--bg-card); color: var(--text-primary); padding: 60px 0 20px 0; border-top: 1px solid var(--border-color); }
+        .footer-grid { display: grid; grid-template-columns: 1fr; gap: 40px; margin-bottom: 40px; }
+        @media (min-width: 768px) { .footer-grid { grid-template-columns: 2fr 1fr 1fr 1fr; } }
+        .footer-grid h4 { color: var(--text-primary); font-size: 1.2rem; margin-bottom: 20px; }
+        .footer-about p { color: var(--text-secondary); margin-bottom: 20px; }
+        .footer-socials a { color: var(--text-primary); font-size: 1.2rem; margin-right: 15px; }
+        .footer-links ul { list-style: none; padding: 0; }
+        .footer-links li { margin-bottom: 10px; }
+        .footer-links a { color: var(--text-secondary); text-decoration: none; }
+        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid var(--border-color); color: var(--text-secondary); }
     </style>
 </head>
 <body class="dark-mode">
@@ -53,39 +65,43 @@
             <div class="profile-header">
                 <img src="https://placehold.co/120x120/10336d/a7c0e8?text=..." alt="Profile Picture" class="profile-picture" id="profile-picture">
                 <h1 class="profile-name" id="profile-name">Loading...</h1>
-                <p class="welcome-message" id="welcome-message">Welcome to your dashboard!</p>
+                <p class="welcome-message" id="welcome-message"></p>
             </div>
-            
+
             <div class="dashboard-section">
                 <h2 class="section-title">Quick Navigation</h2>
                 <div class="menu-grid">
                     <a href="index.html" class="menu-item"><div class="icon"><i class="fas fa-home"></i></div><span class="label">Homepage</span></a>
                     <a href="services.html" class="menu-item"><div class="icon"><i class="fas fa-search"></i></div><span class="label">Find Services</span></a>
+                    <a href="browse-jobs.html" class="menu-item"><div class="icon"><i class="fas fa-briefcase"></i></div><span class="label">Browse Jobs</span></a>
                     <a href="group-chat.html" class="menu-item"><div class="icon"><i class="fas fa-users"></i></div><span class="label">Community Chat</span></a>
                 </div>
-
-
             </div>
 
             <div class="dashboard-section">
                 <h2 class="section-title">Hiring Menu (Seeker Actions)</h2>
-                <p class="section-description">Use these tools to find and hire local professionals.</p>
                 <div class="menu-grid">
                     <a href="my-job-posts.html" class="menu-item"><div class="icon"><i class="fas fa-tasks"></i></div><span class="label">My Job Posts</span></a>
-               
+                    <a href="post-job.html" class="menu-item"><div class="icon"><i class="fas fa-plus-circle"></i></div><span class="label">Post a New Job</span></a>
+                </div>
             </div>
-</div>
 
-
-            <div class="dashboard-section">
+            <div id="provider-section" class="dashboard-section" style="display: none;">
                 <h2 class="section-title">Working Menu (Provider Actions)</h2>
-                <p class="section-description">Offer your skills, manage your services, and track your performance.</p>
                 <div class="menu-grid">
-                    <a href="manage-service.html" class="menu-item"><div class="icon"><i class="fas fa-plus-circle"></i></div><span class="label">Add Service</span></a>
                     <a href="manage-service.html" class="menu-item"><div class="icon"><i class="fas fa-th-list"></i></div><span class="label">My Services</span></a>
                     <a href="analytics.html" class="menu-item"><div class="icon"><i class="fas fa-chart-line"></i></div><span class="label">Analytics</span></a>
                     <a href="earnings.html" class="menu-item"><div class="icon"><i class="fas fa-wallet"></i></div><span class="label">Earnings</span></a>
                 </div>
+            </div>
+
+            <div id="become-provider-section" class="dashboard-section" style="display: none;">
+                 <h2 class="section-title">Want to Offer Your Skills?</h2>
+                 <p class="section-description">Upgrade your account to a provider profile to start listing your services and earning money in the community.</p>
+                 <a href="edit-profile.html" class="menu-item" style="max-width: 250px; margin: 0 auto; background-color: var(--accent-primary); border-color: var(--accent-primary);">
+                    <div class="icon" style="color: #fff;"><i class="fas fa-handshake"></i></div>
+                    <span class="label" style="color: #fff;">Become a Provider</span>
+                 </a>
             </div>
 
             <div class="dashboard-section">
@@ -99,7 +115,52 @@
             <button class="btn-logout" id="logout-btn">Logout</button>
         </div>
     </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-about">
+                    <h4>KabaleOnline</h4>
+                    <p>Connecting our community by making it easy to find and offer skilled services across the Kigezi region.</p>
+                     <div class="footer-socials">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul id="footer-quick-links">
+                        <li><a href="services.html">Browse Services</a></li>
+                        <li><a href="browse-jobs.html">Browse Jobs</a></li>
+                        <!-- Dynamic Links will be added here by global-auth.js -->
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Help & FAQ</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                 <div class="footer-links">
+                    <h4>Contact Us</h4>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Kabale, Uganda</li>
+                        <li><i class="fas fa-phone-alt"></i> +256 123 456789</li>
+                        <li><i class="fas fa-envelope"></i> help@kabaleonline.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 KabaleOnline. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
     <script src="theme.js" defer></script>
-    <script src="dashboard.js" type="module"></script>
+    <script src="global-auth.js" type="module"></script>
+    <script src="dashboard.js" type="module"></script> 
 </body>
 </html>
