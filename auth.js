@@ -45,7 +45,7 @@ signupForm.addEventListener('submit', async (e) => {
     const photoFile = photoInput.files[0];
 
     if (password !== retypePassword) {
-        alert("Passwords do not match. Please try again.");
+        alert("Passwords do not match.");
         return;
     }
 
@@ -59,12 +59,13 @@ signupForm.addEventListener('submit', async (e) => {
                 profilePicUrl = await uploadToCloudinary(photoFile);
             } catch (uploadError) {
                 console.error("Profile photo upload failed:", uploadError);
-                alert("Account was created, but the profile photo failed to upload.");
+                alert("Account created, but photo failed to upload.");
             }
         }
 
         const userProfile = { 
-            uid: user.uid, name, email, role: 'seeker', // All new users start as seekers
+            uid: user.uid, name, email, role: 'user', // ALL users are created with a universal 'user' role
+            isProvider: false, // We can add a flag to track if they become a provider later
             location, telephone, profilePicUrl, createdAt: new Date() 
         };
         await setDoc(doc(db, "users", user.uid), userProfile);
@@ -89,7 +90,7 @@ loginForm.addEventListener('submit', async (e) => {
             alert("Please verify your email address before logging in.");
             return;
         }
-        window.location.href = 'dashboard.html';
+        window.location.href = 'dashboard.html'; // Always redirect to the universal dashboard
     } catch (error) {
         alert(`Error: ${error.message}`);
     }
@@ -105,11 +106,12 @@ const handleGoogleSignIn = async () => {
         if (!userDoc.exists()) {
             const userProfile = {
                 uid: user.uid, name: user.displayName, email: user.email,
-                role: 'seeker', createdAt: new Date(), profilePicUrl: user.photoURL || ''
+                role: 'user', isProvider: false, createdAt: new Date(), 
+                profilePicUrl: user.photoURL || ''
             };
             await setDoc(userDocRef, userProfile);
         }
-        window.location.href = 'dashboard.html';
+        window.location.href = 'dashboard.html'; // Always redirect to the universal dashboard
     } catch (error) {
         alert(`Google Sign-In Error: ${error.message}`);
     }
@@ -129,5 +131,6 @@ const handleVerificationRedirect = async () => {
         }
     }
 };
+
 handleVerificationRedirect();
 showLoginView();
