@@ -36,7 +36,7 @@ async function loadServiceAndProvider() {
         const serviceData = serviceSnap.data();
         const providerRef = doc(db, 'users', serviceData.providerId);
         const providerSnap = await getDoc(providerRef);
-        const providerData = providerSnap.exists() ? providerSnap.data() : { name: 'Unknown Provider' };
+        const providerData = providerSnap.exists() ? { id: providerSnap.id, ...providerSnap.data() } : { name: 'Unknown Provider' };
 
         renderServiceDetails(serviceData, providerData);
         loadReviews(serviceData.providerId);
@@ -93,28 +93,118 @@ function loadReviews(providerId) {
     const reviewsRef = collection(db, 'users', providerId, 'reviews');
     const q = query(reviewsRef, orderBy('createdAt', 'desc'));
 
-    onSnapshot(q, (snapshot) => {
+    onSnapshot(q, async (snapshot) => {
         reviewsList.innerHTML = '';
         if (snapshot.empty) {
             reviewsList.innerHTML = '<p>No reviews yet for this provider.</p>';
         } else {
-            snapshot.forEach(docSnap => {
+            for (const docSnap of snapshot.docs) {
                 const review = docSnap.data();
-                // We will build the review display logic here
+                const reviewerDoc = await getDoc(doc(db, 'users', review.reviewerId));
+                const reviewerData = reviewerDoc.exists() ? reviewerDoc.data() : { name: 'Anonymous' };
+                
+                const reviewEl = document.createElement('div');
+                reviewEl.className = 'review-item';
+                reviewEl.innerHTML = `
+                    <div class="review-header">
+                        <img src="${reviewerData.profilePicUrl || `https://placehold.co/45x45?text=${reviewerData.name.charAt(0)}`}" class="reviewer-avatar">
+                        <div>
+                            <div class="reviewer-name">${reviewerData.name}</div>
+                            <div class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</div>
+                        </div>
+                    </div>
+                    <p class="review-text">${review.text}</p>
+                `;
+                reviewsList.appendChild(reviewEl);
+            }
+        }
+    });
+
+    // Setup review form
+    if (currentUser && currentUser.uid !== providerId) {
+        setupReviewForm(providerId);
+    } else if (!currentUser) {
+         reviewFormContainer.innerHTML = `<p>Please <a href="auth.html" style="color: var(--accent-primary);">log in</a> to leave a review.</p>`;
+    }
+}
+
+function setupReviewForm(providerId) {
+    reviewFormContainer.innerHTML = `
+        <h4>Leave a Review</h4>
+        <form id="review-form" class="review-form">
+            <div class="form-group star-rating" id="star-rating">
+                <span class="star" data-value="1">☆</span><span class="star" data-value="2">☆</span><span class="star" data-value="3">☆</span><span class="star" data-value="4">☆</span><span class="star" data-value="5">☆</span>
+            </div>
+            <div class="form-group">
+                <textarea id="review-text" class="form-control" placeholder="Share your experience..." required></textarea>
+            </div>
+            <button type="submit" class="btn-submit" style="width: auto; padding: 10px 20px;">Submit Review</button>
+        </form>
+    `;
+
+    const starRatingContainer = document.getElementById('star-rating');
+    let selectedRating = 0;
+
+    starRatingContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('star')) {
+            selectedRating = parseInt(e.target.dataset.value, 10);
+            const stars = starRatingContainer.querySelectorAll('.star');
+            stars.forEach(s => {
+                s.textContent = parseInt(s.dataset.value, 10) <= selectedRating ? '★' : '☆';
+                s.classList.toggle('selected', parseInt(s.dataset.value, 10) <= selectedRating);
             });
         }
     });
 
-    if (currentUser && currentUser.uid !== providerId) {
-        reviewFormContainer.innerHTML = `
-            <h4>Leave a Review for this Provider</h4>
-            <form id="review-form">
-                <!-- Add star rating and textarea here later -->
-                <p style="margin: 15px 0;">Feature coming soon!</p>
-                <button type="submit" disabled>Submit Review</button>
-            </form>
-        `;
-    } else if (!currentUser) {
-         reviewFormContainer.innerHTML = `<p>Please <a href="auth.html" style="color: var(--accent-primary);">log in</a> to leave a review.</p>`;
+    document.getElementById('review-form').addEventListener('submit', (e) => submitReview(e, providerId, selectedRating));
+}
+
+async function submitReview(e, providerId, rating) {
+    e.preventDefault();
+    const reviewText = document.getElementById('review-text').value.trim();
+    if (!rating) {
+        showToast('Please select a star rating.', 'error');
+        return;
+    }
+    if (!reviewText) {
+        showToast('Please write a review.', 'error');
+        return;
+    }
+
+    showToast('Submitting review...', 'progress');
+    try {
+        await runTransaction(db, async (transaction) => {
+            const providerRef = doc(db, "users", providerId);
+            const reviewRef = doc(db, "users", providerId, "reviews", currentUser.uid);
+
+            const providerDoc = await transaction.get(providerRef);
+            if (!providerDoc.exists()) throw "Provider not found.";
+            
+            const reviewDoc = await transaction.get(reviewRef);
+            if (reviewDoc.exists()) throw "You have already reviewed this provider.";
+
+            const newReviewCount = (providerDoc.data().reviewCount || 0) + 1;
+            const newRatingTotal = (providerDoc.data().ratingTotal || 0) + rating;
+            const newAverageRating = newRatingTotal / newReviewCount;
+            
+            transaction.update(providerRef, {
+                reviewCount: newReviewCount,
+                ratingTotal: newRatingTotal,
+                averageRating: newAverageRating
+            });
+
+            transaction.set(reviewRef, {
+                reviewerId: currentUser.uid,
+                rating: rating,
+                text: reviewText,
+                createdAt: serverTimestamp()
+            });
+        });
+        hideToast();
+        showToast('Review submitted successfully!', 'success');
+        reviewFormContainer.innerHTML = '<p>Thank you for your feedback!</p>';
+    } catch (error) {
+        hideToast();
+        showToast(`Error: ${error}`, 'error');
     }
 }
