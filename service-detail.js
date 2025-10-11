@@ -1,6 +1,6 @@
 import { app } from './firebase-init.js';
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, addDoc, query, onSnapshot, serverTimestamp, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, addDoc, query, onSnapshot, serverTimestamp, orderBy, updateDoc, runTransaction } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 import { showToast } from './notifications.js';
 
 const auth = getAuth(app);
@@ -18,7 +18,7 @@ if (!serviceId) {
     serviceDetailContent.innerHTML = '<h1>Service Not Found</h1><p>The service ID is missing from the URL.</p>';
 } else {
     onAuthStateChanged(auth, (user) => {
-        currentUser = user; // Can be null if not logged in
+        currentUser = user; // This will be null if logged out, or the user object if logged in
         loadServiceAndProvider();
     });
 }
@@ -36,7 +36,7 @@ async function loadServiceAndProvider() {
         const serviceData = serviceSnap.data();
         const providerRef = doc(db, 'users', serviceData.providerId);
         const providerSnap = await getDoc(providerRef);
-        const providerData = providerSnap.exists() ? providerSnap.data() : {};
+        const providerData = providerSnap.exists() ? providerSnap.data() : { name: 'Unknown Provider' };
 
         renderServiceDetails(serviceData, providerData);
         loadReviews(serviceData.providerId);
@@ -51,6 +51,9 @@ function renderServiceDetails(service, provider) {
     serviceDetailContent.innerHTML = ''; // Clear loading message
     const serviceElement = document.createElement('div');
     serviceElement.className = 'service-detail-layout';
+
+    // This is the correct, simple link that passes the provider's ID to the chat page.
+    const contactLink = `chat.html?recipientId=${service.providerId}`;
 
     serviceElement.innerHTML = `
         <div class="service-main-content">
@@ -68,7 +71,7 @@ function renderServiceDetails(service, provider) {
                 <h2 class="provider-name">${provider.name}</h2>
                 <p class="provider-location"><i class="fas fa-map-marker-alt"></i> ${provider.location}</p>
                 <div class="price-display">UGX ${service.price.toLocaleString()} <span>/ ${service.priceUnit}</span></div>
-                <a href="chat.html?recipientId=${service.providerId}" id="contact-provider-btn" class="btn-contact"><i class="fas fa-envelope"></i> Contact Provider</a>
+                <a href="${contactLink}" id="contact-provider-btn" class="btn-contact"><i class="fas fa-envelope"></i> Contact Provider</a>
             </div>
         </aside>
     `;
@@ -78,9 +81,11 @@ function renderServiceDetails(service, provider) {
     // Disable contact button if user is viewing their own service
     if (currentUser && currentUser.uid === service.providerId) {
         const contactBtn = document.getElementById('contact-provider-btn');
-        contactBtn.style.pointerEvents = 'none';
-        contactBtn.style.backgroundColor = '#555';
-        contactBtn.textContent = 'This is your service';
+        if(contactBtn){
+            contactBtn.style.pointerEvents = 'none';
+            contactBtn.style.backgroundColor = '#555';
+            contactBtn.textContent = 'This is your service';
+        }
     }
 }
 
@@ -94,21 +99,22 @@ function loadReviews(providerId) {
             reviewsList.innerHTML = '<p>No reviews yet for this provider.</p>';
         } else {
             snapshot.forEach(docSnap => {
-                // Logic to display each review
+                const review = docSnap.data();
+                // We will build the review display logic here
             });
         }
     });
 
     if (currentUser && currentUser.uid !== providerId) {
         reviewFormContainer.innerHTML = `
-            <h4>Leave a Review</h4>
+            <h4>Leave a Review for this Provider</h4>
             <form id="review-form">
-                <!-- Add star rating and textarea here -->
-                <button type="submit">Submit Review</button>
+                <!-- Add star rating and textarea here later -->
+                <p style="margin: 15px 0;">Feature coming soon!</p>
+                <button type="submit" disabled>Submit Review</button>
             </form>
         `;
-        // Add event listener for form submission
     } else if (!currentUser) {
-         reviewFormContainer.innerHTML = `<p>Please <a href="auth.html">log in</a> to leave a review.</p>`;
+         reviewFormContainer.innerHTML = `<p>Please <a href="auth.html" style="color: var(--accent-primary);">log in</a> to leave a review.</p>`;
     }
 }
