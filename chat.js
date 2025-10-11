@@ -93,6 +93,19 @@ function setupMessageListener() {
     });
 }
 
+function renderMessage(message) {
+    const div = document.createElement('div');
+    div.classList.add('message');
+    div.classList.add(message.senderId === currentUser.uid ? 'sent' : 'received');
+    
+    const bubble = document.createElement('p');
+    bubble.className = 'message-bubble';
+    bubble.textContent = message.text || '';
+    div.appendChild(bubble);
+    
+    chatMessages.appendChild(div);
+}
+
 chatForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const text = messageInput.value.trim();
