@@ -8,7 +8,8 @@ import {
     query, 
     where, 
     getDocs, 
-    addDoc, 
+    addDoc,
+    setDoc,
     serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 import { showToast, hideToast } from './notifications.js';
@@ -22,7 +23,7 @@ const contactBtn = document.getElementById('contact-btn');
 const serviceCategoryEl = document.getElementById('service-category');
 const serviceTitleEl = document.getElementById('service-title');
 const serviceCoverImageEl = document.getElementById('service-cover-image');
-const serviceDescriptionEl = document.getElementById('service-description');
+const serviceDescriptionEl = document.getElementById('service-description-text');
 const providerAvatarEl = document.getElementById('provider-avatar');
 const providerNameEl = document.getElementById('provider-name');
 const providerLocationEl = document.getElementById('provider-location');
@@ -31,7 +32,6 @@ const servicePriceEl = document.getElementById('service-price');
 let currentUserId = null;
 let providerId = null;
 
-// Check for logged-in user as soon as the page loads
 onAuthStateChanged(auth, (user) => {
     if (user && user.emailVerified) {
         currentUserId = user.uid;
@@ -54,7 +54,7 @@ const loadServiceDetails = async () => {
             return;
         }
         const serviceData = serviceDoc.data();
-        providerId = serviceData.providerId; // Store the provider's ID globally
+        providerId = serviceData.providerId;
 
         const providerDoc = await getDoc(doc(db, "users", providerId));
         if (!providerDoc.exists()) {
@@ -63,7 +63,6 @@ const loadServiceDetails = async () => {
         }
         const providerData = providerDoc.data();
 
-        // Populate the page with data
         document.title = `${serviceData.title} | KabaleOnline`;
         serviceCategoryEl.textContent = serviceData.category;
         serviceTitleEl.textContent = serviceData.title;
@@ -83,11 +82,9 @@ const loadServiceDetails = async () => {
     }
 };
 
-// --- THIS IS THE NEW, CORRECTED LOGIC ---
 contactBtn.addEventListener('click', async (e) => {
     e.preventDefault();
 
-    // 1. Check if the user is logged in
     if (!currentUserId) {
         showToast("You must be logged in to contact a provider.", "error");
         setTimeout(() => { window.location.href = `auth.html`; }, 2000);
@@ -102,20 +99,17 @@ contactBtn.addEventListener('click', async (e) => {
     showToast("Finding or creating conversation...", "progress");
 
     try {
-        // 2. Check if a conversation between these two users already exists
-        const conversationsRef = collection(db, "conversations");
-        // Create a unique ID for the conversation room based on the two user IDs
-        // This ensures there is only ever ONE chat room between two people
+        // Create a unique, predictable ID for the conversation room
         const conversationId = [currentUserId, providerId].sort().join('_');
         
         const convoDocRef = doc(db, "conversations", conversationId);
         const convoDoc = await getDoc(convoDocRef);
 
-        // 3. If a conversation exists, redirect to it
         if (convoDoc.exists()) {
+            // If conversation already exists, just go to it
             window.location.href = `chat.html?id=${conversationId}`;
         } else {
-            // 4. If not, create the new conversation with the specific ID
+            // If not, create the new conversation document with the specific ID
             await setDoc(convoDocRef, {
                 participants: [currentUserId, providerId],
                 lastMessageTimestamp: serverTimestamp(),
@@ -132,5 +126,4 @@ contactBtn.addEventListener('click', async (e) => {
     }
 });
 
-// Run the main function when the page loads
 loadServiceDetails();
