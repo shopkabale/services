@@ -35,14 +35,18 @@
         .group-chat-card .icon { font-size: 2rem; color: var(--accent-primary); }
         .group-chat-card h2 { font-size: 1.2rem; color: var(--text-primary); margin-bottom: 4px; }
         .conversation-list { background-color: var(--bg-secondary); border-radius: 16px; padding: 10px; border: 1px solid var(--border-color); min-height: 200px; }
-        .conversation { display: flex; align-items: center; gap: 15px; padding: 15px; border-radius: 12px; text-decoration: none; }
-        .conversation:not(:last-child) { border-bottom: 1px solid var(--border-color); }
-        .convo-avatar { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; }
-        .convo-details { flex-grow: 1; overflow: hidden; }
-        .convo-header { display: flex; justify-content: space-between; align-items: baseline; }
-        .convo-name { font-weight: 600; color: var(--text-primary); font-size: 1.1rem; }
-        .convo-time { font-size: 0.8rem; color: var(--text-secondary); }
-        .convo-preview { font-size: 0.95rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .conversation-item { display: flex; align-items: center; gap: 15px; padding: 15px; border-radius: 12px; text-decoration: none; }
+        .conversation-item:not(:last-child) { border-bottom: 1px solid var(--border-color); }
+        .conversation-item:hover { background-color: var(--bg-primary); }
+        .avatar { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+        .details { flex-grow: 1; overflow: hidden; }
+        .header-row { display: flex; justify-content: space-between; align-items: baseline; }
+        .user-name { font-weight: 600; color: var(--text-primary); font-size: 1.1rem; }
+        .timestamp { font-size: 0.8rem; color: var(--text-secondary); }
+        .last-message { font-size: 0.95rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .conversation-item.unread .user-name { color: var(--accent-primary); }
+        .conversation-item.unread .last-message { color: var(--text-primary); font-weight: 500; }
+        .unread-dot { display: inline-block; width: 10px; height: 10px; background-color: var(--accent-primary); border-radius: 50%; margin-left: 8px; }
     </style>
 </head>
 <body>
@@ -54,105 +58,17 @@
     </header>
     <main class="main-content">
         <div class="container">
-            <div class="page-header"><h1>Inbox</h1><a href="dashboard.html" id="back-button" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</a></div>
+            <div class="page-header"><h1>Inbox</h1><a href="dashboard.html" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</a></div>
             <a href="group-chat.html" class="group-chat-card">
                 <div class="icon"><i class="fas fa-users"></i></div>
                 <div><h2>Community Group Chat</h2><p>Join the public conversation with all KabaleOnline users.</p></div>
             </a>
             <div class="conversation-list" id="conversation-list">
-                 <!-- Conversations will be loaded here by JavaScript -->
+                 <!-- Conversations will be loaded here by inbox.js -->
             </div>
         </div>
     </main>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { getFirestore, collection, query, where, orderBy, onSnapshot, getDoc, doc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-        
-        const firebaseConfig = {
-          apiKey: "AIzaSy...YOUR_API_KEY",
-          authDomain: "your-project-id.firebaseapp.com",
-          projectId: "your-project-id",
-          storageBucket: "your-project-id.appspot.com",
-          messagingSenderId: "1234567890",
-          appId: "1:1234567890:web:abcdef123456"
-        };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        const conversationListEl = document.getElementById('conversation-list');
-        
-        onAuthStateChanged(auth, user => {
-            if (user && user.emailVerified) {
-                listenForConversations(user.uid);
-            } else {
-                window.location.href = 'auth.html';
-            }
-        });
-
-        function listenForConversations(userId) {
-            const conversationsRef = collection(db, "conversations");
-            const q = query(conversationsRef, where("participants", "array-contains", userId), orderBy("lastMessageTimestamp", "desc"));
-            
-            conversationListEl.innerHTML = '<p style="padding: 20px; text-align: center;">Loading conversations...</p>';
-
-            onSnapshot(q, async (snapshot) => {
-                if (snapshot.empty) {
-                    conversationListEl.innerHTML = '<p style="padding: 20px; text-align: center;">No conversations yet.</p>';
-                    return;
-                }
-
-                conversationListEl.innerHTML = '';
-                for (const doc of snapshot.docs) {
-                    const convo = { id: doc.id, ...doc.data() };
-                    const otherParticipantId = convo.participants.find(p => p !== userId);
-
-                    if (otherParticipantId) {
-                        const userDoc = await getDoc(doc(db, "users", otherParticipantId));
-                        if (userDoc.exists()) {
-                            renderConversation(convo, userDoc.data());
-                        }
-                    }
-                }
-            }, (error) => {
-                console.error("Error fetching conversations (check Firestore Indexes):", error);
-                conversationListEl.innerHTML = '<p style="padding: 20px; text-align: center; color: #dc3545;">Could not load conversations.</p>';
-            });
-        }
-
-        function renderConversation(convo, otherUser) {
-            const convoLink = document.createElement('a');
-            convoLink.href = `chat.html?recipientId=${otherUser.uid}`;
-            convoLink.className = 'conversation';
-
-            const time = convo.lastMessageTimestamp?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || '';
-
-            convoLink.innerHTML = `
-                <img src="${otherUser.profilePicUrl || `https://placehold.co/55x55/10336d/a7c0e8?text=${otherUser.name.charAt(0)}`}" alt="Avatar" class="convo-avatar">
-                <div class="convo-details">
-                    <div class="convo-header">
-                        <span class="convo-name">${otherUser.name}</span>
-                        <span class="convo-time">${time}</span>
-                    </div>
-                    <p class="convo-preview">${convo.lastMessageText || 'No messages yet.'}</p>
-                </div>
-            `;
-            conversationListEl.appendChild(convoLink);
-        }
-        
-        // Theme logic
-        const themeToggle = document.getElementById('theme-toggle');
-        const applyTheme = (theme) => {
-            document.body.classList.toggle('light-mode', theme === 'light-mode');
-            localStorage.setItem('theme', theme);
-        };
-        const currentTheme = localStorage.getItem('theme') || 'dark-mode';
-        applyTheme(currentTheme);
-        themeToggle.addEventListener('click', () => {
-            const newTheme = document.body.classList.contains('light-mode') ? 'dark-mode' : 'light-mode';
-            applyTheme(newTheme);
-        });
-    </script>
+    <script src="theme.js" defer></script>
+    <script src="inbox.js" type="module"></script>
 </body>
 </html>
