@@ -13,20 +13,13 @@
 
     <style>
         :root {
-            --bg-primary: #0d2857;
-            --bg-secondary: #10336d;
-            --text-primary: #ffffff;
-            --text-secondary: #a7c0e8;
-            --accent-primary: #007bff;
-            --border-color: #1f4287;
+            --bg-primary: #0d2857; --bg-secondary: #10336d; --text-primary: #ffffff;
+            --text-secondary: #a7c0e8; --accent-primary: #007bff; --border-color: #1f4287;
             --font-family: 'Poppins', sans-serif;
         }
         body.light-mode {
-            --bg-primary: #f0f4f9;
-            --bg-secondary: #ffffff;
-            --text-primary: #0d2857;
-            --text-secondary: #6c757d;
-            --border-color: #e9ecef;
+            --bg-primary: #f0f4f9; --bg-secondary: #ffffff; --text-primary: #0d2857;
+            --text-secondary: #6c757d; --border-color: #e9ecef;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { height: 100%; }
@@ -34,9 +27,7 @@
             font-family: var(--font-family);
             background-color: var(--bg-primary);
             color: var(--text-secondary);
-            display: flex;
-            flex-direction: column;
-            min-height: 100%;
+            display: flex; flex-direction: column; min-height: 100%;
         }
         .header {
             position: absolute; top: 0; left: 0; width: 100%;
@@ -48,15 +39,10 @@
         body.light-mode .theme-toggle { color: var(--text-primary); }
         .main-container {
             display: flex; align-items: center; justify-content: center;
-            width: 100%;
-            flex-grow: 1;
-            padding: 120px 20px 40px;
+            width: 100%; flex-grow: 1; padding: 120px 20px 40px;
         }
-        .auth-wrapper { width: 100%; max-width: 480px; }
-        .form-container {
-            background-color: var(--bg-secondary); padding: 40px;
-            border-radius: 16px; border: 1px solid var(--border-color);
-        }
+        .auth-wrapper { width: 100%; max-width: 450px; }
+        .form-container { background-color: var(--bg-secondary); padding: 40px; border-radius: 16px; border: 1px solid var(--border-color); }
         #signup-form-container, #verification-notice { display: none; }
         .form-container h2 { text-align: center; color: var(--text-primary); margin-bottom: 25px; font-size: 2rem; font-weight: 700; }
         .form-group { margin-bottom: 20px; }
@@ -75,19 +61,6 @@
         .btn-google img { width: 20px; height: 20px; }
         .toggle-link { text-align: center; margin-top: 25px; }
         .toggle-link a { color: var(--accent-primary); font-weight: 600; text-decoration: none; cursor: pointer; }
-        .provider-fields { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out, margin-top 0.5s ease-in-out; }
-        .provider-fields.visible { max-height: 500px; margin-top: 20px; }
-        .profile-photo-group { text-align: center; margin-bottom: 20px; }
-        #photo-preview { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--border-color); background-color: var(--bg-primary); display: block; margin: 0 auto 15px; }
-        .photo-upload-label { cursor: pointer; color: var(--accent-primary); font-weight: 600; }
-        #profile-photo-input { display: none; }
-        .role-options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .role-option { padding: 15px; border: 2px solid var(--border-color); border-radius: 8px; text-align: center; cursor: pointer; }
-        .role-option i { font-size: 1.8rem; color: var(--text-secondary); margin-bottom: 8px; }
-        .role-option span { display: block; font-weight: 600; color: var(--text-primary); }
-        .role-option input { display: none; }
-        .role-option.selected { border-color: var(--accent-primary); background-color: rgba(0, 123, 255, 0.1); }
-        .role-option.selected i, .role-option.selected span { color: var(--accent-primary); }
         .verification-notice { text-align: center; }
         .verification-notice i { font-size: 3rem; color: var(--accent-primary); margin-bottom: 20px; }
         .verification-notice p { line-height: 1.7; }
@@ -96,12 +69,10 @@
     </style>
 </head>
 <body>
-
     <header class="header">
         <a href="index.html" class="nav-logo">KabaleOnline</a>
         <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
     </header>
-
     <div class="main-container">
         <div class="auth-wrapper">
             <div id="login-form-container" class="form-container">
@@ -112,65 +83,29 @@
                     <button type="submit" class="btn-submit">Login</button>
                 </form>
                 <div class="divider">or</div>
-                <button class="btn-google" id="google-login-btn">
-                    <img src="https://www.google.com/images/hpp/ic_wahlberg_product_core_48.png8.png" alt="Google icon">
-                    Sign in with Google
-                </button>
+                <button class="btn-google" id="google-login-btn"><img src="https://www.google.com/images/hpp/ic_wahlberg_product_core_48.png8.png" alt="Google icon"> Sign in with Google</button>
                 <p class="toggle-link">Don't have an account? <a href="#" id="show-signup-link">Sign Up</a></p>
             </div>
-
             <div id="signup-form-container" class="form-container">
                 <h2>Create Account</h2>
+                <button class="btn-google" id="google-signup-btn"><img src="https://www.google.com/images/hpp/ic_wahlberg_product_core_48.png8.png" alt="Google icon"> Sign up with Google</button>
+                <div class="divider">or</div>
                 <form id="signup-form">
-                    <div class="role-options">
-                        <label class="role-option" id="role-seeker-label">
-                            <input type="radio" name="role" value="seeker" checked>
-                            <i class="fas fa-search"></i>
-                            <span>I want to HIRE</span>
-                        </label>
-                        <label class="role-option" id="role-provider-label">
-                            <input type="radio" name="role" value="provider">
-                            <i class="fas fa-handshake"></i>
-                            <span>I want to WORK</span>
-                        </label>
-                    </div>
                     <div class="form-group"><input type="text" id="signup-name" class="form-control" placeholder="Full Name" required></div>
                     <div class="form-group"><input type="email" id="signup-email" class="form-control" placeholder="Email Address" required></div>
                     <div class="form-group"><input type="password" id="signup-password" class="form-control" placeholder="Password" required></div>
-                    
-                    <div class="provider-fields" id="provider-fields">
-                        <div class="profile-photo-group">
-                            <img src="https://placehold.co/100x100/e0e0e0/777?text=Photo" alt="Profile preview" id="photo-preview">
-                            <label for="profile-photo-input" class="photo-upload-label">Upload Profile Photo</label>
-                            <input type="file" id="profile-photo-input" accept="image/*">
-                        </div>
-                        <div class="form-group"><input type="text" id="signup-bname" class="form-control" placeholder="Business Name (Optional)"></div>
-                        <div class="form-group"><input type="text" id="signup-location" class="form-control" placeholder="Your Location (e.g., Kabale Town)"></div>
-                        <div class="form-group"><input type="tel" id="signup-tel" class="form-control" placeholder="Telephone (e.g., 07...)"></div>
-                    </div>
-
-                    <button type="submit" class="btn-submit">Create Account</button>
+                    <button type="submit" class="btn-submit">Create Account with Email</button>
                 </form>
-                <div class="divider">or</div>
-                <button class="btn-google" id="google-signup-btn">
-                     <img src="https://www.google.com/images/hpp/ic_wahlberg_product_core_48.png8.png" alt="Google icon">
-                    Sign up with Google
-                </button>
                 <p class="toggle-link">Already have an account? <a href="#" id="show-login-link">Login</a></p>
             </div>
-
             <div id="verification-notice" class="form-container verification-notice">
                 <i class="fas fa-envelope-open-text"></i>
                 <h2>Verify Your Email</h2>
-                <p>We've sent a verification link to your email address. Please check your inbox (and spam folder) and click the link to activate your account before logging in.</p>
+                <p>We've sent a verification link to your email. Please check your inbox and click the link to activate your account before logging in.</p>
             </div>
         </div>
     </div>
-
-    <footer>
-        <p>&copy; 2025 KabaleOnline. All Rights Reserved. <a href="#">Terms of Service</a></p>
-    </footer>
-
+    <footer><p>&copy; 2025 KabaleOnline. All Rights Reserved. <a href="#">Terms of Service</a></p></footer>
     <script src="theme.js" defer></script>
     <script src="auth.js" type="module"></script>
 </body>
