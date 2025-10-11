@@ -1,38 +1,38 @@
-// --- Import Firebase Services & Initialized App ---
 import { app } from './firebase-init.js';
-import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 const db = getFirestore(app);
-
-// --- ELEMENT SELECTORS ---
 const servicesGrid = document.getElementById('services-grid');
+const filterButtons = document.querySelectorAll('.filter-btn');
 
-// --- FUNCTION to fetch and display all services ---
-const displayAllServices = async () => {
+const fetchAndDisplayServices = async (categoryFilter = 'All') => {
     if (!servicesGrid) return;
+    servicesGrid.innerHTML = '<p class="loading-text">Loading services...</p>';
 
     try {
-        // 1. Fetch all documents from the "services" collection
-        const servicesSnapshot = await getDocs(collection(db, "services"));
+        const servicesRef = collection(db, "services");
+        let q;
         
+        if (categoryFilter === 'All') {
+            q = query(servicesRef);
+        } else {
+            q = query(servicesRef, where("category", "==", categoryFilter));
+        }
+
+        const servicesSnapshot = await getDocs(q);
         if (servicesSnapshot.empty) {
-            servicesGrid.innerHTML = '<p class="loading-text">No services have been listed yet. Be the first!</p>';
+            servicesGrid.innerHTML = `<p class="loading-text">No services found in the "${categoryFilter}" category.</p>`;
             return;
         }
 
-        servicesGrid.innerHTML = ''; // Clear the loading message
-
-        // 2. Loop through each service document
+        servicesGrid.innerHTML = '';
         for (const serviceDoc of servicesSnapshot.docs) {
             const service = { id: serviceDoc.id, ...serviceDoc.data() };
-
-            // 3. Fetch the provider's profile data from the "users" collection
+            
             let providerName = 'Anonymous';
-            let providerAvatar = 'https://placehold.co/40x40'; // Default avatar
-
+            let providerAvatar = 'https://placehold.co/40x40';
             if (service.providerId) {
-                const userDocRef = doc(db, "users", service.providerId);
-                const userDoc = await getDoc(userDocRef);
+                const userDoc = await getDoc(doc(db, "users", service.providerId));
                 if (userDoc.exists()) {
                     const providerData = userDoc.data();
                     providerName = providerData.name || 'Provider';
@@ -40,36 +40,32 @@ const displayAllServices = async () => {
                 }
             }
             
-            // 4. Create the HTML for the service card
             const card = document.createElement('a');
-            card.href = `service-detail.html?id=${service.id}`; // Link to the detail page
+            card.href = `service-detail.html?id=${service.id}`;
             card.className = 'service-card';
             card.innerHTML = `
                 <div class="card-image" style="background-image: url('${service.coverImageUrl || 'https://placehold.co/600x400'}');"></div>
                 <div class="card-content">
-                    <div class="provider-info">
-                        <img src="${providerAvatar}" alt="${providerName}" class="provider-avatar">
-                        <span class="provider-name">${providerName}</span>
-                    </div>
+                    <div class="provider-info"><img src="${providerAvatar}" alt="${providerName}" class="provider-avatar"><span class="provider-name">${providerName}</span></div>
                     <h3 class="service-title">${service.title}</h3>
                     <p class="service-location"><i class="fas fa-map-marker-alt"></i> ${service.location}</p>
-                    <div class="card-footer">
-                        <!-- Ratings can be added here later -->
-                        <div class="price"><span>From </span>UGX ${service.price.toLocaleString()}</div>
-                    </div>
-                </div>
-            `;
-            
-            // 5. Append the card to the grid
+                    <div class="card-footer"><div class="price"><span>From </span>UGX ${service.price.toLocaleString()}</div></div>
+                </div>`;
             servicesGrid.appendChild(card);
         }
-
     } catch (error) {
         console.error("Error fetching services:", error);
-        servicesGrid.innerHTML = '<p class="loading-text">Could not load services. Please try again later.</p>';
+        servicesGrid.innerHTML = '<p class="loading-text">Could not load services.</p>';
     }
 };
 
-// --- INITIALIZATION ---
-// Run the function when the page loads.
+filterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        const category = button.textContent;
+        fetchAndDisplayServices(category);
+    });
+});
+
 displayAllServices();
