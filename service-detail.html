@@ -56,16 +56,71 @@
         .price-display span { font-size: 1rem; font-weight: 400; color: var(--text-secondary); }
         .btn-contact { display: block; width: 100%; padding: 15px; background-color: var(--accent-primary); color: #fff; border-radius: 8px; text-decoration: none; font-size: 1.1rem; font-weight: 600; }
         #loading-state { text-align: center; font-size: 1.5rem; padding: 50px; }
-
-        footer { background-color: var(--bg-card); color: var(--text-primary); padding: 60px 0 20px 0; }
-        .footer-container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
-        .footer-grid { display: grid; grid-template-columns: 1fr; gap: 40px; margin-bottom: 40px; text-align: center; }
-        @media (min-width: 768px) { .footer-grid { grid-template-columns: 2fr 1fr 1fr 1fr; text-align: left; } }
-        .footer-grid h4 { color: var(--text-primary); font-size: 1.2rem; margin-bottom: 20px; }
-        .footer-links ul { list-style: none; padding: 0; }
-        .footer-links li { margin-bottom: 12px; }
-        .footer-links a { color: var(--text-secondary); text-decoration: none; }
-        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid var(--border-color); color: var(--text-secondary); }
+        /* --- NEW: FOOTER STYLES --- */
+footer {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    padding: 60px 0 20px 0;
+    border-top: 1px solid var(--border-color);
+}
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Default to single column on mobile */
+    gap: 40px;
+    margin-bottom: 40px;
+    text-align: center; /* Center text on mobile */
+}
+/* On tablets and larger, switch to a multi-column grid */
+@media (min-width: 768px) {
+    .footer-grid {
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        text-align: left; /* Align left on larger screens */
+    }
+}
+.footer-grid h4 {
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+.footer-about p {
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+}
+.footer-socials a {
+    color: var(--text-primary);
+    font-size: 1.3rem;
+    margin: 0 10px;
+    transition: color 0.3s;
+}
+.footer-socials a:hover {
+    color: var(--accent-primary);
+}
+.footer-links ul {
+    list-style: none;
+    padding: 0;
+}
+.footer-links li {
+    margin-bottom: 12px;
+}
+.footer-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.3s;
+}
+.footer-links a:hover {
+    color: var(--accent-primary);
+    padding-left: 5px;
+}
+.footer-links ul li i {
+    margin-right: 10px;
+    color: var(--accent-primary);
+}
+.footer-bottom {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
     </style>
 </head>
 <body class="dark-mode">
@@ -88,13 +143,11 @@
                     <p class="service-category" id="service-category"></p>
                     <h1 id="service-title"></h1>
                     <img src="https://placehold.co/800x450/10336d/a7c0e8?text=Loading..." alt="Service Cover Image" class="service-cover-image" id="service-cover-image">
-                    
                     <div class="content-section service-description">
                         <h2 class="section-title">About This Service</h2>
                         <div id="service-description-text"></div>
                     </div>
                 </div>
-
                 <aside class="provider-sidebar">
                     <div class="provider-card">
                         <img src="https://placehold.co/100x100" alt="Provider Avatar" class="provider-avatar" id="provider-avatar">
@@ -111,43 +164,191 @@
         </div>
     </main>
     
-    <footer>
-        <div class="footer-container">
-            <div class="footer-grid">
-                <div class="footer-about">
-                    <h4 class="nav-logo" style="font-size: 2rem;">KabaleOnline</h4>
-                    <p>Connecting our community by making it easy to find and offer skilled services across the Kigezi region.</p>
-                </div>
-                <div class="footer-links">
-                    <h4>Quick Links</h4>
-                    <ul id="footer-quick-links">
-                        <li><a href="services.html">Browse Services</a></li>
-                        <li><a href="browse-jobs.html">Browse Jobs</a></li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h4>Support</h4>
-                    <ul>
-                        <li><a href="#">Contact Us</a></li>
-                        <li><a href="#">Help & FAQ</a></li>
-                    </ul>
-                </div>
-                 <div class="footer-links">
-                    <h4>Contact</h4>
-                    <ul>
-                        <li><i class="fas fa-map-marker-alt"></i> Kabale, Uganda</li>
-                        <li><i class="fas fa-phone-alt"></i> +256 123 456789</li>
-                    </ul>
+    <!-- START: New Footer Code -->
+<footer>
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-about">
+                <h4 class="nav-logo" style="font-size: 2rem;">KabaleOnline</h4>
+                <p>Connecting our community by making it easy to find and offer skilled services across the Kigezi region.</p>
+                <div class="footer-socials">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 KabaleOnline. All Rights Reserved.</p>
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <ul id="footer-quick-links">
+                    <li><a href="services.html">Browse Services</a></li>
+                    <li><a href="browse-jobs.html">Browse Jobs</a></li>
+                    <li><a href="group-chat.html">Community Chat</a></li>
+                    <!-- Dynamic links (Login/Dashboard/Logout) will be added here by global-auth.js -->
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Help & FAQ</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+             <div class="footer-links">
+                <h4>Contact Us</h4>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt"></i> Kabale, Uganda</li>
+                    <li><i class="fas fa-phone-alt"></i> +256 123 456789</li>
+                    <li><i class="fas fa-envelope"></i> help@kabaleonline.com</li>
+                </ul>
             </div>
         </div>
-    </footer>
+        <div class="footer-bottom">
+            <p>&copy; 2025 KabaleOnline Services. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
+<!-- END: New Footer Code -->
+    <!-- ALL JAVASCRIPT IS NOW IN THIS SINGLE BLOCK -->
+    <script type="module">
+        // --- PART 1: FIREBASE INITIALIZATION ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSy...YOUR_API_KEY",
+            authDomain: "your-project-id.firebaseapp.com",
+            projectId: "your-project-id",
+            storageBucket: "your-project-id.appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:1234567890:web:abcdef123456"
+        };
+        const app = initializeApp(firebaseConfig);
 
-    <script src="theme.js" defer></script>
-    <script src="global-auth.js" type="module"></script>
-    <script src="service-detail.js" type="module"></script>
+        // --- PART 2: THEME LOGIC ---
+        const themeToggle = document.getElementById('theme-toggle');
+        const applyTheme = (theme) => {
+            document.body.className = theme;
+            localStorage.setItem('theme', theme);
+            themeToggle.textContent = theme === 'light-mode' ? '☀️' : '🌙';
+        };
+        const currentTheme = localStorage.getItem('theme') || 'dark-mode';
+        applyTheme(currentTheme);
+        themeToggle.addEventListener('click', () => {
+            const newTheme = document.body.classList.contains('light-mode') ? 'dark-mode' : 'light-mode';
+            applyTheme(newTheme);
+        });
+
+        // --- PART 3: GLOBAL AUTH LOGIC ---
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        const auth = getAuth(app);
+        const loginLink = document.getElementById('login-link');
+        const dashboardLink = document.getElementById('dashboard-link');
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.emailVerified) {
+                if (loginLink) loginLink.style.display = 'none';
+                if (dashboardLink) dashboardLink.style.display = 'inline-flex';
+            } else {
+                if (loginLink) loginLink.style.display = 'inline-flex';
+                if (dashboardLink) dashboardLink.style.display = 'none';
+            }
+        });
+
+        // --- PART 4: SERVICE DETAIL PAGE LOGIC ---
+        import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        const db = getFirestore(app);
+        const contentContainer = document.getElementById('content-container');
+        const loadingState = document.getElementById('loading-state');
+        const contactBtn = document.getElementById('contact-btn');
+        const serviceCategoryEl = document.getElementById('service-category');
+        const serviceTitleEl = document.getElementById('service-title');
+        const serviceCoverImageEl = document.getElementById('service-cover-image');
+        const serviceDescriptionEl = document.getElementById('service-description-text');
+        const providerAvatarEl = document.getElementById('provider-avatar');
+        const providerNameEl = document.getElementById('provider-name');
+        const providerLocationEl = document.getElementById('provider-location');
+        const servicePriceEl = document.getElementById('service-price');
+        let currentUserId = null;
+        let providerId = null;
+
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.emailVerified) {
+                currentUserId = user.uid;
+            }
+        });
+
+        const loadServiceDetails = async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const serviceId = urlParams.get('id');
+            if (!serviceId) {
+                loadingState.innerHTML = '<p>Error: No service specified.</p>';
+                return;
+            }
+            try {
+                const serviceDoc = await getDoc(doc(db, "services", serviceId));
+                if (!serviceDoc.exists()) {
+                    loadingState.innerHTML = '<p>Error: Service not found.</p>';
+                    return;
+                }
+                const serviceData = serviceDoc.data();
+                providerId = serviceData.providerId;
+
+                const providerDoc = await getDoc(doc(db, "users", providerId));
+                if (!providerDoc.exists()) {
+                    loadingState.innerHTML = '<p>Error: Provider not found.</p>';
+                    return;
+                }
+                const providerData = providerDoc.data();
+                
+                document.title = `${serviceData.title} | KabaleOnline`;
+                serviceCategoryEl.textContent = serviceData.category;
+                serviceTitleEl.textContent = serviceData.title;
+                serviceCoverImageEl.src = serviceData.coverImageUrl;
+                serviceDescriptionEl.innerHTML = `<p>${serviceData.description.replace(/\n/g, '</p><p>')}</p>`;
+                providerAvatarEl.src = providerData.profilePicUrl || `https://placehold.co/100x100/10336d/a7c0e8?text=${providerData.name.charAt(0)}`;
+                providerNameEl.textContent = providerData.name;
+                providerLocationEl.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${providerData.location}`;
+                servicePriceEl.innerHTML = `UGX ${serviceData.price.toLocaleString()} <span>/ ${serviceData.priceUnit}</span>`;
+                
+                loadingState.style.display = 'none';
+                contentContainer.style.display = 'block';
+
+            } catch (error) {
+                console.error("Error loading service details:", error);
+                loadingState.innerHTML = '<p>An error occurred. Please try again.</p>';
+            }
+        };
+
+        contactBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            if (!currentUserId) {
+                alert("You must be logged in to contact a provider.");
+                window.location.href = `auth.html`;
+                return;
+            }
+            if (currentUserId === providerId) {
+                alert("You cannot start a conversation with yourself.");
+                return;
+            }
+            try {
+                const conversationId = [currentUserId, providerId].sort().join('_');
+                const convoDocRef = doc(db, "conversations", conversationId);
+                const convoDoc = await getDoc(convoDocRef);
+                if (convoDoc.exists()) {
+                    window.location.href = `chat.html?id=${conversationId}`;
+                } else {
+                    await setDoc(convoDocRef, {
+                        participants: [currentUserId, providerId],
+                        lastMessageTimestamp: serverTimestamp(),
+                    });
+                    window.location.href = `chat.html?id=${conversationId}`;
+                }
+            } catch (error) {
+                console.error("Error starting conversation:", error);
+                alert("Could not start conversation. Please try again.");
+            }
+        });
+
+        loadServiceDetails();
+    </script>
 </body>
 </html>
