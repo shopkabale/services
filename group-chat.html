@@ -13,81 +13,48 @@
 
     <style>
         :root {
-            --bg-primary: #0d2857;
-            --bg-secondary: #10336d;
-            --text-primary: #ffffff;
-            --text-secondary: #a7c0e8;
-            --accent-primary: #007bff;
-            --border-color: #1f4287;
-            --font-family: 'Poppins', sans-serif;
+            --bg-primary: #0d2857; --bg-secondary: #10336d; --bg-card: #1e293b;
+            --text-primary: #ffffff; --text-secondary: #a7c0e8; --accent-primary: #007bff;
+            --border-color: #1f4287; --font-family: 'Poppins', sans-serif;
         }
-
         body.light-mode {
-            --bg-primary: #f0f4f9;
-            --bg-secondary: #ffffff;
-            --text-primary: #0d2857;
-            --text-secondary: #6c757d;
-            --border-color: #e9ecef;
+            --bg-primary: #f0f4f9; --bg-secondary: #ffffff; --bg-card: #ffffff;
+            --text-primary: #0d2857; --text-secondary: #6c757d; --border-color: #e9ecef;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; overflow: hidden; }
-        body {
-            font-family: var(--font-family);
-            background-color: var(--bg-primary);
-            color: var(--text-secondary);
+        body { font-family: var(--font-family); background-color: var(--bg-primary); color: var(--text-secondary); }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 15px; }
+        
+        .header { position: sticky; top: 0; z-index: 1000; background-color: var(--bg-secondary); border-bottom: 1px solid var(--border-color); padding: 15px 0; }
+        .navbar { display: flex; justify-content: space-between; align-items: center; max-width:1200px; margin: 0 auto; padding: 0 15px; }
+        .nav-logo { font-size: 1.6rem; font-weight: 800; color: var(--accent-primary); text-decoration: none; }
+        .nav-menu { display: flex; align-items: center; gap: 15px; }
+        .btn-header { display: inline-flex; align-items: center; padding: 8px 20px; font-size: 0.9rem; background-color: var(--accent-primary); color: #ffffff; border-radius: 50px; text-decoration: none; font-weight: 600; border: 2px solid var(--accent-primary); }
+        .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; }
+        
+        .main-content { padding: 40px 0; }
+        .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; }
+        .page-header h1 { font-size: 2.2rem; color: var(--text-primary); }
+        .btn-back { display: inline-flex; align-items: center; gap: 8px; background-color: var(--bg-secondary); color: var(--text-primary); padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 500; border: 1px solid var(--border-color); }
+
+        .chat-container {
+            background-color: var(--bg-secondary);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
+            height: 70vh; /* Fixed height for the chat box */
         }
-
-        .header {
-            background-color: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-color);
-            padding: 10px 15px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-shrink: 0;
-        }
-        .back-button {
-            background: none; border: none; font-size: 1.5rem;
-            color: var(--text-primary); cursor: pointer;
-        }
-        .header-title { font-size: 1.2rem; font-weight: 600; color: var(--text-primary); }
-
-        .message-area {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 20px 15px;
-        }
-        .message {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            max-width: 85%;
-        }
-        .message-avatar {
-            width: 40px; height: 40px; border-radius: 50%;
-            background-color: var(--bg-secondary);
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 600; color: var(--accent-primary);
-            flex-shrink: 0;
-        }
-        .message-content {
-            display: flex; flex-direction: column;
-        }
+        .message-area { flex-grow: 1; overflow-y: auto; padding: 20px; }
+        .message { display: flex; gap: 15px; margin-bottom: 20px; max-width: 85%; }
+        .message-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+        .message-content { display: flex; flex-direction: column; }
         .message-sender { font-weight: 600; color: var(--text-primary); font-size: 0.9rem; margin-bottom: 3px; }
-        .message-bubble { padding: 10px 15px; border-radius: 18px; line-height: 1.5; background-color: var(--bg-secondary); }
+        .message-bubble { padding: 10px 15px; border-radius: 18px; line-height: 1.5; background-color: var(--bg-primary); }
         
-        .message.own-message {
-            margin-left: auto;
-            flex-direction: row-reverse;
-        }
-        .message.own-message .message-bubble {
-            background-color: var(--accent-primary);
-            color: #fff;
-        }
-        .message.own-message .message-sender { display: none; } /* Hide own name */
+        .message.own-message { margin-left: auto; flex-direction: row-reverse; }
+        .message.own-message .message-bubble { background-color: var(--accent-primary); color: #fff; }
+        .message.own-message .message-sender { text-align: right; }
 
         .chat-input-area {
             background-color: var(--bg-secondary);
@@ -96,41 +63,79 @@
             display: flex;
             gap: 15px;
             flex-shrink: 0;
+            border-radius: 0 0 16px 16px;
         }
-        .chat-input {
-            flex-grow: 1; padding: 12px 18px;
-            background-color: var(--bg-primary); border: 1px solid var(--border-color);
-            border-radius: 50px; color: var(--text-primary); font-size: 1rem;
-        }
+        .chat-input { flex-grow: 1; padding: 12px 18px; background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 50px; color: var(--text-primary); font-size: 1rem; }
         .chat-input:focus { outline: none; border-color: var(--accent-primary); }
-        .btn-send {
-            background-color: var(--accent-primary); color: #fff;
-            border: none; border-radius: 50%; width: 50px; height: 50px;
-            font-size: 1.2rem; cursor: pointer; flex-shrink: 0;
-        }
+        .btn-send { background-color: var(--accent-primary); color: #fff; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 1.2rem; cursor: pointer; flex-shrink: 0; }
+        
+        footer { background-color: var(--bg-card); color: var(--text-primary); padding: 60px 0 20px 0; }
+        .footer-container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
+        .footer-grid { display: grid; grid-template-columns: 1fr; gap: 40px; margin-bottom: 40px; text-align: center; }
+        @media (min-width: 768px) { .footer-grid { grid-template-columns: 2fr 1fr 1fr 1fr; text-align: left; } }
+        .footer-grid h4 { color: var(--text-primary); font-size: 1.2rem; margin-bottom: 20px; }
+        .footer-links ul { list-style: none; padding: 0; }
+        .footer-links li { margin-bottom: 12px; }
+        .footer-links a { color: var(--text-secondary); text-decoration: none; }
+        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid var(--border-color); color: var(--text-secondary); }
     </style>
 </head>
 <body class="dark-mode">
 
     <header class="header">
-        <a href="provider-dashboard.html" class="back-button" id="back-button" aria-label="Back to Dashboard">
-            <i class="fas fa-arrow-left"></i>
-        </a>
-        <h1 class="header-title">Community Chat</h1>
+        <div class="navbar container">
+            <a href="index.html" class="nav-logo">KabaleOnline</a>
+            <div class="nav-menu">
+                <a href="auth.html" class="btn-header" id="login-link">Login / Sign Up</a>
+                <a href="dashboard.html" class="btn-header" id="dashboard-link" style="display: none;">My Dashboard</a>
+                <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
+            </div>
+        </div>
     </header>
 
-    <main class="message-area" id="message-area">
-        <!-- Messages will be dynamically loaded here -->
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1>Community Chat</h1>
+                <a href="dashboard.html" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+            </div>
+            <div class="chat-container">
+                <div class="message-area" id="message-area">
+                    <!-- Messages will be dynamically loaded here -->
+                </div>
+                <div class="chat-input-area">
+                    <form id="chat-form" style="display: flex; flex-grow: 1; gap: 15px;">
+                        <input type="text" class="chat-input" id="message-input" placeholder="Type a message..." autocomplete="off" required>
+                        <button type="submit" class="btn-send" aria-label="Send Message"><i class="fas fa-paper-plane"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </main>
-
-    <footer class="chat-input-area">
-        <form id="chat-form" style="display: flex; flex-grow: 1; gap: 15px;">
-            <input type="text" class="chat-input" id="message-input" placeholder="Type a message..." autocomplete="off" required>
-            <button type="submit" class="btn-send" aria-label="Send Message"><i class="fas fa-paper-plane"></i></button>
-        </form>
+    
+    <footer style="margin-top: 40px;">
+        <div class="footer-container">
+            <div class="footer-grid">
+                 <div class="footer-about">
+                    <h4 class="nav-logo" style="font-size: 2rem;">KabaleOnline</h4>
+                    <p>Connecting our community by making it easy to find and offer skilled services across the Kigezi region.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul id="footer-quick-links">
+                        <li><a href="services.html">Browse Services</a></li>
+                        <li><a href="browse-jobs.html">Browse Jobs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links"><h4>Support</h4><ul><li><a href="#">Contact Us</a></li><li><a href="#">Help & FAQ</a></li></ul></div>
+                 <div class="footer-links"><h4>Contact Us</h4><ul><li><i class="fas fa-map-marker-alt"></i> Kabale, Uganda</li><li><i class="fas fa-phone-alt"></i> +256 123 456789</li></ul></div>
+            </div>
+            <div class="footer-bottom"><p>&copy; 2025 KabaleOnline. All Rights Reserved.</p></div>
+        </div>
     </footer>
 
     <script src="theme.js" defer></script>
+    <script src="global-auth.js" type="module"></script>
     <script src="group-chat.js" type="module"></script>
 </body>
 </html>
