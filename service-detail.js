@@ -1,126 +1,114 @@
 import { app } from './firebase-init.js';
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { 
-    getFirestore, 
-    doc, 
-    getDoc, 
-    collection, 
-    query, 
-    where, 
-    getDocs, 
-    addDoc, 
-    setDoc,
-    serverTimestamp 
-} from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-import { showToast, hideToast } from './notifications.js';
+import { getFirestore, doc, getDoc, collection, addDoc, query, onSnapshot, serverTimestamp, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { showToast } from './notifications.js';
 
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const contentContainer = document.getElementById('content-container');
-const loadingState = document.getElementById('loading-state');
-const contactBtn = document.getElementById('contact-btn');
-const serviceCategoryEl = document.getElementById('service-category');
-const serviceTitleEl = document.getElementById('service-title');
-const serviceCoverImageEl = document.getElementById('service-cover-image');
-// --- THIS IS THE FIX ---
-// The ID in the HTML is 'service-description-text', not 'service-description'.
-const serviceDescriptionEl = document.getElementById('service-description-text'); 
-const providerAvatarEl = document.getElementById('provider-avatar');
-const providerNameEl = document.getElementById('provider-name');
-const providerLocationEl = document.getElementById('provider-location');
-const servicePriceEl = document.getElementById('service-price');
+const serviceDetailContent = document.getElementById('service-detail-content');
+const reviewsList = document.getElementById('reviews-list');
+const reviewFormContainer = document.getElementById('review-form-container');
 
-let currentUserId = null;
-let providerId = null;
+let currentUser = null;
+const urlParams = new URLSearchParams(window.location.search);
+const serviceId = urlParams.get('id');
 
-onAuthStateChanged(auth, (user) => {
-    if (user && user.emailVerified) {
-        currentUserId = user.uid;
-    }
-});
+if (!serviceId) {
+    serviceDetailContent.innerHTML = '<h1>Service Not Found</h1><p>The service ID is missing from the URL.</p>';
+} else {
+    onAuthStateChanged(auth, (user) => {
+        currentUser = user; // Can be null if not logged in
+        loadServiceAndProvider();
+    });
+}
 
-const loadServiceDetails = async () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const serviceId = urlParams.get('id');
-
-    if (!serviceId) {
-        loadingState.innerHTML = '<p>Error: No service specified.</p>';
-        return;
-    }
-
+async function loadServiceAndProvider() {
     try {
-        const serviceDoc = await getDoc(doc(db, "services", serviceId));
-        if (!serviceDoc.exists()) {
-            loadingState.innerHTML = '<p>Error: Service not found.</p>';
+        const serviceRef = doc(db, 'services', serviceId);
+        const serviceSnap = await getDoc(serviceRef);
+
+        if (!serviceSnap.exists()) {
+            serviceDetailContent.innerHTML = '<h1>Service Not Found</h1><p>This listing may have been removed.</p>';
             return;
         }
-        const serviceData = serviceDoc.data();
-        providerId = serviceData.providerId;
 
-        const providerDoc = await getDoc(doc(db, "users", providerId));
-        if (!providerDoc.exists()) {
-            loadingState.innerHTML = '<p>Error: Provider not found.</p>';
-            return;
-        }
-        const providerData = providerDoc.data();
+        const serviceData = serviceSnap.data();
+        const providerRef = doc(db, 'users', serviceData.providerId);
+        const providerSnap = await getDoc(providerRef);
+        const providerData = providerSnap.exists() ? providerSnap.data() : {};
 
-        document.title = `${serviceData.title} | KabaleOnline`;
-        serviceCategoryEl.textContent = serviceData.category;
-        serviceTitleEl.textContent = serviceData.title;
-        serviceCoverImageEl.src = serviceData.coverImageUrl;
-        // This line will now work correctly.
-        serviceDescriptionEl.innerHTML = `<p>${serviceData.description.replace(/\n/g, '</p><p>')}</p>`;
-        providerAvatarEl.src = providerData.profilePicUrl || `https://placehold.co/100x100/10336d/a7c0e8?text=${providerData.name.charAt(0)}`;
-        providerNameEl.textContent = providerData.name;
-        providerLocationEl.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${providerData.location}`;
-        servicePriceEl.innerHTML = `UGX ${serviceData.price.toLocaleString()} <span>/ ${serviceData.priceUnit}</span>`;
-
-        loadingState.style.display = 'none';
-        contentContainer.style.display = 'block';
+        renderServiceDetails(serviceData, providerData);
+        loadReviews(serviceData.providerId);
 
     } catch (error) {
-        console.error("Error loading service details:", error);
-        loadingState.innerHTML = '<p>An error occurred while loading the service.</p>';
+        console.error("Error loading service:", error);
+        serviceDetailContent.innerHTML = '<h1>Error</h1><p>Could not load service details.</p>';
     }
-};
+}
 
-contactBtn.addEventListener('click', async (e) => {
-    e.preventDefault();
+function renderServiceDetails(service, provider) {
+    serviceDetailContent.innerHTML = ''; // Clear loading message
+    const serviceElement = document.createElement('div');
+    serviceElement.className = 'service-detail-layout';
 
-    if (!currentUserId) {
-        showToast("You must be logged in to contact a provider.", "error");
-        setTimeout(() => { window.location.href = `auth.html`; }, 2000);
-        return;
+    serviceElement.innerHTML = `
+        <div class="service-main-content">
+            <p class="service-category">${service.category}</p>
+            <h1>${service.title}</h1>
+            <img src="${service.coverImageUrl}" alt="${service.title}" class="service-cover-image">
+            <div class="content-section">
+                <h2 class="section-title">About This Service</h2>
+                <p>${service.description.replace(/\n/g, '<br>')}</p>
+            </div>
+        </div>
+        <aside class="provider-sidebar">
+            <div class="provider-card">
+                <img src="${provider.profilePicUrl || `https://placehold.co/100x100?text=${provider.name.charAt(0)}`}" alt="${provider.name}" class="provider-avatar">
+                <h2 class="provider-name">${provider.name}</h2>
+                <p class="provider-location"><i class="fas fa-map-marker-alt"></i> ${provider.location}</p>
+                <div class="price-display">UGX ${service.price.toLocaleString()} <span>/ ${service.priceUnit}</span></div>
+                <a href="chat.html?recipientId=${service.providerId}" id="contact-provider-btn" class="btn-contact"><i class="fas fa-envelope"></i> Contact Provider</a>
+            </div>
+        </aside>
+    `;
+    
+    serviceDetailContent.appendChild(serviceElement);
+
+    // Disable contact button if user is viewing their own service
+    if (currentUser && currentUser.uid === service.providerId) {
+        const contactBtn = document.getElementById('contact-provider-btn');
+        contactBtn.style.pointerEvents = 'none';
+        contactBtn.style.backgroundColor = '#555';
+        contactBtn.textContent = 'This is your service';
     }
+}
 
-    if (currentUserId === providerId) {
-        showToast("You cannot start a conversation with yourself.", "error");
-        return;
-    }
+function loadReviews(providerId) {
+    const reviewsRef = collection(db, 'users', providerId, 'reviews');
+    const q = query(reviewsRef, orderBy('createdAt', 'desc'));
 
-    showToast("Finding or creating conversation...", "progress");
-
-    try {
-        const conversationId = [currentUserId, providerId].sort().join('_');
-        const convoDocRef = doc(db, "conversations", conversationId);
-        const convoDoc = await getDoc(convoDocRef);
-
-        if (convoDoc.exists()) {
-            window.location.href = `chat.html?id=${conversationId}`;
+    onSnapshot(q, (snapshot) => {
+        reviewsList.innerHTML = '';
+        if (snapshot.empty) {
+            reviewsList.innerHTML = '<p>No reviews yet for this provider.</p>';
         } else {
-            await setDoc(convoDocRef, {
-                participants: [currentUserId, providerId],
-                lastMessageTimestamp: serverTimestamp(),
-                lastMessageText: ''
+            snapshot.forEach(docSnap => {
+                // Logic to display each review
             });
-            window.location.href = `chat.html?id=${conversationId}`;
         }
-    } catch (error) {
-        console.error("Error starting conversation:", error);
-        hideToast();
-        showToast("Could not start conversation. Please try again.", "error");
-    }
-});
+    });
 
-loadServiceDetails();
+    if (currentUser && currentUser.uid !== providerId) {
+        reviewFormContainer.innerHTML = `
+            <h4>Leave a Review</h4>
+            <form id="review-form">
+                <!-- Add star rating and textarea here -->
+                <button type="submit">Submit Review</button>
+            </form>
+        `;
+        // Add event listener for form submission
+    } else if (!currentUser) {
+         reviewFormContainer.innerHTML = `<p>Please <a href="auth.html">log in</a> to leave a review.</p>`;
+    }
+}
