@@ -15,7 +15,6 @@
         :root {
             --bg-primary: #0d2857;
             --bg-secondary: #10336d;
-            --bg-card: #1e293b;
             --text-primary: #ffffff;
             --text-secondary: #a7c0e8;
             --accent-primary: #007bff;
@@ -28,7 +27,6 @@
         body.light-mode {
             --bg-primary: #f0f4f9;
             --bg-secondary: #ffffff;
-            --bg-card: #ffffff;
             --text-primary: #0d2857;
             --text-secondary: #6c757d;
             --border-color: #e9ecef;
@@ -67,11 +65,15 @@
         .btn {
             display: inline-flex; align-items: center; gap: 8px;
             padding: 12px 24px; border-radius: 8px; text-decoration: none;
-            font-weight: 600; transition: all 0.3s ease;
+            font-weight: 600; transition: all 0.3s ease; white-space: nowrap;
         }
         .btn-primary { background-color: var(--accent-primary); color: #fff; }
         .btn-primary:hover { background-color: #0069d9; }
         
+        .job-posts-container {
+             min-height: 300px;
+        }
+
         .job-post-card {
             background-color: var(--bg-secondary);
             border-radius: 12px;
@@ -127,7 +129,7 @@
 
     <header class="header">
         <div class="navbar">
-            <a href="https://services.kabaleonline.com" class="nav-logo">KabaleOnline</a>
+            <a href="index.html" class="nav-logo">KabaleOnline</a>
             <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
         </div>
     </header>
@@ -139,55 +141,8 @@
                 <a href="#" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Post a New Job</a>
             </div>
 
-            <!-- Job Post Card 1 -->
-            <div class="job-post-card">
-                <div class="job-details">
-                    <h2 class="job-title">Looking for an Event Photographer</h2>
-                    <div class="job-meta">
-                        <span><i class="fas fa-tag"></i> Creative & Media</span>
-                        <span><i class="fas fa-calendar-alt"></i> Posted: Oct 08, 2025</span>
-                        <span><i class="fas fa-file-alt"></i> 3 Proposals</span>
-                    </div>
-                </div>
-                <div class="job-status">
-                    <span class="status-badge status-open">Open</span>
-                    <button class="btn-action" title="View Proposals"><i class="fas fa-eye"></i></button>
-                    <button class="btn-action" title="Delete"><i class="fas fa-trash-alt"></i></button>
-                </div>
-            </div>
-
-            <!-- Job Post Card 2 -->
-            <div class="job-post-card">
-                <div class="job-details">
-                    <h2 class="job-title">Need a Website for my New Shop</h2>
-                    <div class="job-meta">
-                        <span><i class="fas fa-tag"></i> Technical & IT</span>
-                        <span><i class="fas fa-calendar-alt"></i> Posted: Sep 25, 2025</span>
-                         <span><i class="fas fa-file-alt"></i> 5 Proposals</span>
-                    </div>
-                </div>
-                <div class="job-status">
-                     <span class="status-badge status-open">Open</span>
-                    <button class="btn-action" title="View Proposals"><i class="fas fa-eye"></i></button>
-                    <button class="btn-action" title="Delete"><i class="fas fa-trash-alt"></i></button>
-                </div>
-            </div>
-            
-             <!-- Job Post Card 3 -->
-            <div class="job-post-card">
-                <div class="job-details">
-                    <h2 class="job-title">Urgent Plumbing Help Needed</h2>
-                    <div class="job-meta">
-                        <span><i class="fas fa-tag"></i> Home Services</span>
-                        <span><i class="fas fa-calendar-alt"></i> Posted: Sep 15, 2025</span>
-                         <span><i class="fas fa-file-alt"></i> 1 Proposal</span>
-                    </div>
-                </div>
-                <div class="job-status">
-                     <span class="status-badge status-closed">Filled</span>
-                    <button class="btn-action" title="View Proposals"><i class="fas fa-eye"></i></button>
-                    <button class="btn-action" title="Delete"><i class="fas fa-trash-alt"></i></button>
-                </div>
+            <div class="job-posts-container" id="job-posts-list">
+                <!-- Dynamic job posts will be inserted here by my-job-posts.js -->
             </div>
 
         </div>
@@ -198,5 +153,6 @@
     </footer>
 
     <script src="theme.js" defer></script>
+    <script src="my-job-posts.js" type="module"></script>
 </body>
 </html>
