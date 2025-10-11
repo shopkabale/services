@@ -1,51 +1,71 @@
-// This script runs on EVERY page to manage the user's login state.
 import { app } from './firebase-init.js';
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 
 const auth = getAuth(app);
 
-// --- DOM ELEMENT SELECTORS ---
-// These elements exist on the public-facing pages (index, services, etc.)
-const loginLink = document.getElementById('login-link');
-const dashboardLink = document.getElementById('dashboard-link');
+// --- Header Links ---
+const loginLinkHeader = document.getElementById('login-link');
+const dashboardLinkHeader = document.getElementById('dashboard-link');
 
-// This element only exists on the dashboard pages
-const logoutBtn = document.getElementById('logout-btn');
+// --- Footer Links ---
+const footerQuickLinks = document.getElementById('footer-quick-links');
 
-// --- GLOBAL AUTHENTICATION LISTENER ---
-// This runs on every page load and checks the user's status.
+// --- Logout Triggers ---
+// Use querySelectorAll to handle logout buttons in both the dashboard and potentially the footer
+const logoutTriggers = document.querySelectorAll('#logout-btn, #footer-logout-link');
+
+// Create footer list items once
+const footerLoginLi = document.createElement('li');
+footerLoginLi.innerHTML = `<a href="auth.html">Login / Sign Up</a>`;
+
+const footerDashboardLi = document.createElement('li');
+footerDashboardLi.innerHTML = `<a href="dashboard.html">My Dashboard</a>`;
+
+const footerLogoutLi = document.createElement('li');
+footerLogoutLi.innerHTML = `<a href="#" id="footer-logout-link">Logout</a>`;
+
+
 onAuthStateChanged(auth, (user) => {
+    // Clear dynamic footer links before adding the correct ones
+    if (footerQuickLinks) {
+         // A simple way to remove the dynamic links without affecting the static ones
+        const dynamicLinks = footerQuickLinks.querySelectorAll('.dynamic-link');
+        dynamicLinks.forEach(link => link.remove());
+    }
+
     if (user && user.emailVerified) {
-        // --- USER IS LOGGED IN and VERIFIED ---
-        if (loginLink) {
-            loginLink.style.display = 'none'; // Hide the "Login" button
+        // --- USER IS LOGGED IN ---
+        if (loginLinkHeader) loginLinkHeader.style.display = 'none';
+        if (dashboardLinkHeader) dashboardLinkHeader.style.display = 'inline-flex';
+
+        if (footerQuickLinks) {
+            footerDashboardLi.className = 'dynamic-link';
+            footerLogoutLi.className = 'dynamic-link';
+            footerQuickLinks.appendChild(footerDashboardLi);
+            footerQuickLinks.appendChild(footerLogoutLi);
         }
-        if (dashboardLink) {
-            dashboardLink.style.display = 'inline-flex'; // Show the "Dashboard" button
-        }
+
     } else {
-        // --- USER IS LOGGED OUT or NOT VERIFIED ---
-        if (loginLink) {
-            loginLink.style.display = 'inline-flex'; // Show the "Login" button
-        }
-        if (dashboardLink) {
-            dashboardLink.style.display = 'none'; // Hide the "Dashboard" button
+        // --- USER IS LOGGED OUT ---
+        if (loginLinkHeader) loginLinkHeader.style.display = 'inline-flex';
+        if (dashboardLinkHeader) dashboardLinkHeader.style.display = 'none';
+        
+        if (footerQuickLinks) {
+            footerLoginLi.className = 'dynamic-link';
+            footerQuickLinks.appendChild(footerLoginLi);
         }
     }
 });
 
-// --- GLOBAL LOGOUT HANDLER ---
-// If a logout button exists on the current page, add the event listener.
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
+// A single logout handler for any logout button/link on the page
+document.body.addEventListener('click', async (event) => {
+    if (event.target.matches('#logout-btn') || event.target.matches('#footer-logout-link')) {
+        event.preventDefault();
         try {
             await signOut(auth);
-            // After successful sign out, redirect to the homepage.
             window.location.href = 'index.html';
         } catch (error) {
             console.error("Error signing out:", error);
-            alert("Could not log out. Please try again.");
         }
-    });
-}
+    }
+});
