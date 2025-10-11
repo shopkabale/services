@@ -3,177 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KabaleOnline | Find & Offer Local Services in Kigezi</title>
-    <meta name="description" content="Connect with skilled local service providers in Kabale and the Kigezi region. From plumbers to tutors, find the help you need or offer your services to the community.">
-    
+
+    <!-- SEO: Primary Meta Tags -->
+    <title>KabaleOnline Services | Find Local Pros in Kabale & Kigezi</title>
+    <meta name="description" content="The #1 marketplace to find and offer services in Kabale, Uganda. Connect with trusted local plumbers, developers, photographers, tutors, and more. Post a job or grow your business in the Kigezi region.">
+    <meta name="keywords" content="services in kabale, find a job kabale, local professionals kigezi, kabale uganda marketplace, hire someone kabale, photographers kabale, plumbers kabale, web developers kabale">
+    <meta name="author" content="KabaleOnline">
+    <link rel="canonical" href="https://services.kabaleonline.com/">
+
+    <!-- SEO: Favicon -->
+    <link rel="icon" href="favicon.webp" type="image/webp">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png"> <!-- Optional: for Apple devices -->
+
+    <!-- SEO: Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://services.kabaleonline.com/">
+    <meta property="og:title" content="KabaleOnline Services | Find Local Pros in Kabale & Kigezi">
+    <meta property="og:description" content="The #1 marketplace to connect with trusted local plumbers, developers, photographers, tutors, and more in the Kigezi region.">
+    <meta property="og:image" content="https://services.kabaleonline.com/social-share.jpg"> <!-- IMPORTANT: Create a 1200x630px image and name it social-share.jpg -->
+
+    <!-- SEO: Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://services.kabaleonline.com/">
+    <meta property="twitter:title" content="KabaleOnline Services | Find Local Pros in Kabale & Kigezi">
+    <meta property="twitter:description" content="The #1 marketplace to connect with trusted local plumbers, developers, photographers, tutors, and more in the Kigezi region.">
+    <meta property="twitter:image" content="https://services.kabaleonline.com/social-share.jpg">
+
+    <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- SEO: JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "KabaleOnline Services",
+      "url": "https://services.kabaleonline.com/",
+      "logo": "https://services.kabaleonline.com/logo.png",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+256-123-456789",
+        "contactType": "Customer Service"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "KabaleOnline Services",
+      "url": "https://services.kabaleonline.com/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://services.kabaleonline.com/services.html?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
 
     <style>
         :root {
-            --bg-primary: #0d2857;
-            --bg-secondary: #10336d;
-            --bg-card: #0a214d;
-            --text-primary: #ffffff;
-            --text-secondary: #a7c0e8;
-            --accent-primary: #007bff;
-            --accent-secondary: #e7f1ff;
-            --border-color: #1f4287;
-            --shadow-color: rgba(0, 0, 0, 0.2);
-            --transition-speed: 0.3s;
+            --bg-primary: #0d2857; --bg-secondary: #10336d; --bg-card: #0a214d;
+            --text-primary: #ffffff; --text-secondary: #a7c0e8; --accent-primary: #007bff;
+            --border-color: #1f4287; --transition-speed: 0.3s;
         }
-
         body.light-mode {
-            --bg-primary: #f0f4f9;
-            --bg-secondary: #ffffff;
-            --bg-card: #ffffff;
-            --text-primary: #0d2857;
-            --text-secondary: #6c757d;
-            --border-color: #dee2e6;
-            --shadow-color: rgba(0, 0, 0, 0.08);
+            --bg-primary: #f0f4f9; --bg-secondary: #ffffff; --bg-card: #ffffff;
+            --text-primary: #0d2857; --text-secondary: #6c757d; --border-color: #dee2e6;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-secondary);
-            transition: background-color var(--transition-speed), color var(--transition-speed);
-        }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-primary); color: var(--text-secondary); }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
         section { padding: 80px 0; overflow-x: hidden; }
-        h1, h2, h3, h4 { font-weight: 700; color: var(--text-primary); }
-        h2 { font-size: 2.5rem; text-align: center; margin-bottom: 1rem; }
-        .section-subtitle { text-align: center; color: var(--accent-primary); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; }
+        h2 { font-size: 2.5rem; text-align: center; margin-bottom: 1rem; color: var(--text-primary); }
+        .section-subtitle { text-align: center; color: var(--accent-primary); font-weight: 600; text-transform: uppercase; }
         .section-description { text-align: center; max-width: 700px; margin: 0 auto 50px auto; }
-        .btn {
-            display: inline-block; padding: 10px 24px; background-color: var(--accent-primary);
-            color: #ffffff; border-radius: 50px; text-decoration: none; font-weight: 600;
-            transition: all var(--transition-speed) ease; border: 2px solid var(--accent-primary);
-            margin: 5px;
-        }
-        .btn:hover { background-color: transparent; color: var(--accent-primary); transform: translateY(-3px); }
+        .btn { display: inline-block; padding: 12px 28px; background-color: var(--accent-primary); color: #ffffff; border-radius: 50px; text-decoration: none; font-weight: 600; border: 2px solid var(--accent-primary); margin: 5px; }
         
-        .header {
-            position: sticky; top: 0; left: 0; width: 100%; z-index: 1000;
-            background-color: var(--bg-card);
-            box-shadow: 0 2px 15px var(--shadow-color);
-            transition: background-color var(--transition-speed);
-            padding: 10px 0;
-        }
+        .header { position: sticky; top: 0; z-index: 1000; background-color: var(--bg-card); padding: 10px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         .navbar { display: flex; justify-content: space-between; align-items: center; }
         .nav-logo { font-size: 1.6rem; font-weight: 800; color: var(--accent-primary); text-decoration: none; }
-        .nav-menu { display: flex; align-items: center; gap: 25px; }
-        .nav-links { display: flex; list-style: none; gap: 25px; }
-        .nav-links a { text-decoration: none; color: var(--text-primary); font-weight: 500; position: relative; padding-bottom: 5px; }
-        .nav-links a::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background-color: var(--accent-primary); transition: width var(--transition-speed) ease; }
-        .nav-links a:hover::after { width: 100%; }
-        .header .btn { padding: 8px 20px; font-size: 0.9rem; }
-        .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; transition: transform 0.3s ease; }
-        .theme-toggle:hover { transform: scale(1.2) rotate(15deg); }
+        .nav-menu { display: flex; align-items: center; gap: 15px; }
+        .btn-header { display: inline-flex; align-items: center; padding: 8px 20px; font-size: 0.9rem; background-color: var(--accent-primary); color: #ffffff; border-radius: 50px; text-decoration: none; font-weight: 600; border: 2px solid var(--accent-primary); }
+        .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; }
         
-        .hero {
-            height: 95vh; position: relative; color: #ffffff; display: flex;
-            align-items: center; justify-content: center; text-align: center;
-            padding: 0; overflow: hidden;
-        }
-        .hero-slider { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        .hero-slide {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-size: cover; background-position: center;
-            opacity: 0; transition: opacity 1s ease-in-out; z-index: 1;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .hero-slide.active { opacity: 1; }
+        .hero { height: 95vh; position: relative; padding: 0; overflow: hidden; }
+        .hero-slider-wrapper { display: flex; height: 100%; transition: transform 0.7s ease-in-out; }
+        .hero-slide { min-width: 100%; height: 100%; background-size: cover; background-position: center; position: relative; display: flex; align-items: center; justify-content: center; text-align: center; color: #fff; }
         .hero-slide::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 40, 87, 0.7); }
-        .hero-content { max-width: 800px; margin: 0 auto; position: relative; z-index: 2; }
-        .hero-slide .hero-content > * { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
-        .hero-slide.active .hero-content > * { opacity: 1; transform: translateY(0); }
-        .hero-slide.active .hero-content h1 { transition-delay: 0.3s; }
-        .hero-slide.active .hero-content p { transition-delay: 0.5s; }
-        .hero-slide.active .hero-content div { transition-delay: 0.7s; }
+        .hero-content { max-width: 800px; position: relative; z-index: 2; }
         .hero-content h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.2; margin-bottom: 20px; color: #ffffff; }
-        .hero-content p { font-size: 1.2rem; margin-bottom: 30px; opacity: 0.9; color: #ffffff; }
-        .btn-secondary { background-color: transparent; color: #ffffff; border-color: #ffffff; }
-        .btn-secondary:hover { background-color: #ffffff; color: var(--accent-primary); }
-        .hero-nav {
-            position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
-            background: rgba(255, 255, 255, 0.2); border: none; color: #fff;
-            font-size: 2rem; width: 50px; height: 50px; border-radius: 50%;
-            cursor: pointer; transition: background 0.3s;
-        }
-        .hero-nav:hover { background: rgba(255, 255, 255, 0.4); }
+        .hero-content p { font-size: 1.2rem; margin-bottom: 30px; }
+        .btn-secondary { background-color: transparent; border-color: #ffffff; }
+        .hero-nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 3; background: rgba(255, 255, 255, 0.2); border: none; color: #fff; font-size: 2rem; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; }
         .hero-prev { left: 30px; }
         .hero-next { right: 30px; }
         .hero-dots { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 3; display: flex; gap: 10px; }
-        .hero-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255, 255, 255, 0.5); cursor: pointer; transition: background 0.3s; }
+        .hero-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255, 255, 255, 0.5); cursor: pointer; }
         .hero-dot.active { background: #ffffff; }
 
-        .fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
-        .fade-in.visible { opacity: 1; transform: translateY(0); }
-
-        #how-it-works { background-color: var(--bg-secondary); }
-        .how-it-works-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; text-align: center; }
-        .step-item { background: var(--bg-card); padding: 40px 30px; border-radius: 12px; border: 1px solid var(--border-color); transition: all var(--transition-speed) ease; box-shadow: 0 10px 30px var(--shadow-color); }
-        .step-item:hover { transform: translateY(-10px); border-color: var(--accent-primary); }
-        .step-item .icon { font-size: 3rem; color: var(--accent-primary); margin-bottom: 20px; }
-        .step-item h3 { font-size: 1.5rem; margin-bottom: 10px; }
+        #why-us { background-color: var(--bg-secondary); }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+        .feature-card { background: var(--bg-card); padding: 30px; border-radius: 12px; text-align: center; border-bottom: 4px solid var(--accent-primary); }
+        .feature-card .icon { font-size: 3rem; color: var(--accent-primary); margin-bottom: 20px; }
+        .feature-card h3 { font-size: 1.3rem; margin-bottom: 10px; color: var(--text-primary); }
         
-        .about-grid { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 50px; }
-        .about-image img { width: 100%; border-radius: 15px; box-shadow: 0 10px 30px var(--shadow-color); }
-        .about-content h2 { text-align: left; margin-bottom: 20px; }
+        .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; text-align: center; }
+        .category-card { background: var(--bg-secondary); padding: 25px; border-radius: 12px; text-decoration: none; color: var(--text-primary); }
+        .category-card .icon { font-size: 2.5rem; color: var(--accent-primary); margin-bottom: 15px; }
+        .category-card span { font-weight: 500; }
         
-        #services { background-color: var(--bg-secondary); }
-        .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
-        .service-card { background: var(--bg-card); padding: 40px 30px; border-radius: 15px; text-align: center; box-shadow: 0 10px 30px var(--shadow-color); transition: all var(--transition-speed) ease; }
-        .service-card:hover { transform: translateY(-10px); background: var(--accent-primary); }
-        .service-card .icon { font-size: 3rem; color: var(--accent-primary); margin-bottom: 20px; transition: color var(--transition-speed) ease; }
-        .service-card h3 { margin-bottom: 15px; font-size: 1.4rem; transition: color var(--transition-speed) ease; }
-        .service-card:hover .icon, .service-card:hover h3, .service-card:hover p { color: #ffffff; }
-
-        #cta { background: var(--bg-secondary); text-align: center; }
-        #cta h2 { margin-bottom: 20px; }
-        #cta p { max-width: 600px; margin: 0 auto 30px auto; font-size: 1.1rem; }
-
-        footer { background-color: var(--bg-card); color: #ffffff; padding: 60px 0 20px 0; }
-        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
-        .footer-grid h4 { color: #ffffff; font-size: 1.2rem; margin-bottom: 20px; }
-        .footer-about p { color: var(--text-secondary); margin-bottom: 20px; }
-        .footer-links ul { list-style: none; }
-        .footer-links li { margin-bottom: 10px; }
-        .footer-links a { color: var(--text-secondary); text-decoration: none; transition: all var(--transition-speed) ease; }
-        .footer-links a:hover { color: #ffffff; padding-left: 5px; }
+        #providers { background-color: var(--bg-secondary); }
+        .provider-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+        .provider-card { background: var(--bg-card); border-radius: 12px; text-align: center; padding: 30px; }
+        .provider-card img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid var(--accent-primary); margin-bottom: 15px; }
+        .provider-card h3 { color: var(--text-primary); }
+        .provider-card .role { color: var(--accent-primary); font-weight: 500; margin-bottom: 5px; }
+        
+        .testimonial-card { background: var(--bg-card); padding: 30px; border-radius: 12px; }
+        .testimonial-card p { font-style: italic; font-size: 1.1rem; margin-bottom: 20px; }
+        .testimonial-author { display: flex; align-items: center; gap: 15px; }
+        .testimonial-author img { width: 50px; height: 50px; border-radius: 50%; }
+        .testimonial-author h4 { color: var(--text-primary); font-size: 1rem; margin: 0; }
+        
+        footer { background-color: var(--bg-card); color: var(--text-primary); padding: 60px 0 20px 0; }
         .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid var(--border-color); color: var(--text-secondary); }
-        
-        @media (max-width: 992px) {
-            .nav-links { display: none; }
-            .how-it-works-grid { grid-template-columns: 1fr; }
-            .about-grid { grid-template-columns: 1fr; }
-            .footer-grid { grid-template-columns: 1fr; text-align: center; }
-        }
-        @media (max-width: 768px) {
-            .hero-content h1 { font-size: 2.5rem; }
-            .hero-nav { display: none; }
-        }
     </style>
 </head>
 <body class="dark-mode">
-
     <header class="header">
         <nav class="navbar container">
             <a href="index.html" class="nav-logo">KabaleOnline</a>
             <div class="nav-menu">
-                <ul class="nav-links">
-                    <li><a href="#hero">Home</a></li>
-                    <li><a href="#how-it-works">How It Works</a></li>
-                    <li><a href="#services">Categories</a></li>
-                    <li><a href="#about">About</a></li>
-                </ul>
-                <a href="auth.html" class="btn">Join Now</a>
+                <a href="auth.html" class="btn-header" id="login-link">Login / Sign Up</a>
+                <a href="dashboard.html" class="btn-header" id="dashboard-link" style="display: none;">My Dashboard</a>
                 <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
             </div>
         </nav>
@@ -181,189 +151,142 @@
 
     <main>
         <section id="hero" class="hero">
-            <div class="hero-slider">
-                <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1521791136064-7986c2920216?q=80&w=2070&auto=format&fit=crop');">
-                    <div class="hero-content">
-                        <h1>Need a Skill? Find a Pro.</h1>
-                        <p>Connect with trusted local experts for any project, big or small.</p>
-                        <div><a href="services.html" class="btn">Find a Service</a><a href="auth.html" class="btn btn-secondary">Offer a Service</a></div>
-                    </div>
+            <div class="hero-slider-wrapper">
+                <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1521791136064-7986c2920216?q=80&w=2070&auto=format&fit=crop');">
+                    <div class="hero-content"><h1>Need a Skill? Find a Local Pro.</h1><p>Connect with trusted experts in Kabale for any project.</p><div><a href="services.html" class="btn">Find a Service</a><a href="auth.html" class="btn btn-secondary">Offer a Service</a></div></div>
                 </div>
                 <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop');">
-                    <div class="hero-content">
-                        <h1>Your Home, Expertly Cared For.</h1>
-                        <p>From plumbing to painting, find reliable help for your home maintenance.</p>
-                        <div><a href="services.html" class="btn">Find a Service</a><a href="auth.html" class="btn btn-secondary">Offer a Service</a></div>
-                    </div>
+                    <div class="hero-content"><h1>Your Home, Expertly Cared For.</h1><p>From plumbing to painting, find reliable help for home maintenance.</p><div><a href="services.html" class="btn">Find a Service</a><a href="auth.html" class="btn btn-secondary">Offer a Service</a></div></div>
                 </div>
                 <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070&auto=format&fit=crop');">
-                     <div class="hero-content">
-                        <h1>Bring Your Ideas to Life.</h1>
-                        <p>Hire talented local designers, developers, and creatives.</p>
-                        <div><a href="services.html" class="btn">Find a Service</a><a href="auth.html" class="btn btn-secondary">Offer a Service</a></div>
-                    </div>
+                     <div class="hero-content"><h1>Bring Your Ideas to Life.</h1><p>Hire talented local designers, developers, and creatives.</p><div><a href="services.html" class="btn">Find a Service</a><a href="auth.html" class="btn btn-secondary">Offer a Service</a></div></div>
                 </div>
                 <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1558611848-73f7eb4001a1?q=80&w=2071&auto=format&fit=crop');">
-                    <div class="hero-content">
-                        <h1>Unforgettable Events, Made Easy.</h1>
-                        <p>Find caterers, planners, and decorators for your next celebration.</p>
-                        <div><a href="services.html" class="btn">Find a Service</a><a href="auth.html" class="btn btn-secondary">Offer a Service</a></div>
-                    </div>
+                    <div class="hero-content"><h1>Unforgettable Events, Made Easy.</h1><p>Find caterers, planners, and decorators for your next celebration.</p><div><a href="services.html" class="btn">Find a Service</a><a href="auth.html" class="btn btn-secondary">Offer a Service</a></div></div>
+                </div>
+                 <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2070&auto=format&fit=crop');">
+                    <div class="hero-content"><h1>Grow Your Local Business.</h1><p>Access marketing, accounting, and consulting services from local professionals.</p><div><a href="services.html" class="btn">Find a Service</a><a href="auth.html" class="btn btn-secondary">Offer a Service</a></div></div>
                 </div>
                 <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=2070&auto=format&fit=crop');">
-                     <div class="hero-content">
-                        <h1>Have a Skill? Start Earning.</h1>
-                        <p>Offer your services to the community and build your own business.</p>
-                        <div><a href="services.html" class="btn">Find a Service</a><a href="auth.html" class="btn btn-secondary">Offer a Service</a></div>
-                    </div>
+                     <div class="hero-content"><h1>Have a Skill? Start Earning Today.</h1><p>Offer your services to the community and build your own business.</p><div><a href="services.html" class="btn">Find a Service</a><a href="auth.html" class="btn btn-secondary">Offer a Service</a></div></div>
                 </div>
             </div>
-            
             <button class="hero-nav hero-prev"><i class="fas fa-chevron-left"></i></button>
             <button class="hero-nav hero-next"><i class="fas fa-chevron-right"></i></button>
             <div class="hero-dots"></div>
         </section>
 
-        <section id="how-it-works" class="how-it-works">
+        <section id="why-us">
             <div class="container">
-                <p class="section-subtitle">Get Started in 3 Easy Steps</p>
-                <h2>How KabaleOnline Works</h2>
-                <div class="how-it-works-grid">
-                    <div class="step-item fade-in">
-                        <i class="fas fa-search icon"></i>
-                        <h3>1. Post or Find</h3>
-                        <p>If you need help, post a job or browse our service categories. If you're a provider, create your profile and list your skills.</p>
-                    </div>
-                    <div class="step-item fade-in" style="transition-delay: 0.1s;">
-                        <i class="fas fa-comments icon"></i>
-                        <h3>2. Connect & Agree</h3>
-                        <p>Communicate directly and securely. Service seekers can compare quotes and profiles, and agree on the scope and price with the provider.</p>
-                    </div>
-                    <div class="step-item fade-in" style="transition-delay: 0.2s;">
-                        <i class="fas fa-check-circle icon"></i>
-                        <h3>3. Get It Done</h3>
-                        <p>The provider completes the work to your satisfaction. Once done, you can leave a review to help build a trusted community.</p>
-                    </div>
+                <p class="section-subtitle">Why Choose Us?</p>
+                <h2>A Platform Built for the Kigezi Community</h2>
+                <div class="features-grid">
+                    <div class="feature-card"><div class="icon"><i class="fas fa-users"></i></div><h3>Support Local</h3><p>By hiring on KabaleOnline, you're directly supporting local artisans, technicians, and professionals, strengthening our community's economy.</p></div>
+                    <div class="feature-card"><div class="icon"><i class="fas fa-shield-alt"></i></div><h3>Trusted & Verified</h3><p>We encourage a community of trust with user reviews and profiles, so you can hire with confidence.</p></div>
+                    <div class="feature-card"><div class="icon"><i class="fas fa-comments"></i></div><h3>Direct Communication</h3><p>No middlemen. Connect and communicate directly with providers to discuss your needs and agree on terms.</p></div>
                 </div>
             </div>
         </section>
-        
-        <section id="services" class="services">
+
+        <section id="categories">
             <div class="container">
-                <p class="section-subtitle">Explore Categories</p>
-                <h2>A World of Local Services at Your Fingertips</h2>
+                <p class="section-subtitle">Explore</p>
+                <h2>A World of Services at Your Fingertips</h2>
                 <div class="services-grid">
-                    <div class="service-card fade-in"><i class="fas fa-home icon"></i><h3>Home Services</h3><p>Plumbing, electrical, carpentry, painting, cleaning, gardening.</p></div>
-                    <div class="service-card fade-in" style="transition-delay: 0.1s;"><i class="fas fa-briefcase icon"></i><h3>Professional</h3><p>Web design, accounting, legal advice, business consulting.</p></div>
-                    <div class="service-card fade-in" style="transition-delay: 0.2s;"><i class="fas fa-paint-brush icon"></i><h3>Creative & Media</h3><p>Photography, videography, graphic design, writing.</p></div>
-                     <div class="service-card fade-in" style="transition-delay: 0.3s;"><i class="fas fa-graduation-cap icon"></i><h3>Lessons & Tutoring</h3><p>Academic subjects, music lessons, language tutoring.</p></div>
-                    <div class="service-card fade-in" style="transition-delay: 0.4s;"><i class="fas fa-birthday-cake icon"></i><h3>Events</h3><p>Catering, event planning, DJs, MCs, decoration, equipment rental.</p></div>
-                    <div class="service-card fade-in" style="transition-delay: 0.5s;"><i class="fas fa-car icon"></i><h3>Automotive</h3><p>Mechanics, car washing, detailing, boda boda repair.</p></div>
+                    <a href="services.html" class="category-card"><div class="icon"><i class="fas fa-home"></i></div><span>Home Services</span></a>
+                    <a href="services.html" class="category-card"><div class="icon"><i class="fas fa-paint-brush"></i></div><span>Creative & Media</span></a>
+                    <a href="services.html" class="category-card"><div class="icon"><i class="fas fa-laptop-code"></i></div><span>Technical & IT</span></a>
+                    <a href="services.html" class="category-card"><div class="icon"><i class="fas fa-briefcase"></i></div><span>Professional</span></a>
+                    <a href="services.html" class="category-card"><div class="icon"><i class="fas fa-birthday-cake"></i></div><span>Events</span></a>
+                    <a href="services.html" class="category-card"><div class="icon"><i class="fas fa-graduation-cap"></i></div><span>Tutoring</span></a>
                 </div>
             </div>
         </section>
 
-        <section id="about" class="about">
-            <div class="container about-grid">
-                <div class="about-image fade-in">
-                    <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070&auto=format&fit=crop" alt="Local artisans and professionals in Kabale">
-                </div>
-                <div class="about-content fade-in">
-                    <p class="section-subtitle">For Our Community, By Our Community</p>
-                    <h2 style="text-align: left;">Empowering Local Skills & Businesses in Kigezi</h2>
-                    <p>KabaleOnline was born from a simple idea: to make it easier for people in our community to connect. We believe in the incredible talent right here in the Kigezi region, and we want to help it thrive.</p>
-                    <p>Our platform is a bridge between those who need help and those who have the skills to provide it. By choosing a local provider, you are not just getting a job done – you are investing in our local economy and supporting your neighbours.</p>
-                    <a href="auth.html" class="btn">Join Our Community</a>
+        <section id="providers">
+            <div class="container">
+                <p class="section-subtitle">Our Community</p>
+                <h2>Meet Some of Our Skilled Providers</h2>
+                <div class="provider-grid">
+                    <div class="provider-card"><img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Provider"><h3 class="provider-name">David M.</h3><p class="role">Web Developer</p><p>5 Years of experience building sites for local businesses.</p></div>
+                    <div class="provider-card"><img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Provider"><h3 class="provider-name">Hope K.</h3><p class="role">Caterer</p><p>Specializing in delicious local and international cuisine for all events.</p></div>
+                    <div class="provider-card"><img src="https://randomuser.me/api/portraits/men/56.jpg" alt="Provider"><h3 class="provider-name">John A.</h3><p class="role">Plumber</p><p>Reliable and fast plumbing services available 24/7 for any emergency.</p></div>
                 </div>
             </div>
         </section>
 
-        <section id="cta" class="cta">
-            <div class="container fade-in">
-                <h2>Ready to Get Started?</h2>
-                <p>Join our growing community today. Whether you're looking to hire for a specific task or offer your professional skills, your journey starts here. Signing up is free and easy.</p>
-                <div>
-                     <a href="auth.html" class="btn">Sign Up as a Provider</a>
-                     <a href="auth.html" class="btn" style="background:var(--bg-primary); color:var(--text-primary); border-color: var(--text-primary)">Sign Up as a Seeker</a>
-                </div>
+        <section id="testimonials">
+            <div class="container">
+                 <p class="section-subtitle">Testimonials</p>
+                 <h2>What Our Users Are Saying</h2>
+                 <div class="features-grid"> <!-- Re-using the grid for layout -->
+                    <div class="testimonial-card">
+                        <p>"I needed a plumber urgently and found John on KabaleOnline. He was professional, fast, and did a great job. So much easier than asking around!"</p>
+                        <div class="testimonial-author"><img src="https://randomuser.me/api/portraits/women/12.jpg" alt="User"><div><h4>Sarah K.</h4><span>Homeowner, Kabale Town</span></div></div>
+                    </div>
+                     <div class="testimonial-card">
+                        <p>"As a freelance designer, this platform has connected me with great local clients I wouldn't have found otherwise. It's been a huge boost for my business."</p>
+                        <div class="testimonial-author"><img src="https://randomuser.me/api/portraits/men/15.jpg" alt="User"><div><h4>Alex M.</h4><span>Service Provider</span></div></div>
+                    </div>
+                 </div>
             </div>
         </section>
+
     </main>
 
     <footer>
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-about">
-                    <h4>KabaleOnline</h4>
-                    <p>Connecting our community by making it easy to find and offer skilled services across the Kigezi region.</p>
-                </div>
-                <div class="footer-links"><h4>Quick Links</h4><ul><li><a href="#about">About Us</a></li><li><a href="#how-it-works">How It Works</a></li><li><a href="services.html">Browse Services</a></li></ul></div>
-                <div class="footer-links"><h4>Support</h4><ul><li><a href="#">Contact Us</a></li><li><a href="#">FAQ</a></li><li><a href="#">Privacy Policy</a></li></ul></div>
-            </div>
-            <div class="footer-bottom"><p>&copy; 2025 KabaleOnline. All Rights Reserved.</p></div>
+        <div class="container footer-bottom">
+            <p>&copy; 2025 KabaleOnline Services. All Rights Reserved.</p>
         </div>
     </footer>
-
+    
     <script src="theme.js" defer></script>
+    <script src="global-auth.js" type="module"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            const wrapper = document.querySelector('.hero-slider-wrapper');
             const slides = document.querySelectorAll('.hero-slide');
             const nextBtn = document.querySelector('.hero-next');
             const prevBtn = document.querySelector('.hero-prev');
             const dotsContainer = document.querySelector('.hero-dots');
+            if (!wrapper || slides.length === 0) return;
+
             let currentSlide = 0;
             let slideInterval;
+            const totalSlides = slides.length;
 
             function createDots() {
-                slides.forEach((_, i) => {
+                for (let i = 0; i < totalSlides; i++) {
                     const dot = document.createElement('div');
                     dot.classList.add('hero-dot');
-                    if (i === 0) dot.classList.add('active');
                     dot.addEventListener('click', () => { goToSlide(i); startSlideShow(); });
                     dotsContainer.appendChild(dot);
-                });
+                }
             }
 
             function updateDots() {
-                const dots = document.querySelectorAll('.hero-dot');
+                const dots = dotsContainer.querySelectorAll('.hero-dot');
                 dots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
             }
 
             function goToSlide(n) {
-                slides[currentSlide].classList.remove('active');
-                currentSlide = (n + slides.length) % slides.length;
-                slides[currentSlide].classList.add('active');
+                currentSlide = (n + totalSlides) % totalSlides;
+                wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
                 updateDots();
             }
 
-            function nextSlide() { goToSlide(currentSlide + 1); }
             function startSlideShow() {
                 clearInterval(slideInterval);
-                slideInterval = setInterval(nextSlide, 5000);
+                slideInterval = setInterval(() => goToSlide(currentSlide + 1), 5000);
             }
 
-            nextBtn.addEventListener('click', () => { nextSlide(); startSlideShow(); });
+            nextBtn.addEventListener('click', () => { goToSlide(currentSlide + 1); startSlideShow(); });
             prevBtn.addEventListener('click', () => { goToSlide(currentSlide - 1); startSlideShow(); });
             
-            if(slides.length > 0) {
-                createDots();
-                startSlideShow();
-            }
-
-            const faders = document.querySelectorAll('.fade-in');
-            const appearOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
-            const appearOnScroll = new IntersectionObserver(function(entries, observer) {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, appearOptions);
-            faders.forEach(fader => appearOnScroll.observe(fader));
+            createDots();
+            goToSlide(0);
+            startSlideShow();
         });
     </script>
-
 </body>
 </html>
-
