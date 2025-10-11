@@ -1,142 +1,176 @@
-// --- Import Firebase Services & Helpers ---
 import { app } from './firebase-init.js';
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, query, where, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { getFirestore, collection, doc, addDoc, getDoc, getDocs, query, where, updateDoc, deleteDoc, Timestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 import { uploadToCloudinary } from './cloudinary-upload.js';
+import { showToast, hideToast, showButtonLoader, hideButtonLoader } from './notifications.js';
 
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// --- ELEMENT SELECTORS ---
 const serviceForm = document.getElementById('service-form');
+const myServicesList = document.getElementById('my-services-list');
+const formTitle = document.getElementById('form-title');
+const submitButton = document.querySelector('.btn-submit');
 const imageInput = document.getElementById('cover-image-input');
 const imagePreview = document.getElementById('cover-image-preview');
-const myServicesList = document.getElementById('my-services-list');
-const submitButton = document.querySelector('.btn-submit');
+const deleteModal = document.getElementById('delete-modal');
+const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
 
 let currentUserId = null;
+let editingServiceId = null; // To track if we are editing or creating
+let serviceToDeleteId = null;
 
-// --- AUTHENTICATION & INITIAL DATA LOAD ---
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, user => {
     if (user) {
-        // User is signed in.
         currentUserId = user.uid;
-        await fetchAndDisplayServices(currentUserId);
+        fetchAndDisplayServices(currentUserId);
     } else {
-        // User is signed out, redirect.
         window.location.href = 'auth.html';
     }
 });
 
-
-// --- FUNCTION to fetch and display provider's services ---
 const fetchAndDisplayServices = async (userId) => {
-    if (!userId) return;
-    myServicesList.innerHTML = '<p>Loading your services...</p>'; // Show a loading state
-
-    const servicesRef = collection(db, "services");
-    const q = query(servicesRef, where("providerId", "==", userId));
-    
+    myServicesList.innerHTML = '<p>Loading...</p>';
+    const q = query(collection(db, "services"), where("providerId", "==", userId));
     try {
-        const querySnapshot = await getDocs(q);
-        myServicesList.innerHTML = ''; // Clear loading state
-
-        if (querySnapshot.empty) {
+        const snapshot = await getDocs(q);
+        myServicesList.innerHTML = '';
+        if (snapshot.empty) {
             myServicesList.innerHTML = '<p>You have not listed any services yet.</p>';
             return;
         }
-
-        querySnapshot.forEach((doc) => {
-            const service = doc.data();
-            const serviceElement = document.createElement('div');
-            serviceElement.className = 'service-item';
-            serviceElement.innerHTML = `
-                <img src="${service.coverImageUrl || 'https://placehold.co/80x80'}" alt="${service.title}" class="service-item-img">
-                <div class="service-item-details">
-                    <h3 class="service-item-title">${service.title}</h3>
-                    <p class="service-item-status">Active</p>
-                </div>
+        snapshot.forEach(doc => {
+            const service = { id: doc.id, ...doc.data() };
+            const el = document.createElement('div');
+            el.className = 'service-item';
+            el.innerHTML = `
+                <img src="${service.coverImageUrl || 'https://placehold.co/60x60'}" alt="${service.title}" class="service-item-img">
+                <div class="service-item-details"><h3 class="service-item-title">${service.title}</h3></div>
                 <div class="service-item-actions">
-                    <button title="Edit"><i class="fas fa-pencil-alt"></i></button>
-                    <button class="delete" title="Delete"><i class="fas fa-trash-alt"></i></button>
-                </div>
-            `;
-            myServicesList.appendChild(serviceElement);
+                    <button class="edit-btn" data-id="${service.id}"><i class="fas fa-pencil-alt"></i></button>
+                    <button class="delete-btn delete" data-id="${service.id}"><i class="fas fa-trash-alt"></i></button>
+                </div>`;
+            myServicesList.appendChild(el);
         });
-    } catch (error) {
-        console.error("Error fetching services:", error);
-        myServicesList.innerHTML = '<p>Could not load your services.</p>';
+    } catch (e) {
+        myServicesList.innerHTML = '<p>Could not load services.</p>';
     }
 };
 
+const setFormToEditMode = async (serviceId) => {
+    editingServiceId = serviceId;
+    formTitle.textContent = 'Edit Service';
+    submitButton.textContent = 'Save Changes';
+    try {
+        const serviceDoc = await getDoc(doc(db, "services", serviceId));
+        if (serviceDoc.exists()) {
+            const data = serviceDoc.data();
+            document.getElementById('service-title').value = data.title;
+            document.getElementById('service-category').value = data.category;
+            document.getElementById('service-description').value = data.description;
+            document.getElementById('service-location').value = data.location;
+            document.getElementById('service-price').value = data.price;
+            document.getElementById('price-unit').value = data.priceUnit;
+            imagePreview.innerHTML = `<img src="${data.coverImageUrl}" alt="Cover image preview">`;
+            window.scrollTo({ top: serviceForm.offsetTop, behavior: 'smooth' });
+        }
+    } catch (error) {
+        showToast('Failed to load service data for editing.', 'error');
+    }
+};
 
-// --- FORM SUBMISSION LOGIC ---
+const resetForm = () => {
+    editingServiceId = null;
+    formTitle.textContent = 'Add a New Service';
+    submitButton.textContent = 'Publish Service';
+    serviceForm.reset();
+    imagePreview.innerHTML = '<span class="placeholder-text"><i class="fas fa-camera"></i> Upload</span>';
+};
+
 serviceForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (!currentUserId) {
-        alert('You must be logged in to post a service.');
-        return;
-    }
+    if (!currentUserId) return;
+    showButtonLoader(submitButton);
 
-    const imageFile = imageInput.files[0];
-    if (!imageFile) {
-        alert('Please upload a cover image for your service.');
-        return;
-    }
-
-    submitButton.disabled = true;
-    submitButton.textContent = 'Publishing...';
+    const serviceData = {
+        title: document.getElementById('service-title').value,
+        category: document.getElementById('service-category').value,
+        description: document.getElementById('service-description').value,
+        location: document.getElementById('service-location').value,
+        price: Number(document.getElementById('service-price').value),
+        priceUnit: document.getElementById('price-unit').value,
+        providerId: currentUserId,
+    };
 
     try {
-        // 1. Upload image to Cloudinary
-        const coverImageUrl = await uploadToCloudinary(imageFile);
+        const imageFile = imageInput.files[0];
+        if (imageFile) {
+            showToast('Uploading image...', 'progress');
+            serviceData.coverImageUrl = await uploadToCloudinary(imageFile);
+            hideToast();
+        }
 
-        // 2. Gather form data
-        const serviceData = {
-            providerId: currentUserId,
-            title: document.getElementById('service-title').value,
-            category: document.getElementById('service-category').value,
-            description: document.getElementById('service-description').value,
-            location: document.getElementById('service-location').value,
-            price: Number(document.getElementById('service-price').value),
-            priceUnit: document.getElementById('price-unit').value,
-            coverImageUrl: coverImageUrl,
-            createdAt: Timestamp.fromDate(new Date())
-        };
-
-        // 3. Save service data to Firestore
-        const docRef = await addDoc(collection(db, "services"), serviceData);
-        console.log("Service published with ID: ", docRef.id);
-
-        // 4. Reset form and refresh the list
-        serviceForm.reset();
-        imagePreview.innerHTML = '<span class="placeholder-text"><i class="fas fa-camera"></i> Click to Upload</span>';
-        await fetchAndDisplayServices(currentUserId);
-        
-        alert('Service published successfully!');
-
+        if (editingServiceId) {
+            showToast('Updating service...', 'progress');
+            const serviceDocRef = doc(db, "services", editingServiceId);
+            await updateDoc(serviceDocRef, serviceData);
+            hideToast();
+            showToast('Service updated successfully!', 'success');
+        } else {
+            showToast('Publishing service...', 'progress');
+            serviceData.createdAt = Timestamp.fromDate(new Date());
+            await addDoc(collection(db, "services"), serviceData);
+            hideToast();
+            showToast('Service published successfully!', 'success');
+        }
+        resetForm();
+        fetchAndDisplayServices(currentUserId);
     } catch (error) {
-        console.error("Error publishing service:", error);
-        alert('There was an error publishing your service. Please try again.');
+        hideToast();
+        showToast(`Error: ${error.message}`, 'error');
     } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = 'Publish Service';
+        hideButtonLoader(submitButton);
     }
 });
 
+myServicesList.addEventListener('click', e => {
+    if (e.target.closest('.edit-btn')) {
+        const serviceId = e.target.closest('.edit-btn').dataset.id;
+        setFormToEditMode(serviceId);
+    }
+    if (e.target.closest('.delete-btn')) {
+        serviceToDeleteId = e.target.closest('.delete-btn').dataset.id;
+        deleteModal.classList.add('show');
+    }
+});
 
-// --- IMAGE PREVIEW LOGIC ---
+cancelDeleteBtn.addEventListener('click', () => {
+    deleteModal.classList.remove('show');
+    serviceToDeleteId = null;
+});
+
+confirmDeleteBtn.addEventListener('click', async () => {
+    if (!serviceToDeleteId) return;
+    showButtonLoader(confirmDeleteBtn);
+    try {
+        await deleteDoc(doc(db, "services", serviceToDeleteId));
+        showToast('Service deleted successfully.', 'success');
+        fetchAndDisplayServices(currentUserId);
+    } catch (error) {
+        showToast('Failed to delete service.', 'error');
+    } finally {
+        hideButtonLoader(confirmDeleteBtn);
+        deleteModal.classList.remove('show');
+        serviceToDeleteId = null;
+    }
+});
+
 imageInput.addEventListener('change', () => {
     if (imageInput.files && imageInput.files[0]) {
         const reader = new FileReader();
         reader.onload = (e) => {
-            imagePreview.innerHTML = '';
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            img.style.width = '100%';
-            img.style.height = '100%';
-            img.style.objectFit = 'cover';
-            imagePreview.appendChild(img);
+            imagePreview.innerHTML = `<img src="${e.target.result}" alt="Cover image preview">`;
         };
         reader.readAsDataURL(imageInput.files[0]);
     }
