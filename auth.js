@@ -1,6 +1,20 @@
 import { app } from './firebase-init.js';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, sendEmailVerification, applyActionCode } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { 
+    getAuth, 
+    onAuthStateChanged, // Import the new function
+    createUserWithEmailAndPassword, 
+    signInWithEmailAndPassword,
+    GoogleAuthProvider,
+    signInWithPopup,
+    sendEmailVerification,
+    applyActionCode 
+} from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+import { 
+    getFirestore, 
+    doc, 
+    setDoc, 
+    getDoc 
+} from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 import { uploadToCloudinary } from './cloudinary-upload.js';
 import { showToast, hideToast, showButtonLoader, hideButtonLoader } from './notifications.js';
 
@@ -21,6 +35,18 @@ const photoInput = document.getElementById('profile-photo-input');
 const photoPreview = document.getElementById('photo-preview');
 const passwordToggles = document.querySelectorAll('.password-toggle');
 
+// --- NEW: REDIRECT LOGIC FOR LOGGED-IN USERS ---
+// This runs on page load. If the user is already logged in and verified,
+// it redirects them away from the auth page to their dashboard.
+onAuthStateChanged(auth, (user) => {
+    if (user && user.emailVerified) {
+        console.log("User is already logged in and verified. Redirecting to dashboard...");
+        window.location.href = 'dashboard.html';
+    }
+    // If no user, or user is not verified, the script will continue and show the login/signup forms.
+});
+
+
 const showLoginView = (e) => { if (e) e.preventDefault(); signupContainer.style.display = 'none'; verificationNotice.style.display = 'none'; loginContainer.style.display = 'block'; };
 const showSignupView = (e) => { if (e) e.preventDefault(); loginContainer.style.display = 'none'; verificationNotice.style.display = 'none'; signupContainer.style.display = 'block'; };
 const showVerificationView = () => { loginContainer.style.display = 'none'; signupContainer.style.display = 'none'; verificationNotice.style.display = 'block'; };
@@ -36,7 +62,6 @@ photoInput.addEventListener('change', () => {
     }
 });
 
-// Password visibility toggle logic
 passwordToggles.forEach(toggle => {
     toggle.addEventListener('click', () => {
         const passwordInput = toggle.previousElementSibling;
@@ -158,7 +183,6 @@ const handleVerificationRedirect = async () => {
         } catch (error) {
             showToast('Error: The verification link is invalid or expired.', 'error');
         }
-        // Clean the URL
         window.history.replaceState({}, document.title, window.location.pathname);
     }
 };
