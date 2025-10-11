@@ -1,15 +1,10 @@
-// --- Import Firebase Services & Initialized App ---
 import { app } from './firebase-init.js';
-// FIX: Added 'doc' and 'getDoc' to the import list.
 import { getFirestore, collection, getDocs, doc, getDoc, query, where } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 const db = getFirestore(app);
-
-// --- ELEMENT SELECTORS ---
 const servicesGrid = document.getElementById('services-grid');
 const filterButtons = document.querySelectorAll('.filter-btn');
 
-// --- FUNCTION to fetch and display all services ---
 const fetchAndDisplayServices = async (categoryFilter = 'All') => {
     if (!servicesGrid) return;
     servicesGrid.innerHTML = '<p class="loading-text">Loading services...</p>';
@@ -18,8 +13,7 @@ const fetchAndDisplayServices = async (categoryFilter = 'All') => {
         const servicesRef = collection(db, "services");
         let q;
         
-        // Build the query based on the filter
-        if (categoryFilter === 'All') {
+        if (categoryFilter === 'All' || !categoryFilter) {
             q = query(servicesRef);
         } else {
             q = query(servicesRef, where("category", "==", categoryFilter));
@@ -28,11 +22,11 @@ const fetchAndDisplayServices = async (categoryFilter = 'All') => {
         const servicesSnapshot = await getDocs(q);
         
         if (servicesSnapshot.empty) {
-            servicesGrid.innerHTML = `<p class="loading-text">No services found in the "${categoryFilter}" category.</p>`;
+            servicesGrid.innerHTML = `<p class="loading-text">No services found in this category.</p>`;
             return;
         }
 
-        servicesGrid.innerHTML = ''; // Clear loading message
+        servicesGrid.innerHTML = '';
 
         for (const serviceDoc of servicesSnapshot.docs) {
             const service = { id: serviceDoc.id, ...serviceDoc.data() };
@@ -40,18 +34,17 @@ const fetchAndDisplayServices = async (categoryFilter = 'All') => {
             let providerName = 'Anonymous';
             let providerAvatar = 'https://placehold.co/40x40';
 
-            // Fetch the provider's data only if a providerId exists
             if (service.providerId) {
                 const userDocRef = doc(db, "users", service.providerId);
                 const userDoc = await getDoc(userDocRef);
                 if (userDoc.exists()) {
                     const providerData = userDoc.data();
                     providerName = providerData.name || 'Provider';
+                    // This is the key line that fetches the real profile picture URL
                     providerAvatar = providerData.profilePicUrl || `https://placehold.co/40x40/10336d/a7c0e8?text=${providerName.charAt(0)}`;
                 }
             }
             
-            // Create and append the service card
             const card = document.createElement('a');
             card.href = `service-detail.html?id=${service.id}`;
             card.className = 'service-card';
@@ -77,21 +70,13 @@ const fetchAndDisplayServices = async (categoryFilter = 'All') => {
     }
 };
 
-// --- EVENT LISTENERS for filter buttons ---
 filterButtons.forEach(button => {
     button.addEventListener('click', () => {
-        // Update active state on buttons
         filterButtons.forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
-        
-        // Get the category from the button's text content
         const category = button.textContent;
-        
-        // Re-fetch services with the new filter
         fetchAndDisplayServices(category);
     });
 });
 
-// --- INITIALIZATION ---
-// Run the function once when the page loads to show all services.
 fetchAndDisplayServices();
