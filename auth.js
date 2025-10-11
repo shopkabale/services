@@ -2,6 +2,7 @@ import { app } from './firebase-init.js';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, sendEmailVerification, applyActionCode } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 import { uploadToCloudinary } from './cloudinary-upload.js';
+import { showToast, hideToast, showButtonLoader, hideButtonLoader } from './notifications.js';
 
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -18,6 +19,7 @@ const googleLoginBtn = document.getElementById('google-login-btn');
 const googleSignupBtn = document.getElementById('google-signup-btn');
 const photoInput = document.getElementById('profile-photo-input');
 const photoPreview = document.getElementById('photo-preview');
+const passwordToggles = document.querySelectorAll('.password-toggle');
 
 const showLoginView = (e) => { if (e) e.preventDefault(); signupContainer.style.display = 'none'; verificationNotice.style.display = 'none'; loginContainer.style.display = 'block'; };
 const showSignupView = (e) => { if (e) e.preventDefault(); loginContainer.style.display = 'none'; verificationNotice.style.display = 'none'; signupContainer.style.display = 'block'; };
@@ -34,8 +36,28 @@ photoInput.addEventListener('change', () => {
     }
 });
 
+// Password visibility toggle logic
+passwordToggles.forEach(toggle => {
+    toggle.addEventListener('click', () => {
+        const passwordInput = toggle.previousElementSibling;
+        const icon = toggle.querySelector('i');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    });
+});
+
 signupForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const submitButton = signupForm.querySelector('.btn-submit');
+    showButtonLoader(submitButton);
+
     const name = document.getElementById('signup-name').value;
     const email = document.getElementById('signup-email').value;
     const password = document.getElementById('signup-password').value;
@@ -45,54 +67,62 @@ signupForm.addEventListener('submit', async (e) => {
     const photoFile = photoInput.files[0];
 
     if (password !== retypePassword) {
-        alert("Passwords do not match.");
+        showToast("Passwords do not match.", "error");
+        hideButtonLoader(submitButton);
         return;
     }
 
     try {
+        showToast("Creating your account...", "progress");
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         
         let profilePicUrl = '';
         if (photoFile) {
-            try {
-                profilePicUrl = await uploadToCloudinary(photoFile);
-            } catch (uploadError) {
-                console.error("Profile photo upload failed:", uploadError);
-                alert("Account created, but photo failed to upload.");
-            }
+            showToast("Uploading profile picture...", "progress");
+            profilePicUrl = await uploadToCloudinary(photoFile);
         }
 
+        showToast("Saving your profile...", "progress");
         const userProfile = { 
-            uid: user.uid, name, email, role: 'user', // ALL users are created with a universal 'user' role
-            isProvider: false, // We can add a flag to track if they become a provider later
+            uid: user.uid, name, email, role: 'user', isProvider: false,
             location, telephone, profilePicUrl, createdAt: new Date() 
         };
         await setDoc(doc(db, "users", user.uid), userProfile);
         
+        showToast("Sending verification email...", "progress");
         const actionCodeSettings = { url: window.location.href, handleCodeInApp: true };
         await sendEmailVerification(user, actionCodeSettings);
         
+        hideToast();
         showVerificationView();
 
     } catch (error) {
-        alert(`Error: ${error.message}`);
+        hideToast();
+        showToast(`Error: ${error.message}`, "error");
+    } finally {
+        hideButtonLoader(submitButton);
     }
 });
 
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const submitButton = loginForm.querySelector('.btn-submit');
+    showButtonLoader(submitButton);
+
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         if (!userCredential.user.emailVerified) {
-            alert("Please verify your email address before logging in.");
+            showToast("Please verify your email before logging in.", "error");
+            hideButtonLoader(submitButton);
             return;
         }
-        window.location.href = 'dashboard.html'; // Always redirect to the universal dashboard
+        window.location.href = 'dashboard.html';
     } catch (error) {
-        alert(`Error: ${error.message}`);
+        showToast(`Error: ${error.message}`, "error");
+        hideButtonLoader(submitButton);
     }
 });
 
@@ -102,7 +132,6 @@ const handleGoogleSignIn = async () => {
         const user = result.user;
         const userDocRef = doc(db, "users", user.uid);
         const userDoc = await getDoc(userDocRef);
-
         if (!userDoc.exists()) {
             const userProfile = {
                 uid: user.uid, name: user.displayName, email: user.email,
@@ -111,9 +140,9 @@ const handleGoogleSignIn = async () => {
             };
             await setDoc(userDocRef, userProfile);
         }
-        window.location.href = 'dashboard.html'; // Always redirect to the universal dashboard
+        window.location.href = 'dashboard.html';
     } catch (error) {
-        alert(`Google Sign-In Error: ${error.message}`);
+        showToast(`Google Sign-In Error: ${error.message}`, "error");
     }
 };
 
@@ -125,10 +154,12 @@ const handleVerificationRedirect = async () => {
     if (urlParams.get('mode') === 'verifyEmail') {
         try {
             await applyActionCode(auth, urlParams.get('oobCode'));
-            alert('Email verified successfully! You can now log in.');
+            showToast('Email verified successfully! You can now log in.', 'success');
         } catch (error) {
-            alert('Error verifying email. The link may be invalid or expired.');
+            showToast('Error: The verification link is invalid or expired.', 'error');
         }
+        // Clean the URL
+        window.history.replaceState({}, document.title, window.location.pathname);
     }
 };
 
