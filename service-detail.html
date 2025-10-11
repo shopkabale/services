@@ -42,6 +42,7 @@
         }
         .navbar { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 0 15px; }
         .nav-logo { font-size: 1.8rem; font-weight: 800; color: var(--accent-primary); text-decoration: none; }
+        .nav-menu { display: flex; align-items: center; gap: 20px; }
         .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; }
         .btn-header { 
             padding: 8px 20px; background-color: var(--accent-primary); color: #ffffff; 
@@ -71,11 +72,18 @@
         footer a { color: var(--accent-primary); text-decoration: none; }
         #loading-state { text-align: center; font-size: 1.5rem; padding: 50px; }
 
-        /* --- MOBILE FIX for Header --- */
-        @media (max-width: 400px) {
-            .nav-logo { font-size: 1.4rem; }
-            .btn-header { padding: 6px 14px; font-size: 0.8rem; }
-            .navbar div { display: flex; align-items: center; gap: 10px; }
+        /* --- NEW: MOBILE HEADER FIX --- */
+        @media (max-width: 480px) {
+            .navbar { padding: 0 10px; }
+            .nav-logo { font-size: 1.4rem; } /* Massively reduced logo */
+            .btn-header { 
+                padding: 5px 12px; /* Massively reduced button */
+                font-size: 0.8rem; 
+            }
+            .theme-toggle { 
+                font-size: 1.2rem; /* Massively reduced toggle */
+            }
+            .nav-menu { gap: 10px; } /* Reduced space between items */
         }
     </style>
 </head>
@@ -84,7 +92,7 @@
     <header class="header">
         <div class="navbar">
             <a href="index.html" class="nav-logo">KabaleOnline</a>
-            <div>
+            <div class="nav-menu">
                 <a href="auth.html" class="btn-header">Login / Sign Up</a>
                 <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
             </div>
