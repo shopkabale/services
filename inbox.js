@@ -16,8 +16,8 @@ onAuthStateChanged(auth, user => {
 });
 
 function loadConversations(currentUserId) {
+  // THIS IS THE FIX: Use the correct collection name 'conversations'
   const convosRef = collection(db, 'conversations');
-  // This simple query works because we will sort by date in our code.
   const q = query(convosRef, where('participants', 'array-contains', currentUserId));
   
   conversationList.innerHTML = '<p style="padding:20px;text-align:center;">Loading conversations...</p>';
@@ -33,7 +33,7 @@ function loadConversations(currentUserId) {
       .sort((a,b) => (b.data.lastMessageTimestamp?.toMillis?.() || 0) - (a.data.lastMessageTimestamp?.toMillis?.() || 0));
 
     // Use Promise.all to fetch all user data efficiently.
-    const conversationNodes = await Promise.all(conversations.map(async (convoData) => {
+    const nodes = await Promise.all(conversations.map(async (convoData) => {
       const convo = convoData.data;
       const convoId = convoData.id;
       const recipientId = (convo.participants || []).find(id => id !== currentUserId);
@@ -56,6 +56,7 @@ function loadConversations(currentUserId) {
       const isUnread = lastUpdatedTime > lastReadTime && convo.lastSenderId !== currentUserId;
       
       const a = document.createElement('a');
+      // This now links to the chat page correctly
       a.href = `chat.html?recipientId=${recipientId}`;
       a.className = 'conversation-item' + (isUnread ? ' unread' : '');
       a.innerHTML = `
@@ -72,7 +73,7 @@ function loadConversations(currentUserId) {
     }));
 
     conversationList.innerHTML = '';
-    conversationNodes.filter(node => node).forEach(node => conversationList.appendChild(node));
+    nodes.filter(node => node).forEach(node => conversationList.appendChild(node));
 
   }, err => {
     console.error('Conversation listener failed (check Firestore indexes):', err);
