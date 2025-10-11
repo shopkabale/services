@@ -21,9 +21,8 @@ const messageInput = document.getElementById('message-input');
 const backButton = document.getElementById('back-button');
 
 let currentUser = null;
-let unsubscribe = null; // To stop the listener when the user leaves
+let unsubscribe = null; 
 
-// 1. Check Authentication State
 onAuthStateChanged(auth, async (user) => {
     if (user && user.emailVerified) {
         const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -43,27 +42,31 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-// 2. Listen for Real-Time Messages (CORRECTED LOGIC)
+// --- THIS FUNCTION HAS BEEN REWRITTEN TO BE MORE ROBUST ---
 function listenForMessages() {
     const messagesRef = collection(db, "group-chat");
-    // Get messages ordered by when they were created (oldest first)
     const q = query(messagesRef, orderBy("createdAt", "asc"));
 
     unsubscribe = onSnapshot(q, (snapshot) => {
-        // Use docChanges() to see what's new
-        snapshot.docChanges().forEach((change) => {
-            // Only act on messages that were ADDED
-            if (change.type === "added") {
-                const messageData = change.doc.data();
-                renderMessage(messageData);
-            }
+        // Clear all existing messages first
+        messageArea.innerHTML = '';
+        
+        // Loop through all documents in the snapshot and render them
+        snapshot.forEach((doc) => {
+            const messageData = doc.data();
+            renderMessage(messageData);
         });
-        // Scroll to the bottom every time a new message is added
+
+        // Scroll to the bottom after rendering all messages
         messageArea.scrollTop = messageArea.scrollHeight;
+        
+    }, (error) => {
+        // This will now show an error if the index is missing!
+        console.error("Error fetching messages (Hint: Have you created the Firestore index for 'group-chat' collection on 'createdAt' field?)", error);
+        messageArea.innerHTML = `<p style="color: #ffc107; padding: 20px; text-align: center;">Error: Could not load messages. Check the console for details.</p>`;
     });
 }
 
-// 3. Render a Single Message to the Screen
 function renderMessage(data) {
     const messageDiv = document.createElement('div');
     messageDiv.className = 'message';
@@ -85,7 +88,6 @@ function renderMessage(data) {
     messageArea.appendChild(messageDiv);
 }
 
-// 4. Handle Sending a New Message (Remains the Same)
 chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const messageText = messageInput.value.trim();
@@ -106,7 +108,6 @@ chatForm.addEventListener('submit', async (e) => {
     }
 });
 
-// Clean up the listener if the user navigates away
 window.addEventListener('beforeunload', () => {
     if (unsubscribe) {
         unsubscribe();
