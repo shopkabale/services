@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat | KabaleOnline</title>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
@@ -60,6 +60,15 @@
         .chat-header-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
         .chat-header-info { flex-grow: 1; }
         .chat-header-name { font-size: 1.2rem; font-weight: 600; color: var(--text-primary); }
+
+        /* Theme toggle */
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
 
         /* --- MESSAGE AREA --- */
         .message-area {
@@ -118,7 +127,7 @@
             background-color: var(--bg-secondary);
             border-bottom-left-radius: 5px;
         }
-        
+
         /* SENT */
         .message.sent {
             margin-left: auto;
@@ -185,6 +194,10 @@
         <div class="chat-header-info">
             <span class="chat-header-name" id="chat-header-name">Loading...</span>
         </div>
+        <!-- Theme toggle button -->
+        <button id="theme-toggle" class="theme-toggle" title="Toggle theme">
+            <i class="fas fa-moon"></i>
+        </button>
     </header>
 
     <!-- Dynamic message container -->
