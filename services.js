@@ -1,82 +1,96 @@
-import { app } from './firebase-init.js';
-import { getFirestore, collection, getDocs, doc, getDoc, query, where } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+// This is the final code to power your services page with Algolia.
+// It replaces the old services.js file entirely.
 
-const db = getFirestore(app);
-const servicesGrid = document.getElementById('services-grid');
-const filterButtons = document.querySelectorAll('.filter-btn');
+// 1. Initialize the Algolia client
+// IMPORTANT: Replace these placeholders with your actual Algolia credentials.
+// You can find these in your Algolia Dashboard -> Settings -> API Keys.
+const searchClient = algoliasearch(
+  'HQGXJ2Y7ZD',      // Your Application ID
+  '2e44c7070ebafaeb6ca324daa28f36b4'  // Your public, Search-Only API Key
+);
 
-const fetchAndDisplayServices = async (categoryFilter = 'All') => {
-    if (!servicesGrid) return;
-    servicesGrid.innerHTML = '<p class="loading-text">Loading services...</p>';
-
-    try {
-        const servicesRef = collection(db, "services");
-        let q;
-        
-        if (categoryFilter === 'All' || !categoryFilter) {
-            q = query(servicesRef);
-        } else {
-            q = query(servicesRef, where("category", "==", categoryFilter));
-        }
-
-        const servicesSnapshot = await getDocs(q);
-        
-        if (servicesSnapshot.empty) {
-            servicesGrid.innerHTML = `<p class="loading-text">No services found in this category.</p>`;
-            return;
-        }
-
-        servicesGrid.innerHTML = '';
-
-        for (const serviceDoc of servicesSnapshot.docs) {
-            const service = { id: serviceDoc.id, ...serviceDoc.data() };
-            
-            let providerName = 'Anonymous';
-            let providerAvatar = 'https://placehold.co/40x40';
-
-            if (service.providerId) {
-                const userDocRef = doc(db, "users", service.providerId);
-                const userDoc = await getDoc(userDocRef);
-                if (userDoc.exists()) {
-                    const providerData = userDoc.data();
-                    providerName = providerData.name || 'Provider';
-                    // This is the key line that fetches the real profile picture URL
-                    providerAvatar = providerData.profilePicUrl || `https://placehold.co/40x40/10336d/a7c0e8?text=${providerName.charAt(0)}`;
-                }
-            }
-            
-            const card = document.createElement('a');
-            card.href = `service-detail.html?id=${service.id}`;
-            card.className = 'service-card';
-            card.innerHTML = `
-                <div class="card-image" style="background-image: url('${service.coverImageUrl || 'https://placehold.co/600x400'}');"></div>
-                <div class="card-content">
-                    <div class="provider-info">
-                        <img src="${providerAvatar}" alt="${providerName}" class="provider-avatar">
-                        <span class="provider-name">${providerName}</span>
-                    </div>
-                    <h3 class="service-title">${service.title}</h3>
-                    <p class="service-location"><i class="fas fa-map-marker-alt"></i> ${service.location}</p>
-                    <div class="card-footer">
-                        <div class="price"><span>From </span>UGX ${service.price.toLocaleString()}</div>
-                    </div>
-                </div>
-            `;
-            servicesGrid.appendChild(card);
-        }
-    } catch (error) {
-        console.error("Error fetching services:", error);
-        servicesGrid.innerHTML = '<p class="loading-text">Could not load services. Please try again later.</p>';
-    }
-};
-
-filterButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        filterButtons.forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-        const category = button.textContent;
-        fetchAndDisplayServices(category);
-    });
+// 2. Create the main InstantSearch instance
+const search = instantsearch({
+  indexName: 'services',      // The name of your Algolia index
+  searchClient,
 });
 
-fetchAndDisplayServices();
+// 3. Create and add all the search interface components ("widgets")
+search.addWidgets([
+  /**
+   * Search Box Widget
+   * This connects to the <div id="searchbox"></div> in your HTML.
+   */
+  instantsearch.widgets.searchBox({
+    container: '#searchbox',
+    placeholder: 'What service are you looking for?',
+    showSubmit: true,
+    showReset: false,
+    templates: {
+      submit({ cssClasses }, { html }) {
+        return html`<button type="${cssClasses.submit}" type="submit"><i class="fas fa-search"></i></button>`;
+      },
+    },
+  }),
+
+  /**
+   * Category Filter Widget (Refinement List)
+   * This connects to the <div id="category-filters"></div> and automatically
+   * creates the filter buttons based on the 'category' attribute in your data.
+   */
+  instantsearch.widgets.refinementList({
+    container: '#category-filters',
+    attribute: 'category', // The field in your data to filter on
+    sortBy: ['name:asc'],
+    operator: 'or', // Allow selecting multiple categories
+    templates: {
+      item(item, { html }) {
+        return html`
+          <button class="filter-btn ${item.isRefined ? 'active' : ''}" @click="${item.value}">
+            ${item.label}
+          </button>
+        `;
+      },
+    },
+  }),
+
+  /**
+   * Results (Hits) Widget
+   * This connects to the <div id="services-grid"></div> and displays the results.
+   */
+  instantsearch.widgets.hits({
+    container: '#services-grid',
+    templates: {
+      // Message to show when no results are found
+      empty(results, { html }) {
+        return html`<p class="loading-text">No services found for <q>${results.query}</q>.</p>`;
+      },
+      // This is the HTML template for each search result card.
+      // It uses your existing CSS classes perfectly.
+      item(hit, { html }) {
+        // Use a placeholder if the provider's avatar is missing
+        const providerAvatar = hit.providerAvatar || `https://placehold.co/40x40/10336d/a7c0e8?text=${(hit.providerName || 'P').charAt(0)}`;
+        
+        return html`
+          <a href="service-detail.html?id=${hit.objectID}" class="service-card">
+            <div class="card-image" style="background-image: url('${hit.coverImageUrl || 'https://placehold.co/600x400'}');"></div>
+            <div class="card-content">
+              <div class="provider-info">
+                <img src="${providerAvatar}" alt="${hit.providerName}" class="provider-avatar">
+                <span class="provider-name">${hit.providerName}</span>
+              </div>
+              <h3 class="service-title">${instantsearch.highlight({ attribute: 'title', hit })}</h3>
+              <p class="service-location"><i class="fas fa-map-marker-alt"></i> ${hit.location}</p>
+              <div class="card-footer">
+                <div class="price"><span>From </span>UGX ${hit.price.toLocaleString()}</div>
+              </div>
+            </div>
+          </a>
+        `;
+      },
+    },
+  }),
+]);
+
+// 4. Start the search experience
+search.start();
