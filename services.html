@@ -111,27 +111,30 @@
     </main>
 
     <template id="service-card-template">
-      <a class="service-card">
-        <div class="card-image"></div>
-        <div class="card-content">
-          <div class="provider-info">
+  <a class="service-card">
+    <div class="card-image"></div>
+    <div class="card-content">
+      <a class="provider-info-link" style="text-decoration: none;">
+        <div class="provider-info">
             <img class="provider-avatar">
             <span class="provider-name"></span>
-          </div>
-          <h3 class="service-title"></h3>
-          <div class="service-rating"></div> <p class="service-location">
-            <i class="fas fa-map-marker-alt"></i>
-            <span class="location-text"></span>
-          </p>
-          <div class="card-footer">
-            <div class="price">
-              <span>From </span>
-              <span class="price-amount"></span>
-            </div>
-          </div>
         </div>
       </a>
-    </template>
+      <h3 class="service-title"></h3>
+      <div class="service-rating"></div>
+      <p class="service-location">
+        <i class="fas fa-map-marker-alt"></i>
+        <span class="location-text"></span>
+      </p>
+      <div class="card-footer">
+        <div class="price">
+          <span>From </span>
+          <span class="price-amount"></span>
+        </div>
+      </div>
+    </div>
+  </a>
+</template>
 
         <footer>
         <div class="footer-container">
