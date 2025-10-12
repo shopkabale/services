@@ -1,75 +1,276 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inbox | KabaleOnline</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        :root {
-            --bg-primary: #0d2857; --bg-secondary: #10336d; --text-primary: #ffffff;
-            --text-secondary: #a7c0e8; --accent-primary: #007bff; --border-color: #1f4287;
-        }
-        body.light-mode {
-            --bg-primary: #f0f4f9; --bg-secondary: #ffffff; --text-primary: #0d2857;
-            --text-secondary: #6c757d; --border-color: #e9ecef;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-primary); color: var(--text-secondary); }
-        .container { max-width: 800px; margin: 0 auto; padding: 0 15px; }
-        .header { position: sticky; top: 0; z-index: 1000; background-color: var(--bg-secondary); border-bottom: 1px solid var(--border-color); padding: 15px 0; }
-        .navbar { display: flex; justify-content: space-between; align-items: center; max-width:1200px; margin: 0 auto; padding: 0 15px; }
-        .nav-logo { font-size: 1.8rem; font-weight: 800; color: var(--accent-primary); text-decoration: none; }
-        .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; }
-        .main-content { padding: 40px 0; }
-        .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; }
-        .page-header h1 { font-size: 2.2rem; color: var(--text-primary); }
-        .btn-back { display: inline-flex; align-items: center; gap: 8px; background-color: var(--bg-secondary); color: var(--text-primary); padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 500; border: 1px solid var(--border-color); }
-        .group-chat-card {
-            background-color: var(--bg-secondary); border-radius: 16px; padding: 20px; border: 1px solid var(--border-color);
-            margin-bottom: 20px; display: flex; align-items: center; gap: 20px; text-decoration: none;
-        }
-        .group-chat-card .icon { font-size: 2rem; color: var(--accent-primary); }
-        .group-chat-card h2 { font-size: 1.2rem; color: var(--text-primary); margin-bottom: 4px; }
-        .conversation-list { background-color: var(--bg-secondary); border-radius: 16px; padding: 10px; border: 1px solid var(--border-color); min-height: 200px; }
-        .conversation-item { display: flex; align-items: center; gap: 15px; padding: 15px; border-radius: 12px; text-decoration: none; }
-        .conversation-item:not(:last-child) { border-bottom: 1px solid var(--border-color); }
-        .conversation-item:hover { background-color: var(--bg-primary); }
-        .avatar { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
-        .details { flex-grow: 1; overflow: hidden; }
-        .header-row { display: flex; justify-content: space-between; align-items: baseline; }
-        .user-name { font-weight: 600; color: var(--text-primary); font-size: 1.1rem; }
-        .timestamp { font-size: 0.8rem; color: var(--text-secondary); }
-        .last-message { font-size: 0.95rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .conversation-item.unread .user-name { color: var(--accent-primary); }
-        .conversation-item.unread .last-message { color: var(--text-primary); font-weight: 500; }
-        .unread-dot { display: inline-block; width: 10px; height: 10px; background-color: var(--accent-primary); border-radius: 50%; margin-left: 8px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inbox | KabaleOnline</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-primary: #0d2857;
+      --bg-secondary: #10336d;
+      --bg-card: #143d7a;
+      --text-primary: #ffffff;
+      --text-secondary: #b8c9eb;
+      --accent-primary: #007bff;
+      --border-color: #1f4287;
+      --hover-bg: rgba(255, 255, 255, 0.05);
+    }
+    body.light-mode {
+      --bg-primary: #f0f4f9;
+      --bg-secondary: #ffffff;
+      --bg-card: #f9fbfd;
+      --text-primary: #0d2857;
+      --text-secondary: #6c757d;
+      --border-color: #e9ecef;
+      --hover-bg: rgba(0, 0, 0, 0.05);
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .header {
+      position: sticky;
+      top: 0;
+      background-color: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      z-index: 1000;
+    }
+    .navbar {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-logo {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--accent-primary);
+      text-decoration: none;
+    }
+    .theme-toggle {
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    /* Page Content */
+    main {
+      flex: 1;
+      width: 100%;
+      padding: 30px 15px 60px;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 800px;
+    }
+
+    /* Page Header */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .page-header h1 {
+      font-size: 2rem;
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: var(--accent-primary);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+    }
+    .btn-back:hover {
+      background-color: #0062cc;
+    }
+
+    /* Group Chat Card */
+    .group-chat-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      text-decoration: none;
+      margin-bottom: 25px;
+      transition: background-color 0.3s ease;
+    }
+    .group-chat-card:hover {
+      background-color: var(--hover-bg);
+    }
+    .group-chat-card .icon {
+      font-size: 2rem;
+      color: var(--accent-primary);
+      flex-shrink: 0;
+    }
+    .group-chat-card h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .group-chat-card p {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+    }
+
+    /* Conversation List */
+    .conversation-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .conversation-item {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 14px 16px;
+      text-decoration: none;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    .conversation-item:hover {
+      background-color: var(--hover-bg);
+      transform: translateY(-2px);
+    }
+    .avatar {
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #1f4287;
+    }
+    .details {
+      flex-grow: 1;
+      overflow: hidden;
+    }
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 5px;
+    }
+    .user-name {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .timestamp {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+    .last-message {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .unread-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--accent-primary);
+      border-radius: 50%;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .nav-logo {
+        font-size: 1.5rem;
+      }
+      .page-header h1 {
+        font-size: 1.6rem;
+      }
+      .conversation-item {
+        padding: 12px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-    <header class="header">
-        <div class="navbar">
-            <a href="index.html" class="nav-logo">KabaleOnline</a>
-            <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
+  <header class="header">
+    <div class="navbar">
+      <a href="index.html" class="nav-logo">KabaleOnline</a>
+      <button id="theme-toggle" class="theme-toggle" title="Toggle theme">
+        <i class="fas fa-moon"></i>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="page-header">
+        <h1>Inbox</h1>
+        <a href="dashboard.html" class="btn-back"><i class="fas fa-arrow-left"></i> Back</a>
+      </div>
+
+      <a href="group-chat.html" class="group-chat-card">
+        <div class="icon"><i class="fas fa-users"></i></div>
+        <div>
+          <h2>Community Group Chat</h2>
+          <p>Join the public conversation with all KabaleOnline users.</p>
         </div>
-    </header>
-    <main class="main-content">
-        <div class="container">
-            <div class="page-header"><h1>Inbox</h1><a href="dashboard.html" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</a></div>
-            <a href="group-chat.html" class="group-chat-card">
-                <div class="icon"><i class="fas fa-users"></i></div>
-                <div><h2>Community Group Chat</h2><p>Join the public conversation with all KabaleOnline users.</p></div>
-            </a>
-            <div class="conversation-list" id="conversation-list">
-                 <!-- Conversations will be loaded here by inbox.js -->
+      </a>
+
+      <div class="conversation-list" id="conversation-list">
+        <!-- Example conversation (dynamically loaded in inbox.js) -->
+        <a href="chat.html" class="conversation-item">
+          <img src="https://i.imgur.com/4ZQZ4ZC.png" alt="Avatar" class="avatar">
+          <div class="details">
+            <div class="header-row">
+              <span class="user-name">Ampeire <span class="unread-dot"></span></span>
+              <span class="timestamp">07:37 AM</span>
             </div>
-        </div>
-    </main>
-    <script src="theme.js" defer></script>
-    <script src="global-auth.js" type="module"></script>
-    <script src="inbox.js" type="module"></script>
+            <div class="last-message">Yes sir</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <script src="theme.js" defer></script>
+  <script src="global-auth.js" type="module"></script>
+  <script src="inbox.js" type="module"></script>
 </body>
 </html>
