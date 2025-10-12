@@ -13,11 +13,13 @@ const fullNameInput = document.getElementById('full-name');
 const emailInput = document.getElementById('email');
 const telephoneInput = document.getElementById('telephone');
 const locationInput = document.getElementById('location');
-const businessNameGroup = document.getElementById('business-name-group');
-const businessNameInput = document.getElementById('business-name');
 const editProfileForm = document.getElementById('edit-profile-form');
 const backToDashboardBtn = document.getElementById('back-to-dashboard-btn');
 const submitBtn = document.getElementById('submit-btn');
+
+// --- NEW: Selectors for new fields ---
+const taglineInput = document.getElementById('tagline');
+const aboutInput = document.getElementById('about');
 
 let currentUser = null;
 
@@ -25,19 +27,16 @@ let currentUser = null;
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         currentUser = user;
-        // Fetch and populate the form with existing user data
         const userDocRef = doc(db, "users", user.uid);
         const userDoc = await getDoc(userDocRef);
 
         if (userDoc.exists()) {
-            const userData = userDoc.data();
-            populateForm(userData);
+            populateForm(userDoc.data());
         } else {
             console.error("No profile document found for this user.");
             alert("Could not load your profile data.");
         }
     } else {
-        // Not logged in, redirect
         window.location.href = 'auth.html';
     }
 });
@@ -49,14 +48,15 @@ function populateForm(userData) {
     emailInput.value = userData.email || '';
     telephoneInput.value = userData.telephone || '';
     locationInput.value = userData.location || '';
+    
+    // --- NEW: Populate the new fields ---
+    taglineInput.value = userData.tagline || '';
+    aboutInput.value = userData.about || '';
 
-    // Dynamically show/hide business name and set back button
-    if (userData.role === 'provider') {
-        businessNameGroup.style.display = 'block';
-        businessNameInput.value = userData.businessName || '';
+    // Set back button based on role
+    if (userData.isProvider) { // Assuming you have an 'isProvider' boolean field
         backToDashboardBtn.href = 'provider-dashboard.html';
     } else {
-        businessNameGroup.style.display = 'none';
         backToDashboardBtn.href = 'seeker-dashboard.html';
     }
 }
@@ -87,27 +87,22 @@ editProfileForm.addEventListener('submit', async (e) => {
             name: fullNameInput.value,
             telephone: telephoneInput.value,
             location: locationInput.value,
+            // --- NEW: Add the new fields to the data object to be saved ---
+            tagline: taglineInput.value,
+            about: aboutInput.value,
         };
 
-        // If the user is a provider, also update the business name
-        if (businessNameGroup.style.display === 'block') {
-            updatedData.businessName = businessNameInput.value;
-        }
-        
-        // Check if a new photo was uploaded
         const photoFile = photoInput.files[0];
         if (photoFile) {
-            // Upload the new image to Cloudinary and get the URL
             const imageUrl = await uploadToCloudinary(photoFile);
             updatedData.profilePicUrl = imageUrl;
         }
 
-        // Update the user's document in Firestore
         const userDocRef = doc(db, "users", currentUser.uid);
         await updateDoc(userDocRef, updatedData);
 
         alert('Profile updated successfully!');
-        
+
     } catch (error) {
         console.error("Error updating profile:", error);
         alert("There was an error updating your profile. Please try again.");
