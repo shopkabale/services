@@ -1,82 +1,89 @@
-// This is the final, corrected code for functions/sync.js
-
 export async function onRequest(context) {
-  // First, check if the request is a POST request.
-  // This is the main logic for syncing data.
+  // Handle POST requests for creating/updating records
   if (context.request.method === 'POST') {
-    return await handlePostRequest(context);
+    return await handleCreateOrUpdate(context);
+  }
+  
+  // Handle DELETE requests for removing records
+  if (context.request.method === 'DELETE') {
+    return await handleDelete(context);
   }
 
-  // If someone just visits the URL in a browser (a GET request),
-  // show them a helpful message.
+  // For GET requests or other methods, show a helpful message
   return new Response(
-    "This function is running. Use a POST request to send data to be synced.",
+    "This function is running. Use a POST to create/update or a DELETE to remove a record.",
     { status: 200 }
   );
 }
 
-
-// This is the main function that does all the work
-async function handlePostRequest(context) {
-  // Get all our secrets from the Cloudflare dashboard
-  const { env } = context;
+// --- LOGIC FOR CREATING OR UPDATING ---
+async function handleCreateOrUpdate(context) {
+  const { env, request } = context;
   const ALGOLIA_APP_ID = env.VITE_ALGOLIA_APP_ID;
   const ALGOLIA_ADMIN_KEY = env.ALGOLIA_ADMIN_API_KEY;
   const FIREBASE_WEB_API_KEY = env.FIREBASE_WEB_API_KEY;
   const ALGOLIA_INDEX_NAME = 'services';
-
+  
   try {
-    // === Step 1: Verify the user is a real, logged-in user ===
-    const authorizationHeader = context.request.headers.get('Authorization');
-    if (!authorizationHeader || !authorizationHeader.startsWith('Bearer ')) {
-      return new Response('Missing Authorization Header.', { status: 401 });
-    }
-    const idToken = authorizationHeader.split('Bearer ')[1];
+    const idToken = request.headers.get('Authorization')?.split('Bearer ')[1];
+    if (!idToken) return new Response('Missing Authorization Header.', { status: 401 });
 
-    // We ask Google's servers to verify the token
-    const firebaseAuthUrl = `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${FIREBASE_WEB_API_KEY}`;
-    const authResponse = await fetch(firebaseAuthUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ idToken: idToken }),
-    });
-
-    if (!authResponse.ok) {
-      console.error("Firebase Auth Error:", await authResponse.text());
-      return new Response('Invalid user token.', { status: 401 });
-    }
+    // Verify user token with Google's servers
+    const authUrl = `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${FIREBASE_WEB_API_KEY}`;
+    const authResponse = await fetch(authUrl, { method: 'POST', body: JSON.stringify({ idToken }) });
+    if (!authResponse.ok) return new Response('Invalid user token.', { status: 401 });
     
-    // === Step 2: Get the service data from the request ===
-    const serviceData = await context.request.json();
-    if (!serviceData || !serviceData.objectID) {
-      return new Response('Missing service data or objectID.', { status: 400 });
-    }
+    const serviceData = await request.json();
+    if (!serviceData || !serviceData.objectID) return new Response('Missing service data or objectID.', { status: 400 });
     
-    // === Step 3: Send the data to Algolia's servers ===
+    // Send data to Algolia's servers
     const algoliaUrl = `https://${ALGOLIA_APP_ID}-dsn.algolia.net/1/indexes/${ALGOLIA_INDEX_NAME}/${serviceData.objectID}`;
-    
     const algoliaResponse = await fetch(algoliaUrl, {
-      method: 'PUT', // PUT creates or replaces the record
-      headers: {
-        'X-Algolia-Application-ID': ALGOLIA_APP_ID,
-        'X-Algolia-API-Key': ALGOLIA_ADMIN_KEY,
-        'Content-Type': 'application/json',
-      },
+      method: 'PUT',
+      headers: { 'X-Algolia-Application-ID': ALGOLIA_APP_ID, 'X-Algolia-API-Key': ALGOLIA_ADMIN_KEY },
       body: JSON.stringify(serviceData),
     });
 
-    if (!algoliaResponse.ok) {
-      console.error("Algolia API Error:", await algoliaResponse.text());
-      throw new Error('Failed to save data to Algolia.');
-    }
+    if (!algoliaResponse.ok) throw new Error('Failed to save data to Algolia.');
 
-    console.log(`Successfully synced objectID: ${serviceData.objectID}`);
-    return new Response(JSON.stringify({ success: true, message: 'Synced to Algolia' }), {
-      headers: { 'Content-Type': 'application/json' },
+    return new Response(JSON.stringify({ success: true, message: 'Synced to Algolia' }), { headers: { 'Content-Type': 'application/json' } });
+  } catch (error) {
+    console.error('Error in handleCreateOrUpdate:', error.message);
+    return new Response('An internal error occurred.', { status: 500 });
+  }
+}
+
+// --- NEW LOGIC FOR DELETING ---
+async function handleDelete(context) {
+  const { env, request } = context;
+  const ALGOLIA_APP_ID = env.VITE_ALGOLIA_APP_ID;
+  const ALGOLIA_ADMIN_KEY = env.ALGOLIA_ADMIN_API_KEY;
+  const FIREBASE_WEB_API_KEY = env.FIREBASE_WEB_API_KEY;
+  const ALGOLIA_INDEX_NAME = 'services';
+  
+  try {
+    const idToken = request.headers.get('Authorization')?.split('Bearer ')[1];
+    if (!idToken) return new Response('Missing Authorization Header.', { status: 401 });
+
+    const authUrl = `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${FIREBASE_WEB_API_KEY}`;
+    const authResponse = await fetch(authUrl, { method: 'POST', body: JSON.stringify({ idToken }) });
+    if (!authResponse.ok) return new Response('Invalid user token.', { status: 401 });
+    
+    const { objectID } = await request.json();
+    if (!objectID) return new Response('Missing objectID.', { status: 400 });
+    
+    // Send delete request to Algolia's servers
+    const algoliaUrl = `https://${ALGOLIA_APP_ID}.algolia.net/1/indexes/${ALGOLIA_INDEX_NAME}/${objectID}`;
+    const algoliaResponse = await fetch(algoliaUrl, {
+      method: 'DELETE',
+      headers: { 'X-Algolia-Application-ID': ALGOLIA_APP_ID, 'X-Algolia-API-Key': ALGOLIA_ADMIN_KEY },
     });
 
+    if (!algoliaResponse.ok) throw new Error('Failed to delete data from Algolia.');
+
+    return new Response(JSON.stringify({ success: true, message: 'Deleted from Algolia' }), { headers: { 'Content-Type': 'application/json' } });
   } catch (error) {
-    console.error('Error in Cloudflare Worker:', error.message);
+    console.error('Error in handleDelete:', error.message);
     return new Response('An internal error occurred.', { status: 500 });
   }
 }
