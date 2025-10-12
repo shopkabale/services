@@ -41,6 +41,18 @@
         .form-actions { margin-top: 30px; text-align: right; }
         .btn-submit { padding: 12px 30px; background-color: var(--accent-primary); color: #ffffff; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
         .btn-submit:disabled { background-color: #555; cursor: not-allowed; }
+        footer { background-color: var(--bg-card); color: var(--text-primary); padding: 60px 0 20px 0; border-top: 1px solid var(--border-color); }
+        .footer-container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
+        .footer-grid { display: grid; grid-template-columns: 1fr; gap: 40px; margin-bottom: 40px; text-align: center; }
+        @media (min-width: 768px) { .footer-grid { grid-template-columns: 2fr 1fr 1fr 1fr; text-align: left; } }
+        .footer-grid h4 { color: var(--text-primary); font-size: 1.2rem; margin-bottom: 20px; }
+        .footer-about p { color: var(--text-secondary); margin-bottom: 20px; }
+        .footer-socials a { color: var(--text-primary); font-size: 1.3rem; margin: 0 10px; }
+        .footer-links ul { list-style: none; padding: 0; }
+        .footer-links li { margin-bottom: 12px; }
+        .footer-links a { color: var(--text-secondary); text-decoration: none; }
+        .footer-links ul li i { margin-right: 10px; color: var(--accent-primary); }
+        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid var(--border-color); color: var(--text-secondary); }
     </style>
 </head>
 <body class="dark-mode">
@@ -110,8 +122,46 @@
         </div>
     </main>
 
-    <footer>
-        </footer>
+        <footer>
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-about">
+                    <h4 class="nav-logo" style="font-size: 2rem;">KabaleOnline</h4>
+                    <p>Connecting our community by making it easy to find and offer skilled services across the Kigezi region.</p>
+                     <div class="footer-socials">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul id="footer-quick-links">
+                        <li><a href="services.html">Browse Services</a></li>
+                        <li><a href="browse-jobs.html">Browse Jobs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Help & FAQ</a></li>
+                    </ul>
+                </div>
+                 <div class="footer-links">
+                    <h4>Contact Us</h4>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Kabale, Uganda</li>
+                        <li><i class="fas fa-phone-alt"></i> +256 123 456789</li>
+                        <li><i class="fas fa-envelope"></i> help@kabaleonline.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 KabaleOnline. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
 
     <script src="theme.js" defer></script>
     <script src="edit-profile.js" type="module"></script>
