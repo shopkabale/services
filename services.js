@@ -1,87 +1,92 @@
-// This is the final code to power your services page with Algolia.
-// It replaces your old services.js file entirely.
+// This is the final, corrected search.js file.
+// It uses a more robust method for building the HTML to prevent display errors.
 
-// 1. Initialize the Algolia client
-// IMPORTANT: Replace these placeholders with your actual Algolia credentials.
-// You can find these in your Algolia Dashboard -> Settings -> API Keys.
+// 1. Initialize the Algolia client (remember to replace placeholders)
 const searchClient = algoliasearch(
-  'HQGXJ2Y7ZD',      // Your Application ID
-  '2e44c7070ebafaeb6ca324daa28f36b4'  // Your public, Search-Only API Key
+  'HQGXJ2Y7ZD',
+  '2e44c7070ebafaeb6ca324daa28f36b4'
 );
 
-// 2. Create the main InstantSearch instance
 const search = instantsearch({
-  indexName: 'services',      // The name of your Algolia index
+  indexName: 'services',
   searchClient,
 });
 
-// 3. Create and add all the search interface components ("widgets")
+// 2. Create and add the widgets
 search.addWidgets([
   /**
    * Search Box Widget
-   * This connects to the <div id="searchbox"></div> in your HTML.
    */
   instantsearch.widgets.searchBox({
-    container: '#searchbox',
+    container: '#search-container',
+    inputSelector: '#search-input',
     placeholder: 'What service are you looking for?',
     showSubmit: true,
-    showReset: false,
     templates: {
-      submit({ cssClasses }, { html }) {
-        return html`<button class="${cssClasses.submit}" type="submit"><i class="fas fa-search"></i></button>`;
+      submit(options, { html }) {
+        return html`<button type="submit"><i class="fas fa-search"></i></button>`;
       },
-      reset() {
-        return ''; // Hides the reset button
-      }
+      reset() { return ''; }
     },
   }),
 
   /**
-   * Category Filter Widget (Refinement List)
-   * This connects to the <div id="category-filters"></div> and automatically
-   * creates the filter buttons based on the 'category' attribute in your data.
+   * Custom Category Filter Widget (Connector)
    */
-  instantsearch.widgets.refinementList({
-    container: '#category-filters',
-    attribute: 'category', // The field in your data to filter on
-    sortBy: ['name:asc'],
-    operator: 'or', // Allow selecting multiple categories
-    templates: {
-      item(item, { html }) {
-        // We add a special "All" button that is not part of the data
-        const buttonHTML = html`
-          <button class="filter-btn ${item.isRefined ? 'active' : ''}" @click="${item.value}">
-            ${item.label}
-          </button>
-        `;
-        // This logic is to ensure the "All" button is handled correctly
-        // by the refinement list logic.
-        if (item.label === 'All') {
-            return ''; // Hide the default 'All' if it appears
+  instantsearch.connectors.connectRefinementList(
+    (renderOptions, isFirstRender) => {
+      const { items, refine } = renderOptions;
+      const container = document.querySelector('#category-filters');
+
+      if (isFirstRender) {
+        container.addEventListener('click', event => {
+          const button = event.target.closest('.filter-btn');
+          if (button) {
+            const category = button.dataset.category;
+            if (category === 'All') {
+              const currentRefined = items.find(item => item.isRefined);
+              if (currentRefined) {
+                 refine(currentRefined.value); // Toggling the current one off
+              }
+            } else {
+              refine(category);
+            }
+          }
+        });
+      }
+      
+      const currentRefinedItem = items.find(item => item.isRefined);
+      const allButtons = container.querySelectorAll('.filter-btn');
+
+      allButtons.forEach(button => {
+        const category = button.dataset.category;
+        if (category === 'All') {
+          button.classList.toggle('active', !currentRefinedItem);
+        } else {
+          button.classList.toggle('active', currentRefinedItem && currentRefinedItem.value === category);
         }
-        return buttonHTML;
-      },
-    },
+      });
+    }
+  )({
+    attribute: 'category',
   }),
 
   /**
    * Results (Hits) Widget
-   * This connects to the <div id="services-grid"></div> and displays the results.
+   * THIS IS THE CORRECTED PART
    */
   instantsearch.widgets.hits({
     container: '#services-grid',
     templates: {
-      // Message to show when no results are found
-      empty(results, { html }) {
-        return html`<p class="loading-text">No services found for <q>${results.query}</q>.</p>`;
+      empty(results) {
+        return `<p class="loading-text">No services found for "${results.query}".</p>`;
       },
-      // This is the HTML template for each search result card.
-      // It uses your existing CSS classes perfectly.
-      item(hit, { html }) {
-        // Use a placeholder if the provider's avatar is missing
+      // This template uses standard JavaScript strings, which is more reliable.
+      item(hit) {
         const providerAvatar = hit.providerAvatar || `https://placehold.co/40x40/10336d/a7c0e8?text=${(hit.providerName || 'P').charAt(0)}`;
+        const highlightedTitle = instantsearch.highlight({ attribute: 'title', hit });
 
-        return html`
+        return `
           <a href="service-detail.html?id=${hit.objectID}" class="service-card">
             <div class="card-image" style="background-image: url('${hit.coverImageUrl || 'https://placehold.co/600x400'}');"></div>
             <div class="card-content">
@@ -89,7 +94,7 @@ search.addWidgets([
                 <img src="${providerAvatar}" alt="${hit.providerName}" class="provider-avatar">
                 <span class="provider-name">${hit.providerName}</span>
               </div>
-              <h3 class="service-title">${instantsearch.highlight({ attribute: 'title', hit })}</h3>
+              <h3 class="service-title">${highlightedTitle}</h3>
               <p class="service-location"><i class="fas fa-map-marker-alt"></i> ${hit.location}</p>
               <div class="card-footer">
                 <div class="price"><span>From </span>UGX ${hit.price.toLocaleString()}</div>
@@ -100,32 +105,7 @@ search.addWidgets([
       },
     },
   }),
-
-  /**
-   * Custom widget to manage the "All" button's state
-   * and clear other filters when it's clicked.
-   */
-  instantsearch.connectors.connectCurrentRefinements(
-    (renderOptions, isFirstRender) => {
-      const { items, refine } = renderOptions;
-      if (isFirstRender) {
-        const allButton = document.querySelector('.filter-btn'); // Assumes "All" is the first button
-        allButton.addEventListener('click', () => {
-          // When "All" is clicked, clear all refinements for the 'category' attribute
-          refine(items.filter(item => item.attribute !== 'category'));
-        });
-      }
-      
-      const allButton = document.querySelector('.filter-btn');
-      // If there are no category refinements, make the "All" button active
-      const isAllActive = !items.some(item => item.attribute === 'category');
-      if (allButton) {
-        allButton.classList.toggle('active', isAllActive);
-      }
-    }
-  )(),
-
 ]);
 
-// 4. Start the search experience
+// 3. Start the search
 search.start();
