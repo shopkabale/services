@@ -1,7 +1,7 @@
 import { app } from './firebase-init.js';
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, addDoc, query, onSnapshot, serverTimestamp, orderBy, updateDoc, runTransaction } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-import { showToast } from './notifications.js';
+import { getFirestore, doc, getDoc, collection, query, onSnapshot, serverTimestamp, orderBy, runTransaction } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { showToast, hideToast } from './notifications.js'; // <-- FIX: hideToast is now imported
 
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -48,7 +48,7 @@ async function loadServiceAndProvider() {
 }
 
 function renderServiceDetails(service, provider) {
-    serviceDetailContent.innerHTML = ''; // Clear loading message
+    serviceDetailContent.innerHTML = '';
     const serviceElement = document.createElement('div');
     serviceElement.className = 'service-detail-layout';
 
@@ -87,8 +87,7 @@ function renderServiceDetails(service, provider) {
     }
 }
 
-function loadReviews(serviceId, providerId) {
-    // UPDATED: Reviews are now a subcollection of the service
+async function loadReviews(serviceId, providerId) {
     const reviewsRef = collection(db, 'services', serviceId, 'reviews');
     const q = query(reviewsRef, orderBy('createdAt', 'desc'));
 
@@ -99,7 +98,6 @@ function loadReviews(serviceId, providerId) {
         } else {
             for (const docSnap of snapshot.docs) {
                 const review = docSnap.data();
-                // Fetch reviewer's profile to display their name and picture
                 const reviewerDoc = await getDoc(doc(db, 'users', review.reviewerId));
                 const reviewerData = reviewerDoc.exists() ? reviewerDoc.data() : { name: 'Anonymous' };
 
@@ -120,11 +118,15 @@ function loadReviews(serviceId, providerId) {
         }
     });
 
-    // Setup review form logic
     if (currentUser && currentUser.uid !== providerId) {
-        setupReviewForm(serviceId, providerId);
+        const reviewRef = doc(db, "services", serviceId, "reviews", currentUser.uid);
+        const reviewSnap = await getDoc(reviewRef);
+        if (reviewSnap.exists()) {
+            reviewFormContainer.innerHTML = '<p>You have already reviewed this service. Thank you for your feedback!</p>';
+        } else {
+            setupReviewForm(serviceId, providerId);
+        }
     } else if (currentUser && currentUser.uid === providerId) {
-        // Don't show the form if the user is the provider
         reviewFormContainer.innerHTML = '';
     } else {
          reviewFormContainer.innerHTML = `<p>Please <a href="auth.html" style="color: var(--accent-primary);">log in</a> to leave a review.</p>`;
@@ -177,32 +179,25 @@ async function submitReview(e, serviceId, providerId, rating) {
 
     showToast('Submitting review...', 'progress');
     try {
-        // UPDATED: Use a transaction to safely update the average rating on the service document
         await runTransaction(db, async (transaction) => {
             const serviceRef = doc(db, "services", serviceId);
-            // The review document ID is the user's UID to prevent multiple reviews
             const reviewRef = doc(db, "services", serviceId, "reviews", currentUser.uid);
 
             const serviceDoc = await transaction.get(serviceRef);
             if (!serviceDoc.exists()) throw "Service not found.";
 
-            if (serviceDoc.data().providerId === currentUser.uid) throw "You cannot review your own service.";
-
             const reviewDoc = await transaction.get(reviewRef);
             if (reviewDoc.exists()) throw "You have already reviewed this service.";
 
-            // Calculate new average rating for the service
             const newReviewCount = (serviceDoc.data().reviewCount || 0) + 1;
             const oldRatingTotal = (serviceDoc.data().averageRating || 0) * (serviceDoc.data().reviewCount || 0);
             const newAverageRating = (oldRatingTotal + rating) / newReviewCount;
 
-            // Update the main service document
             transaction.update(serviceRef, {
                 reviewCount: newReviewCount,
-                averageRating: newAverageRating
+                averageRating: newAverageRating.toFixed(2) // Save with 2 decimal places
             });
 
-            // Create the new review document in the subcollection
             transaction.set(reviewRef, {
                 reviewerId: currentUser.uid,
                 providerId: providerId,
@@ -211,12 +206,11 @@ async function submitReview(e, serviceId, providerId, rating) {
                 createdAt: serverTimestamp()
             });
         });
-
         hideToast();
         showToast('Review submitted successfully!', 'success');
-        reviewFormContainer.innerHTML = '<p>Thank you for your feedback!</p>';
+        
     } catch (error) {
-        hideToast();
+        hideToast(); // FIX: Make sure hideToast is called on error
         showToast(`Error: ${error.toString()}`, 'error');
     }
 }
