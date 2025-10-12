@@ -7,38 +7,26 @@ import { showToast, hideToast, showButtonLoader, hideButtonLoader } from './noti
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// --- ALGOLIA SYNC LOGIC: START ---
+// --- ALGOLIA SYNC LOGIC ---
 const WORKER_URL = 'https://services.kabaleonline.com/sync'; // Your live Cloudflare Worker URL
 
-/**
- * Syncs a service record to Algolia by calling the Cloudflare Worker.
- * @param {object} serviceData - The service data, must include an 'objectID'.
- */
 const syncToAlgolia = async (serviceData) => {
     const user = auth.currentUser;
-    if (!user) return; // Exit if no user is logged in
+    if (!user) return;
     try {
-        const idToken = await user.getIdToken(true); // Get the latest auth token
+        const idToken = await user.getIdToken(true);
         const response = await fetch(WORKER_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
             body: JSON.stringify(serviceData),
         });
-        if (!response.ok) {
-            throw new Error(`Algolia sync failed: ${await response.text()}`);
-        }
+        if (!response.ok) throw new Error(`Algolia sync failed: ${await response.text()}`);
         console.log('Sync to Algolia successful for:', serviceData.objectID);
     } catch (error) {
         console.error('Algolia Sync Error:', error);
-        // Silently fail for now to not interrupt the user's experience.
-        // In a production app, you might add this to a retry queue.
     }
 };
 
-/**
- * Deletes a service record from Algolia by calling the Cloudflare Worker.
- * @param {string} objectID - The ID of the service to delete.
- */
 const deleteFromAlgolia = async (objectID) => {
     const user = auth.currentUser;
     if (!user) return;
@@ -49,15 +37,12 @@ const deleteFromAlgolia = async (objectID) => {
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
             body: JSON.stringify({ objectID }),
         });
-        if (!response.ok) {
-            throw new Error(`Algolia delete failed: ${await response.text()}`);
-        }
+        if (!response.ok) throw new Error(`Algolia delete failed: ${await response.text()}`);
         console.log('Delete from Algolia successful for:', objectID);
     } catch (error) {
         console.error('Algolia Delete Error:', error);
     }
 };
-// --- ALGOLIA SYNC LOGIC: END ---
 
 // --- DOM ELEMENT REFERENCES ---
 const serviceForm = document.getElementById('service-form');
@@ -72,8 +57,8 @@ const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
 
 // --- STATE MANAGEMENT ---
 let currentUserId = null;
-let editingServiceId = null; // Tracks if the form is in edit mode
-let serviceToDeleteId = null; // Tracks which service is pending deletion
+let editingServiceId = null;
+let serviceToDeleteId = null;
 
 // --- AUTHENTICATION ---
 onAuthStateChanged(auth, user => {
@@ -81,23 +66,18 @@ onAuthStateChanged(auth, user => {
         currentUserId = user.uid;
         fetchAndDisplayServices(currentUserId);
     } else {
-        // If no user is logged in, redirect to the authentication page
         window.location.href = 'auth.html';
     }
 });
 
 // --- CORE FUNCTIONS ---
 
-/**
- * Fetches all services for a given user and renders them to the list.
- * @param {string} userId - The UID of the current user.
- */
 const fetchAndDisplayServices = async (userId) => {
     myServicesList.innerHTML = '<p>Loading your services...</p>';
     const q = query(collection(db, "services"), where("providerId", "==", userId));
     try {
         const snapshot = await getDocs(q);
-        myServicesList.innerHTML = ''; // Clear the list
+        myServicesList.innerHTML = '';
         if (snapshot.empty) {
             myServicesList.innerHTML = '<p>You have not listed any services yet. Add one using the form above!</p>';
             return;
@@ -123,10 +103,6 @@ const fetchAndDisplayServices = async (userId) => {
     }
 };
 
-/**
- * Populates the form with data from a specific service for editing.
- * @param {string} serviceId - The ID of the service to edit.
- */
 const setFormToEditMode = async (serviceId) => {
     editingServiceId = serviceId;
     formTitle.textContent = 'Edit Your Service';
@@ -146,13 +122,10 @@ const setFormToEditMode = async (serviceId) => {
         }
     } catch (error) {
         showToast('Failed to load service data for editing.', 'error');
-        resetForm(); // Reset form if loading fails
+        resetForm();
     }
 };
 
-/**
- * Resets the form to its default "Add New Service" state.
- */
 const resetForm = () => {
     editingServiceId = null;
     formTitle.textContent = 'Add a New Service';
@@ -163,15 +136,20 @@ const resetForm = () => {
 
 // --- EVENT LISTENERS ---
 
-/**
- * Handles the main form submission for both creating and updating services.
- */
 serviceForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!currentUserId) return;
     showButtonLoader(submitButton);
 
-    // 1. Gather form data
+    const userDocRef = doc(db, "users", currentUserId);
+    const userDoc = await getDoc(userDocRef);
+    if (!userDoc.exists()) {
+        showToast('Error: Could not find your user profile.', 'error');
+        hideButtonLoader(submitButton);
+        return;
+    }
+    const providerProfile = userDoc.data();
+
     const title = document.getElementById('service-title').value;
     const category = document.getElementById('service-category').value;
     const location = document.getElementById('service-location').value;
@@ -184,59 +162,44 @@ serviceForm.addEventListener('submit', async (e) => {
         price: Number(document.getElementById('service-price').value),
         priceUnit: document.getElementById('price-unit').value,
         providerId: currentUserId,
+        providerName: providerProfile.name,
+        providerAvatar: providerProfile.profilePicUrl || ''
     };
 
     try {
-        // 2. Handle image upload to Cloudinary
         const imageFile = imageInput.files[0];
         let previousImageUrl = null;
         if(editingServiceId) {
             const docSnap = await getDoc(doc(db, "services", editingServiceId));
             if (docSnap.exists()) previousImageUrl = docSnap.data().coverImageUrl;
         }
-        serviceData.coverImageUrl = previousImageUrl || ''; // Keep old image unless a new one is uploaded
+        serviceData.coverImageUrl = previousImageUrl || '';
         if (imageFile) {
             showToast('Uploading image...', 'progress');
             serviceData.coverImageUrl = await uploadToCloudinary(imageFile);
             hideToast();
         }
 
-        // 3. Generate keywords for Algolia search
-        const keywords = new Set([
-            ...title.toLowerCase().split(' '),
-            ...category.toLowerCase().split(' '),
-            ...location.toLowerCase().split(' ')
-        ]);
+        const keywords = new Set([...title.toLowerCase().split(' '), ...category.toLowerCase().split(' '), ...location.toLowerCase().split(' ')]);
         serviceData.searchKeywords = Array.from(keywords);
 
-        // 4. Either Update or Create the document in Firestore
         if (editingServiceId) {
             showToast('Updating service...', 'progress');
-            const serviceDocRef = doc(db, "services", editingServiceId);
-            await updateDoc(serviceDocRef, serviceData);
-            hideToast();
+            await updateDoc(doc(db, "services", editingServiceId), serviceData);
             showToast('Service updated successfully!', 'success');
-
-            // 5a. Sync the updated data to Algolia
             const dataForAlgolia = { ...serviceData, objectID: editingServiceId };
             await syncToAlgolia(dataForAlgolia);
-
         } else {
             showToast('Publishing service...', 'progress');
             serviceData.createdAt = Timestamp.fromDate(new Date());
             const docRef = await addDoc(collection(db, "services"), serviceData);
-            hideToast();
             showToast('Service published successfully!', 'success');
-            
-            // 5b. Sync the new data to Algolia
             const dataForAlgolia = { ...serviceData, objectID: docRef.id, createdAt: new Date().toISOString() };
             await syncToAlgolia(dataForAlgolia);
         }
 
-        // 6. Reset UI
         resetForm();
         fetchAndDisplayServices(currentUserId);
-
     } catch (error) {
         hideToast();
         showToast(`Error: ${error.message}`, 'error');
@@ -245,14 +208,10 @@ serviceForm.addEventListener('submit', async (e) => {
     }
 });
 
-/**
- * Handles clicks on the "Edit" and "Delete" buttons in the service list.
- */
 myServicesList.addEventListener('click', e => {
     const editBtn = e.target.closest('.edit-btn');
     if (editBtn) {
-        const serviceId = editBtn.dataset.id;
-        setFormToEditMode(serviceId);
+        setFormToEditMode(editBtn.dataset.id);
         return;
     }
     
@@ -263,46 +222,29 @@ myServicesList.addEventListener('click', e => {
     }
 });
 
-/**
- * Handles the final confirmation of a delete action.
- */
 confirmDeleteBtn.addEventListener('click', async () => {
     if (!serviceToDeleteId) return;
     showButtonLoader(confirmDeleteBtn);
-
     const serviceIdToDelete = serviceToDeleteId;
-    
     try {
-        // 1. Delete from Firestore
         await deleteDoc(doc(db, "services", serviceIdToDelete));
         showToast('Service deleted successfully.', 'success');
-        
-        // 2. Delete from Algolia
         await deleteFromAlgolia(serviceIdToDelete);
-
-        // 3. Update UI
         fetchAndDisplayServices(currentUserId);
     } catch (error) {
         showToast('Failed to delete service.', 'error');
     } finally {
-        // 4. Reset state and hide modal
         hideButtonLoader(confirmDeleteBtn);
         deleteModal.classList.remove('show');
         serviceToDeleteId = null;
     }
 });
 
-/**
- * Hides the delete confirmation modal.
- */
 cancelDeleteBtn.addEventListener('click', () => {
     deleteModal.classList.remove('show');
     serviceToDeleteId = null;
 });
 
-/**
- * Handles the image preview when a new file is selected.
- */
 imageInput.addEventListener('change', () => {
     if (imageInput.files && imageInput.files[0]) {
         const reader = new FileReader();
