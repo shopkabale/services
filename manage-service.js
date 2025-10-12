@@ -8,7 +8,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // --- ALGOLIA SYNC LOGIC ---
-const WORKER_URL = 'https://services.kabaleonline.com/sync'; // Your live Cloudflare Worker URL
+const WORKER_URL = 'https://services.kabaleonline.com/sync';
 
 const syncToAlgolia = async (serviceData) => {
     const user = auth.currentUser;
@@ -171,7 +171,12 @@ serviceForm.addEventListener('submit', async (e) => {
         let previousImageUrl = null;
         if(editingServiceId) {
             const docSnap = await getDoc(doc(db, "services", editingServiceId));
-            if (docSnap.exists()) previousImageUrl = docSnap.data().coverImageUrl;
+            if (docSnap.exists()) {
+                previousImageUrl = docSnap.data().coverImageUrl;
+                // Preserve existing review data when updating
+                serviceData.reviewCount = docSnap.data().reviewCount || 0;
+                serviceData.averageRating = docSnap.data().averageRating || 0;
+            }
         }
         serviceData.coverImageUrl = previousImageUrl || '';
         if (imageFile) {
@@ -192,6 +197,10 @@ serviceForm.addEventListener('submit', async (e) => {
         } else {
             showToast('Publishing service...', 'progress');
             serviceData.createdAt = Timestamp.fromDate(new Date());
+            // --- NEW: Initialize rating fields for new services ---
+            serviceData.reviewCount = 0;
+            serviceData.averageRating = 0;
+
             const docRef = await addDoc(collection(db, "services"), serviceData);
             showToast('Service published successfully!', 'success');
             const dataForAlgolia = { ...serviceData, objectID: docRef.id, createdAt: new Date().toISOString() };
