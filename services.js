@@ -1,69 +1,82 @@
-// This is the final and most robust services.js
+import { app } from './firebase-init.js';
+import { getFirestore, collection, getDocs, doc, getDoc, query, where } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-const searchClient = algoliasearch(
-  'HQGXJ2Y7ZD',
-  '2e44c7070ebafaeb6ca324daa28f36b4'
-);
+const db = getFirestore(app);
+const servicesGrid = document.getElementById('services-grid');
+const filterButtons = document.querySelectorAll('.filter-btn');
 
-const search = instantsearch({
-  indexName: 'services',
-  searchClient,
+const fetchAndDisplayServices = async (categoryFilter = 'All') => {
+    if (!servicesGrid) return;
+    servicesGrid.innerHTML = '<p class="loading-text">Loading services...</p>';
+
+    try {
+        const servicesRef = collection(db, "services");
+        let q;
+        
+        if (categoryFilter === 'All' || !categoryFilter) {
+            q = query(servicesRef);
+        } else {
+            q = query(servicesRef, where("category", "==", categoryFilter));
+        }
+
+        const servicesSnapshot = await getDocs(q);
+        
+        if (servicesSnapshot.empty) {
+            servicesGrid.innerHTML = `<p class="loading-text">No services found in this category.</p>`;
+            return;
+        }
+
+        servicesGrid.innerHTML = '';
+
+        for (const serviceDoc of servicesSnapshot.docs) {
+            const service = { id: serviceDoc.id, ...serviceDoc.data() };
+            
+            let providerName = 'Anonymous';
+            let providerAvatar = 'https://placehold.co/40x40';
+
+            if (service.providerId) {
+                const userDocRef = doc(db, "users", service.providerId);
+                const userDoc = await getDoc(userDocRef);
+                if (userDoc.exists()) {
+                    const providerData = userDoc.data();
+                    providerName = providerData.name || 'Provider';
+                    // This is the key line that fetches the real profile picture URL
+                    providerAvatar = providerData.profilePicUrl || `https://placehold.co/40x40/10336d/a7c0e8?text=${providerName.charAt(0)}`;
+                }
+            }
+            
+            const card = document.createElement('a');
+            card.href = `service-detail.html?id=${service.id}`;
+            card.className = 'service-card';
+            card.innerHTML = `
+                <div class="card-image" style="background-image: url('${service.coverImageUrl || 'https://placehold.co/600x400'}');"></div>
+                <div class="card-content">
+                    <div class="provider-info">
+                        <img src="${providerAvatar}" alt="${providerName}" class="provider-avatar">
+                        <span class="provider-name">${providerName}</span>
+                    </div>
+                    <h3 class="service-title">${service.title}</h3>
+                    <p class="service-location"><i class="fas fa-map-marker-alt"></i> ${service.location}</p>
+                    <div class="card-footer">
+                        <div class="price"><span>From </span>UGX ${service.price.toLocaleString()}</div>
+                    </div>
+                </div>
+            `;
+            servicesGrid.appendChild(card);
+        }
+    } catch (error) {
+        console.error("Error fetching services:", error);
+        servicesGrid.innerHTML = '<p class="loading-text">Could not load services. Please try again later.</p>';
+    }
+};
+
+filterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        const category = button.textContent;
+        fetchAndDisplayServices(category);
+    });
 });
 
-search.addWidgets([
-  instantsearch.widgets.searchBox({
-    container: '#search-container',
-    placeholder: 'Search category, items or services...',
-    showSubmit: true,
-    templates: {
-      submit: '<button type="submit"><i class="fas fa-search"></i></button>',
-      reset: () => '',
-    },
-  }),
-
-  instantsearch.connectors.connectRefinementList(
-    (renderOptions, isFirstRender) => {
-      const { items, refine } = renderOptions;
-      const container = document.querySelector('#category-filters');
-      if (isFirstRender) {
-        container.addEventListener('click', event => {
-          const button = event.target.closest('.filter-btn');
-          if (button) {
-            const category = button.dataset.category;
-            (category === 'All') ? refine(items.find(item => item.isRefined)?.value) : refine(category);
-          }
-        });
-      }
-      const currentRefinedItem = items.find(item => item.isRefined);
-      container.querySelectorAll('.filter-btn').forEach(button => {
-        const category = button.dataset.category;
-        button.classList.toggle('active', (category === 'All') ? !currentRefinedItem : (currentRefinedItem && currentRefinedItem.value === category));
-      });
-    }
-  )({ attribute: 'category' }),
-
-  instantsearch.widgets.hits({
-    container: '#services-grid',
-    templates: {
-      empty: (results) => `<p class="loading-text">No services found for "${results.query}".</p>`,
-      item: (hit, { html }) => {
-        const template = document.getElementById('service-card-template');
-        const card = template.content.cloneNode(true);
-        card.querySelector('.service-card').href = `service-detail.html?id=${hit.objectID}`;
-        card.querySelector('.card-image').style.backgroundImage = `url('${hit.coverImageUrl || 'https://placehold.co/600x400'}')`;
-        const providerAvatar = hit.providerAvatar || `https://placehold.co/40x40/10336d/a7c0e8?text=${(hit.providerName || 'P').charAt(0)}`;
-        card.querySelector('.provider-avatar').src = providerAvatar;
-        card.querySelector('.provider-avatar').alt = hit.providerName || 'Provider';
-        card.querySelector('.provider-name').textContent = hit.providerName || 'Anonymous';
-        card.querySelector('.service-title').innerHTML = instantsearch.highlight({ attribute: 'title', hit });
-        card.querySelector('.location-text').textContent = hit.location || 'Kabale';
-        card.querySelector('.price-amount').textContent = `UGX ${hit.price.toLocaleString()}`;
-        const tempDiv = document.createElement('div');
-        tempDiv.appendChild(card);
-        return tempDiv.innerHTML;
-      },
-    },
-  }),
-]);
-
-search.start();
+fetchAndDisplayServices();
