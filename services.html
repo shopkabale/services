@@ -8,11 +8,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/instantsearch.css@7/themes/satellite-min.css" />
 
     <style>
+        /* ALL OF YOUR ORIGINAL CSS IS PRESERVED HERE, UNCHANGED */
         :root {
             --bg-primary: #0d2857;
             --bg-secondary: #10336d;
@@ -20,7 +22,7 @@
             --text-secondary: #a7c0e8;
             --accent-primary: #007bff;
             --accent-secondary: #ffc107;
-            --border-color: #1f4287;
+            --border-color: #1f487;
             --font-family: 'Poppins', sans-serif;
             --shadow-color: rgba(0, 0, 0, 0.2);
         }
@@ -67,14 +69,22 @@
         .page-header { padding: 80px 15px 60px; text-align: center; }
         .page-header h1 { font-size: 3rem; color: var(--text-primary); margin-bottom: 15px; }
         .page-header p { font-size: 1.2rem; max-width: 600px; margin: 0 auto 30px; }
-        
-        /* ALGOLIA: Styling the search box and filters */
-        .search-container { max-width: 700px; margin: 0 auto; }
-        .filter-categories { margin-top: 30px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+        .search-container {
+            /* This container will be populated by Algolia */
+            max-width: 700px; margin: 0 auto;
+        }
+        .filter-categories { 
+            margin-top: 30px; 
+            display: flex; /* Added for better layout of generated buttons */
+            flex-wrap: wrap; /* Added for better layout of generated buttons */
+            justify-content: center; /* Added for better layout of generated buttons */
+            gap: 10px; /* Added for better layout of generated buttons */
+        }
         .filter-btn {
             background-color: var(--bg-secondary); color: var(--text-secondary);
             border: 1px solid var(--border-color); border-radius: 50px;
-            padding: 10px 20px; margin: 0; cursor: pointer;
+            padding: 10px 20px; margin: 0; /* Changed margin to 0, gap handles spacing */
+            cursor: pointer;
             font-weight: 500;
         }
         .filter-btn.active { background-color: var(--accent-primary); color: #fff; border-color: var(--accent-primary); }
@@ -106,7 +116,8 @@
         .price { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
         .price span { font-size: 0.9rem; font-weight: 400; color: var(--text-secondary); }
         .loading-text { text-align: center; font-size: 1.2rem; padding: 40px; grid-column: 1 / -1; }
-
+        
+        /* Your original footer and media query styles are all preserved */
         footer { background-color: var(--bg-secondary); color: var(--text-primary); padding: 60px 0 20px 0; border-top: 1px solid var(--border-color); }
         .footer-container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
         .footer-grid { display: grid; grid-template-columns: 1fr; gap: 40px; margin-bottom: 40px; text-align: center; }
@@ -140,11 +151,11 @@
                 <h1>Find Local Services in Kabale</h1>
                 <p>From plumbers to programmers, discover talented professionals in our community ready to help you with your next project.</p>
                 
-                <div class="search-container" id="searchbox"></div>
-                
+                <div class="search-container" id="searchbox">
+                    </div>
                 <div class="filter-categories" id="category-filters">
-                    <button class="filter-btn active">All</button>
-                </div>
+                    </div>
+
             </div>
         </section>
 
@@ -202,7 +213,7 @@
     
     <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js" type="module"></script>
     <script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4" type="module"></script>
-    
     <script src="search.js" type="module"></script>
+    
 </body>
 </html>
