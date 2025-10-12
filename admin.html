@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | KabaleOnline</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #0d2857; --bg-secondary: #10336d; --bg-card: #1e293b;
+            --text-primary: #ffffff; --text-secondary: #a7c0e8; --accent-primary: #007bff;
+            --border-color: #1f4287; --font-family: 'Poppins', sans-serif;
+        }
+        body.light-mode {
+            --bg-primary: #f0f4f9; --bg-secondary: #ffffff; --bg-card: #ffffff;
+            --text-primary: #0d2857; --text-secondary: #6c757d; --border-color: #e9ecef;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-family); background-color: var(--bg-primary); color: var(--text-secondary); }
+        .admin-layout { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 250px;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-header .nav-logo { font-size: 1.8rem; font-weight: 800; color: var(--accent-primary); text-decoration: none; margin-bottom: 30px; display: block; }
+        .sidebar-nav a {
+            display: flex; align-items: center; gap: 15px;
+            padding: 15px; border-radius: 8px; text-decoration: none;
+            color: var(--text-secondary); font-weight: 500;
+            margin-bottom: 10px;
+        }
+        .sidebar-nav a.active, .sidebar-nav a:hover {
+            background-color: var(--accent-primary);
+            color: #fff;
+        }
+        .sidebar-nav a i { font-size: 1.2rem; width: 20px; }
+        .sidebar-footer { margin-top: auto; }
+        .main-content { flex-grow: 1; padding: 30px; }
+        .main-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .main-header h1 { font-size: 2rem; color: var(--text-primary); }
+        .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .kpi-card { background-color: var(--bg-secondary); border-radius: 12px; padding: 25px; border: 1px solid var(--border-color); }
+        .kpi-card .label { font-size: 1rem; margin-bottom: 10px; }
+        .kpi-card .value { font-size: 2.5rem; font-weight: 700; color: var(--text-primary); }
+        .table-container { background-color: var(--bg-secondary); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color); }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th, .data-table td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .data-table th { font-weight: 600; font-size: 0.9rem; text-transform: uppercase; }
+        .data-table td .name { font-weight: 600; color: var(--text-primary); }
+    </style>
+</head>
+<body class="dark-mode">
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <header class="sidebar-header"><a href="index.html" class="nav-logo">Admin Panel</a></header>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-link active" data-view="dashboard-view"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="#" class="nav-link" data-view="users-view"><i class="fas fa-users"></i> Manage Users</a>
+                <a href="#" class="nav-link" data-view="services-view"><i class="fas fa-concierge-bell"></i> Manage Services</a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" id="logout-btn" class="nav-link" style="background-color: var(--bg-primary);">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </aside>
+        <main class="main-content">
+            <header class="main-header">
+                <h1 id="main-title">Dashboard</h1>
+                <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
+            </header>
+            
+            <section id="dashboard-view" class="content-section active">
+                <div class="kpi-grid">
+                    <div class="kpi-card"><div class="label">Total Users</div><div class="value" id="total-users">...</div></div>
+                    <div class="kpi-card"><div class="label">Total Services</div><div class="value" id="total-services">...</div></div>
+                    <div class="kpi-card"><div class="label">Total Job Posts</div><div class="value" id="total-job-posts">...</div></div>
+                </div>
+            </section>
+
+            <section id="users-view" class="content-section">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead>
+                        <tbody id="users-table-body"></tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <section id="services-view" class="content-section">
+                 <div class="table-container">
+                    <table class="data-table">
+                        <thead><tr><th>Service Title</th><th>Provider</th><th>Category</th><th>Price</th></tr></thead>
+                        <tbody id="services-table-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+    <script src="theme.js" defer></script>
+    <script src="global-auth.js" type="module"></script>
+    <script src="admin.js" type="module"></script>
+</body>
+</html>
