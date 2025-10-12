@@ -39,7 +39,7 @@ async function loadServiceAndProvider() {
         const providerData = providerSnap.exists() ? { id: providerSnap.id, ...providerSnap.data() } : { name: 'Unknown Provider' };
 
         renderServiceDetails(serviceData, providerData);
-        loadReviews(serviceId, serviceData.providerId); // Pass both IDs
+        loadReviews(serviceId, serviceData.providerId);
 
     } catch (error) {
         console.error("Error loading service:", error);
@@ -195,7 +195,7 @@ async function submitReview(e, serviceId, providerId, rating) {
 
             transaction.update(serviceRef, {
                 reviewCount: newReviewCount,
-                averageRating: newAverageRating.toFixed(2) // Save with 2 decimal places
+                averageRating: newAverageRating.toFixed(2)
             });
 
             transaction.set(reviewRef, {
@@ -210,7 +210,7 @@ async function submitReview(e, serviceId, providerId, rating) {
         showToast('Review submitted successfully!', 'success');
         
     } catch (error) {
-        hideToast(); // FIX: Make sure hideToast is called on error
+        hideToast();
         showToast(`Error: ${error.toString()}`, 'error');
     }
 }
