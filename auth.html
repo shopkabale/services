@@ -178,11 +178,28 @@ footer {
                 <button class="btn-google" id="google-signup-btn"><img src="https://www.google.com/images/hpp/ic_wahlberg_product_core_48.png8.png" alt="Google icon"> Sign up with Google</button>
                 <p class="toggle-link">Already have an account? <a href="#" id="show-login-link">Login</a></p>
             </div>
-            <div id="verification-notice" class="form-container verification-notice">
-                <i class="fas fa-envelope-open-text"></i>
-                <h2>Verify Your Email</h2>
-                <p>We've sent a verification link to your email. Please click the link to activate your account before logging in.</p>
-            </div>
+            <div id="verification-notice" class="form-container" style="display: none;">
+    <h2 class="form-title">📧 Almost There! Verify Your Email</h2>
+    <p class="form-text">
+        We've sent a verification link to the email address:
+    </p>
+    <p id="verification-email-display" class="highlighted-email"></p>
+    <p class="form-text">
+        Please click the link in that email to activate your account.
+    </p>
+
+    <button id="resend-verification-btn" class="btn btn-secondary">
+        <span>Resend Verification Email</span>
+        <div class="loader" style="display: none;"></div>
+    </button>
+    
+    <div class="separator">or</div>
+
+    <p class="form-text">
+        Entered the wrong email? 
+        <a href="#" id="go-back-to-signup" class="form-link">Go back and sign up again</a>.
+    </p>
+</div>
         </div>
     </div>
     <!-- START: New Footer Code -->
