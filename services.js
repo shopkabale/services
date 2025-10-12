@@ -1,10 +1,11 @@
-// This is the final and most robust services.js for your Algolia search page.
+// This is the final services.js with correct linking to the profile page.
 
 // 1. Initialize Algolia Client (Remember to replace your keys)
 const searchClient = algoliasearch(
   'HQGXJ2Y7ZD',
   '2e44c7070ebafaeb6ca324daa28f36b4'
 );
+
 const search = instantsearch({
   indexName: 'services',
   searchClient,
@@ -70,6 +71,10 @@ search.addWidgets([
         card.querySelector('.service-card').href = `service-detail.html?id=${hit.objectID}`;
         card.querySelector('.card-image').style.backgroundImage = `url('${hit.coverImageUrl || 'https://placehold.co/600x400'}')`;
         
+        // --- THIS IS THE FIX FOR PROFILE LINKING ---
+        const providerInfoLink = card.querySelector('.provider-info-link');
+        providerInfoLink.href = `profile.html?id=${hit.providerId}`;
+
         const providerAvatar = hit.providerAvatar || `https://placehold.co/40x40/10336d/a7c0e8?text=${(hit.providerName || 'P').charAt(0)}`;
         card.querySelector('.provider-avatar').src = providerAvatar;
         card.querySelector('.provider-avatar').alt = hit.providerName || 'Provider';
