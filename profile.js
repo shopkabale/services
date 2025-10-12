@@ -5,163 +5,148 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
 const db = getFirestore(app);
 const auth = getAuth();
 
-// Get the provider's ID from the URL query parameter
 const urlParams = new URLSearchParams(window.location.search);
 const providerId = urlParams.get('id');
 
-const profileLayout = document.querySelector('.profile-layout');
+const profileContainer = document.getElementById('profile-container');
 let currentUser = null;
 
 onAuthStateChanged(auth, (user) => {
     currentUser = user;
-    // We can re-run the main function if needed, for now just store the user
+    // You could re-run loadFullProfile here if you need to update UI based on login state
 });
 
 if (!providerId) {
-    profileLayout.innerHTML = '<div class="container"><h1>Provider not found.</h1><p>No provider ID was specified in the URL.</p></div>';
+    profileContainer.innerHTML = '<h1>Provider not found.</h1><p>No provider ID was specified in the URL.</p>';
 } else {
     loadFullProfile(providerId);
 }
 
-/**
- * Main function to load and render all profile data.
- * @param {string} providerId The ID of the provider to load.
- */
 async function loadFullProfile(providerId) {
     try {
-        // --- 1. Fetch Provider's Main Profile ---
+        profileContainer.innerHTML = '<p>Loading profile...</p>';
+
         const providerDocRef = doc(db, 'users', providerId);
         const providerDocSnap = await getDoc(providerDocRef);
 
         if (!providerDocSnap.exists()) {
-            profileLayout.innerHTML = '<div class="container"><h1>Provider not found.</h1><p>This user may no longer exist.</p></div>';
+            profileContainer.innerHTML = '<h1>Provider not found.</h1><p>This user may no longer exist.</p>';
             return;
         }
         const providerData = providerDocSnap.data();
 
-        // --- 2. Fetch Provider's Services ---
         const servicesQuery = query(collection(db, "services"), where("providerId", "==", providerId));
         const servicesSnapshot = await getDocs(servicesQuery);
         const services = servicesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        // --- 3. Fetch All Reviews for All Services ---
         let allReviews = [];
+        let totalRating = 0;
         for (const service of services) {
             const reviewsQuery = query(collection(db, `services/${service.id}/reviews`), orderBy('createdAt', 'desc'));
             const reviewsSnapshot = await getDocs(reviewsQuery);
             reviewsSnapshot.forEach(doc => {
-                allReviews.push(doc.data());
+                const reviewData = doc.data();
+                allReviews.push(reviewData);
+                totalRating += reviewData.rating;
             });
         }
-        // Sort all reviews together by date
         allReviews.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
-        
-        // --- 4. Render Everything ---
-        renderProfileHeader(providerData, allReviews);
-        renderAboutSection(providerData);
-        renderServicesGrid(services);
-        renderReviewsList(allReviews);
+
+        const averageRating = allReviews.length > 0 ? (totalRating / allReviews.length).toFixed(1) : "No ratings";
+
+        renderFullPage(providerData, services, allReviews, averageRating);
 
     } catch (error) {
         console.error("Error loading full profile:", error);
-        profileLayout.innerHTML = '<div class="container"><h1>Error</h1><p>There was a problem loading this profile.</p></div>';
+        profileContainer.innerHTML = '<h1>Error</h1><p>There was a problem loading this profile.</p>';
     }
 }
 
-/**
- * Renders the top profile card with avatar, name, stats, etc.
- */
-function renderProfileHeader(provider, reviews) {
-    const headerCard = document.querySelector('.profile-header-card');
-    
-    // Calculate average rating from all reviews
-    let totalRating = 0;
-    reviews.forEach(r => totalRating += r.rating);
-    const averageRating = reviews.length > 0 ? (totalRating / reviews.length).toFixed(1) : "No ratings";
+async function renderFullPage(provider, services, reviews, averageRating) {
+    profileContainer.innerHTML = ''; // Clear loading message
 
-    headerCard.querySelector('.profile-picture').src = provider.profilePicUrl || `https://placehold.co/140x140?text=${provider.name.charAt(0)}`;
-    headerCard.querySelector('.profile-picture').alt = provider.name;
-    headerCard.querySelector('.profile-name').textContent = provider.name;
-    headerCard.querySelector('.profile-tagline').textContent = provider.tagline || 'Service Provider'; // Assuming a 'tagline' field exists
-    
-    const metaLocation = headerCard.querySelector('.profile-meta .meta-item:nth-child(1)');
-    const metaRating = headerCard.querySelector('.profile-meta .meta-item:nth-child(2)');
-    metaLocation.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${provider.location}`;
-    metaRating.innerHTML = `<i class="fas fa-star"></i> ${averageRating} Stars (${reviews.length} Reviews)`;
-    
-    const contactBtn = headerCard.querySelector('.btn-contact');
-    contactBtn.href = `chat.html?recipientId=${providerId}`;
-    contactBtn.innerHTML = `<i class="fas fa-envelope"></i> Contact ${provider.name.split(' ')[0]}`;
+    // 1. Build Header
+    const headerCard = document.createElement('div');
+    headerCard.className = 'profile-header-card';
+    const contactBtnHref = currentUser && currentUser.uid === providerId ? '#' : `chat.html?recipientId=${providerId}`;
+    const contactBtnText = currentUser && currentUser.uid === providerId ? 'This is Your Profile' : `Contact ${provider.name.split(' ')[0]}`;
+    const contactBtnStyle = currentUser && currentUser.uid === providerId ? 'style="pointer-events: none; background-color: #555;"' : '';
 
-    // Disable contact button if user is viewing their own profile
-    if (currentUser && currentUser.uid === providerId) {
-        contactBtn.style.pointerEvents = 'none';
-        contactBtn.style.backgroundColor = '#555';
-        contactBtn.textContent = 'This is your profile';
-    }
-}
-
-/**
- * Renders the "About Me" section.
- */
-function renderAboutSection(provider) {
-    const aboutSection = document.querySelector('.about-me p');
-    aboutSection.textContent = provider.about || 'This provider has not written a bio yet.'; // Assuming an 'about' field
-}
-
-/**
- * Renders the grid of services offered by the provider.
- */
-function renderServicesGrid(services) {
-    const grid = document.querySelector('.services-grid');
-    grid.innerHTML = ''; // Clear static content
-    if (services.length === 0) {
-        grid.innerHTML = '<p>This provider has not listed any services yet.</p>';
-        return;
-    }
-    services.forEach(service => {
-        const card = document.createElement('a');
-        card.href = `service-detail.html?id=${service.id}`;
-        card.className = 'service-card';
-        card.innerHTML = `
-            <img src="${service.coverImageUrl || 'https://placehold.co/400x150'}" class="service-card-img" alt="${service.title}">
-            <div class="service-card-content">
-                <h3 class="service-card-title">${service.title}</h3>
-                <p class="service-card-price">From UGX ${service.price.toLocaleString()}</p>
+    headerCard.innerHTML = `
+        <img src="${provider.profilePicUrl || `https://placehold.co/140x140?text=${provider.name.charAt(0)}`}" alt="${provider.name}" class="profile-picture">
+        <div class="profile-info">
+            <h1 class="profile-name">${provider.name}</h1>
+            <p class="profile-tagline">${provider.tagline || 'Service Provider'}</p>
+            <div class="profile-meta">
+                <span class="meta-item"><i class="fas fa-map-marker-alt"></i> ${provider.location}</span>
+                <span class="meta-item"><i class="fas fa-star"></i> ${averageRating} Stars (${reviews.length} Reviews)</span>
             </div>
-        `;
-        grid.appendChild(card);
-    });
-}
+            <a href="${contactBtnHref}" class="btn-contact" ${contactBtnStyle}><i class="fas fa-envelope"></i> ${contactBtnText}</a>
+        </div>
+    `;
+    profileContainer.appendChild(headerCard);
 
-/**
- * Renders the list of all reviews for the provider.
- */
-async function renderReviewsList(reviews) {
-    const reviewsContainer = document.querySelector('.content-section:last-child');
-    reviewsContainer.innerHTML = '<h2 class="section-title">Client Reviews</h2>'; // Reset and add title
-    
-    if (reviews.length === 0) {
-        reviewsContainer.innerHTML += '<p>This provider has no reviews yet.</p>';
-        return;
-    }
+    // 2. Build About Section
+    const aboutSection = document.createElement('div');
+    aboutSection.className = 'content-section about-me';
+    aboutSection.innerHTML = `
+        <h2 class="section-title">About Me</h2>
+        <p>${provider.about || 'This provider has not written a bio yet.'}</p>
+    `;
+    profileContainer.appendChild(aboutSection);
 
-    for (const review of reviews) {
-        const reviewerDoc = await getDoc(doc(db, 'users', review.reviewerId));
-        const reviewerData = reviewerDoc.exists() ? reviewerDoc.data() : { name: 'Anonymous' };
-        
-        const reviewEl = document.createElement('div');
-        reviewEl.className = 'review';
-        reviewEl.innerHTML = `
-            <img src="${reviewerData.profilePicUrl || `https://placehold.co/50x50?text=${reviewerData.name.charAt(0)}`}" alt="${reviewerData.name}" class="reviewer-avatar">
-            <div class="review-content">
-                <div class="review-header">
-                    <span class="reviewer-name">${reviewerData.name}</span>
-                    <div class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</div>
-                </div>
-                <p class="review-text">${review.text}</p>
-            </div>
-        `;
-        reviewsContainer.appendChild(reviewEl);
+    // 3. Build Services Section
+    const servicesSection = document.createElement('div');
+    servicesSection.className = 'content-section';
+    let servicesGridHTML = '';
+    if (services.length > 0) {
+        services.forEach(service => {
+            servicesGridHTML += `
+                <a href="service-detail.html?id=${service.id}" class="service-card">
+                    <img src="${service.coverImageUrl || 'https://placehold.co/400x150'}" class="service-card-img" alt="${service.title}">
+                    <div class="service-card-content">
+                        <h3 class="service-card-title">${service.title}</h3>
+                        <p class="service-card-price">From UGX ${service.price.toLocaleString()}</p>
+                    </div>
+                </a>`;
+        });
+    } else {
+        servicesGridHTML = '<p>This provider has not listed any services yet.</p>';
     }
+    servicesSection.innerHTML = `
+        <h2 class="section-title">My Services</h2>
+        <div class="services-grid">${servicesGridHTML}</div>
+    `;
+    profileContainer.appendChild(servicesSection);
+
+    // 4. Build Reviews Section
+    const reviewsSection = document.createElement('div');
+    reviewsSection.className = 'content-section';
+    let reviewsHTML = '';
+    if (reviews.length > 0) {
+        // Fetch reviewer names asynchronously
+        const reviewPromises = reviews.map(async (review) => {
+            const reviewerDoc = await getDoc(doc(db, 'users', review.reviewerId));
+            const reviewerData = reviewerDoc.exists() ? reviewerDoc.data() : { name: 'Anonymous' };
+            return `
+                <div class="review">
+                    <img src="${reviewerData.profilePicUrl || `https://placehold.co/50x50?text=${reviewerData.name.charAt(0)}`}" alt="${reviewerData.name}" class="reviewer-avatar">
+                    <div class="review-content">
+                        <div class="review-header">
+                            <span class="reviewer-name">${reviewerData.name}</span>
+                            <div class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</div>
+                        </div>
+                        <p class="review-text">${review.text}</p>
+                    </div>
+                </div>`;
+        });
+        reviewsHTML = (await Promise.all(reviewPromises)).join('');
+    } else {
+        reviewsHTML = '<p>This provider has no reviews yet.</p>';
+    }
+    reviewsSection.innerHTML = `
+        <h2 class="section-title">Client Reviews</h2>
+        ${reviewsHTML}
+    `;
+    profileContainer.appendChild(reviewsSection);
 }
