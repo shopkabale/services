@@ -5,38 +5,44 @@ import { getFirestore, collection, doc, getDoc, getDocs, getCountFromServer, del
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// --- DOM ELEMENT REFERENCES ---
 const mainTitle = document.getElementById('main-title');
 const navLinks = document.querySelectorAll('.nav-link');
 const contentSections = document.querySelectorAll('.content-section');
-
-// --- NEW: Modal element references ---
 const deleteServiceModal = document.getElementById('delete-service-modal');
 const cancelDeleteServiceBtn = document.getElementById('cancel-delete-service-btn');
 const confirmDeleteServiceBtn = document.getElementById('confirm-delete-service-btn');
 const serviceToDeleteName = document.getElementById('service-to-delete-name');
 let serviceToDeleteId = null;
 
-// --- CRITICAL: SECURITY CHECK ---
+// --- CRITICAL: AUTHENTICATION AND SECURITY CHECK ---
 onAuthStateChanged(auth, async (user) => {
-    if (user && user.emailVerified) {
-        const userDocRef = doc(db, "users", user.uid);
-        const userDoc = await getDoc(userDocRef);
+    try {
+        if (user && user.emailVerified) {
+            const userDocRef = doc(db, "users", user.uid);
+            const userDoc = await getDoc(userDocRef);
 
-        if (userDoc.exists() && userDoc.data().isAdmin === true) {
-            loadDashboardStats();
-            loadUsers();
-            loadServices();
+            if (userDoc.exists() && userDoc.data().isAdmin === true) {
+                // User is a confirmed admin, NOW we load all the data.
+                loadDashboardStats();
+                loadUsers();
+                loadServices();
+            } else {
+                console.warn("Access denied. User is not an admin.");
+                window.location.href = 'index.html';
+            }
         } else {
-            console.warn("Access denied. User is not an admin.");
-            window.location.href = 'index.html';
+            console.warn("Access denied. User not logged in.");
+            window.location.href = 'auth.html';
         }
-    } else {
-        console.warn("Access denied. User not logged in.");
-        window.location.href = 'auth.html';
+    } catch (error) {
+        console.error("Authentication check failed:", error);
+        alert("An error occurred during authentication. Redirecting...");
+        window.location.href = 'index.html';
     }
 });
 
-// --- Navigation Logic ---
+// --- NAVIGATION LOGIC ---
 navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
         e.preventDefault();
@@ -52,51 +58,95 @@ navLinks.forEach(link => {
     });
 });
 
-// --- Data Fetching Functions ---
+// --- DATA FETCHING FUNCTIONS ---
 async function loadDashboardStats() {
-    // ... (This function is unchanged)
+    try {
+        const usersCol = collection(db, 'users');
+        const servicesCol = collection(db, 'services');
+        const jobsCol = collection(db, 'job_posts');
+
+        const userCount = (await getCountFromServer(usersCol)).data().count;
+        const serviceCount = (await getCountFromServer(servicesCol)).data().count;
+        const jobCount = (await getCountFromServer(jobsCol)).data().count;
+
+        document.getElementById('total-users').textContent = userCount;
+        document.getElementById('total-services').textContent = serviceCount;
+        document.getElementById('total-job-posts').textContent = jobCount;
+    } catch (error) {
+        console.error("Error loading dashboard stats:", error);
+        document.getElementById('total-users').textContent = 'Error';
+        document.getElementById('total-services').textContent = 'Error';
+        document.getElementById('total-job-posts').textContent = 'Error';
+    }
 }
 
 async function loadUsers() {
-    // ... (This function is unchanged)
+    const usersTableBody = document.getElementById('users-table-body');
+    usersTableBody.innerHTML = '<tr><td colspan="3">Loading users...</td></tr>';
+    try {
+        const snapshot = await getDocs(collection(db, 'users'));
+        usersTableBody.innerHTML = '';
+        if (snapshot.empty) {
+            usersTableBody.innerHTML = '<tr><td colspan="3">No users found.</td></tr>';
+            return;
+        }
+        snapshot.forEach(doc => {
+            const user = doc.data();
+            const row = usersTableBody.insertRow();
+            row.innerHTML = `
+                <td><div class="name">${user.name || 'N/A'}</div></td>
+                <td>${user.email || 'N/A'}</td>
+                <td>${user.isProvider ? 'Provider' : 'User'}</td>
+            `;
+        });
+    } catch(error) {
+        console.error("Error loading users:", error);
+        usersTableBody.innerHTML = '<tr><td colspan="3">Could not load users.</td></tr>';
+    }
 }
 
 async function loadServices() {
     const servicesTableBody = document.getElementById('services-table-body');
-    servicesTableBody.innerHTML = '<tr><td colspan="5">Loading services...</td></tr>'; // Changed colspan to 5
-    const snapshot = await getDocs(collection(db, 'services'));
-
-    const providerCache = {}; 
-
-    servicesTableBody.innerHTML = '';
-    for(const serviceDoc of snapshot.docs) { 
-        const service = { id: serviceDoc.id, ...serviceDoc.data() };
-        let providerName = '...';
-
-        if(service.providerId && !providerCache[service.providerId]) {
-            const userDocRef = doc(db, 'users', service.providerId);
-            const userDocSnap = await getDoc(userDocRef);
-            if(userDocSnap.exists()) {
-                providerCache[service.providerId] = userDocSnap.data().name;
-            }
+    servicesTableBody.innerHTML = '<tr><td colspan="5">Loading services...</td></tr>';
+    try {
+        const snapshot = await getDocs(collection(db, 'services'));
+        const providerCache = {}; 
+        servicesTableBody.innerHTML = '';
+        if (snapshot.empty) {
+            servicesTableBody.innerHTML = '<tr><td colspan="5">No services found.</td></tr>';
+            return;
         }
-        providerName = providerCache[service.providerId] || 'Unknown';
+        for(const serviceDoc of snapshot.docs) { 
+            const service = { id: serviceDoc.id, ...serviceDoc.data() };
+            let providerName = '...';
 
-        const row = servicesTableBody.insertRow();
-        // --- NEW: Added a 5th column for Actions ---
-        row.innerHTML = `
-            <td><div class="name">${service.title || 'N/A'}</div></td>
-            <td>${providerName}</td>
-            <td>${service.category || 'N/A'}</td>
-            <td>UGX ${service.price ? service.price.toLocaleString() : 'N/A'}</td>
-            <td>
-                <button class="btn-danger delete-service-btn" data-id="${service.id}" data-name="${service.title}">Delete</button>
-            </td>
-        `;
+            if(service.providerId && !providerCache[service.providerId]) {
+                const userDocRef = doc(db, 'users', service.providerId);
+                const userDocSnap = await getDoc(userDocRef);
+                if(userDocSnap.exists()) {
+                    providerCache[service.providerId] = userDocSnap.data().name;
+                }
+            }
+            providerName = providerCache[service.providerId] || 'Unknown';
+
+            const row = servicesTableBody.insertRow();
+            row.innerHTML = `
+                <td><div class="name">${service.title || 'N/A'}</div></td>
+                <td>${providerName}</td>
+                <td>${service.category || 'N/A'}</td>
+                <td>UGX ${service.price ? service.price.toLocaleString() : 'N/A'}</td>
+                <td>
+                    <button class="btn-danger delete-service-btn" data-id="${service.id}" data-name="${service.title}">Delete</button>
+                </td>
+            `;
+        }
+    } catch(error) {
+        console.error("Error loading services:", error);
+        servicesTableBody.innerHTML = '<tr><td colspan="5">Could not load services.</td></tr>';
     }
 }
 
-// --- NEW: Function to handle service deletion ---
+// --- DELETION LOGIC ---
 async function handleDeleteService() {
     if (!serviceToDeleteId) return;
     confirmDeleteServiceBtn.disabled = true;
@@ -107,26 +157,25 @@ async function handleDeleteService() {
         await deleteDoc(doc(db, "services", serviceToDeleteId));
 
         // 2. Delete from Algolia using the Cloudflare Worker
-        // We need the current user's token to authenticate the request
         const user = auth.currentUser;
-        if (user) {
-            const idToken = await user.getIdToken(true);
-            await fetch('https://services.kabaleonline.com/sync', { // Your worker URL
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
-                body: JSON.stringify({ objectID: serviceToDeleteId }),
-            });
+        if (!user) throw new Error("Authentication error: No user found.");
+        
+        const idToken = await user.getIdToken(true);
+        const response = await fetch('https://services.kabaleonline.com/sync', { // Your worker URL
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+            body: JSON.stringify({ objectID: serviceToDeleteId }),
+        });
+        if (!response.ok) {
+            console.error('Algolia delete failed:', await response.text());
         }
         
         console.log(`Service ${serviceToDeleteId} deleted successfully.`);
-        // Reload the services list to show the change
-        loadServices();
-
+        loadServices(); // Reload the services list to show the change
     } catch (error) {
         console.error("Error deleting service:", error);
         alert('Failed to delete the service. Please try again.');
     } finally {
-        // Reset and hide the modal
         serviceToDeleteId = null;
         confirmDeleteServiceBtn.disabled = false;
         confirmDeleteServiceBtn.textContent = 'Delete Service';
@@ -134,21 +183,17 @@ async function handleDeleteService() {
     }
 }
 
-// --- NEW: Event listeners for delete functionality ---
-
-// Listen for clicks on the delete buttons in the services table
+// --- EVENT LISTENERS FOR DELETION ---
 document.getElementById('services-table-body').addEventListener('click', (e) => {
     if (e.target.classList.contains('delete-service-btn')) {
         serviceToDeleteId = e.target.dataset.id;
-        serviceToDeleteName.textContent = e.target.dataset.name;
+        serviceToDeleteName.textContent = `"${e.target.dataset.name}"`;
         deleteServiceModal.classList.add('show');
     }
 });
 
-// Handle the final "Confirm" click in the modal
 confirmDeleteServiceBtn.addEventListener('click', handleDeleteService);
 
-// Handle the "Cancel" click in the modal
 cancelDeleteServiceBtn.addEventListener('click', () => {
     deleteServiceModal.classList.remove('show');
     serviceToDeleteId = null;
