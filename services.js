@@ -5,7 +5,6 @@ const searchClient = algoliasearch(
   'HQGXJ2Y7ZD',
   '2e44c7070ebafaeb6ca324daa28f36b4'
 );
-
 const search = instantsearch({
   indexName: 'services',
   searchClient,
@@ -78,7 +77,7 @@ search.addWidgets([
         
         card.querySelector('.service-title').innerHTML = instantsearch.highlight({ attribute: 'title', hit });
 
-        // --- NEW: Render the star rating ---
+        // --- RENDER THE STAR RATING ---
         const rating = hit.averageRating || 0;
         const reviewCount = hit.reviewCount || 0;
         const ratingContainer = card.querySelector('.service-rating');
