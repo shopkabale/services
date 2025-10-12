@@ -1,7 +1,6 @@
 // This is the final and most robust services.js
 // It uses the HTML <template> tag to guarantee the layout is perfect.
 
-// 1. Initialize Algolia Client (Remember to replace your keys)
 const searchClient = algoliasearch(
   'HQGXJ2Y7ZD',
   '2e44c7070ebafaeb6ca324daa28f36b4'
@@ -12,13 +11,10 @@ const search = instantsearch({
   searchClient,
 });
 
-// 2. Add Widgets
 search.addWidgets([
-  // --- Search Box Widget ---
   instantsearch.widgets.searchBox({
     container: '#search-container',
-    inputSelector: '#search-input',
-    placeholder: 'What service are you looking for?',
+    placeholder: 'Search category, items or services...', // Updated placeholder
     showSubmit: true,
     templates: {
       submit: '<button type="submit"><i class="fas fa-search"></i></button>',
@@ -26,7 +22,6 @@ search.addWidgets([
     },
   }),
 
-  // --- Custom Category Filters ---
   instantsearch.connectors.connectRefinementList(
     (renderOptions, isFirstRender) => {
       const { items, refine } = renderOptions;
@@ -63,19 +58,15 @@ search.addWidgets([
     attribute: 'category',
   }),
 
-  // --- Search Results (Hits) Widget using the HTML Template ---
   instantsearch.widgets.hits({
     container: '#services-grid',
     templates: {
       empty: (results) => `<p class="loading-text">No services found for "${results.query}".</p>`,
       
       item: (hit, { html }) => {
-        // Find the template in the HTML
         const template = document.getElementById('service-card-template');
-        // Clone its content
         const card = template.content.cloneNode(true);
 
-        // Fill the cloned template with data from the search result (the 'hit')
         card.querySelector('.service-card').href = `service-detail.html?id=${hit.objectID}`;
         card.querySelector('.card-image').style.backgroundImage = `url('${hit.coverImageUrl || 'https://placehold.co/600x400'}')`;
         
@@ -84,14 +75,11 @@ search.addWidgets([
         card.querySelector('.provider-avatar').alt = hit.providerName || 'Provider';
         card.querySelector('.provider-name').textContent = hit.providerName || 'Anonymous';
         
-        // Use html function for safe highlighting
         card.querySelector('.service-title').innerHTML = instantsearch.highlight({ attribute: 'title', hit });
 
         card.querySelector('.location-text').textContent = hit.location || 'Kabale';
         card.querySelector('.price-amount').textContent = `UGX ${hit.price.toLocaleString()}`;
 
-        // Return the raw HTML of the filled-in card
-        // This is a workaround to get the final HTML string for InstantSearch
         const tempDiv = document.createElement('div');
         tempDiv.appendChild(card);
         return tempDiv.innerHTML;
@@ -100,5 +88,4 @@ search.addWidgets([
   }),
 ]);
 
-// 3. Start Search
 search.start();
