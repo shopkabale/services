@@ -1,7 +1,7 @@
 import { app } from './firebase-init.js';
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, collection, query, onSnapshot, serverTimestamp, orderBy, runTransaction } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-import { showToast, hideToast } from './notifications.js'; // <-- FIX: hideToast is now imported
+import { showToast, hideToast } from './notifications.js';
 
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -66,8 +66,12 @@ function renderServiceDetails(service, provider) {
         </div>
         <aside class="provider-sidebar">
             <div class="provider-card">
-                <img src="${provider.profilePicUrl || `https://placehold.co/100x100?text=${provider.name.charAt(0)}`}" alt="${provider.name}" class="provider-avatar">
-                <h2 class="provider-name">${provider.name}</h2>
+                
+                <a href="profile.html?id=${provider.id}" style="text-decoration: none; color: inherit;">
+                    <img src="${provider.profilePicUrl || `https://placehold.co/100x100?text=${provider.name.charAt(0)}`}" alt="${provider.name}" class="provider-avatar">
+                    <h2 class="provider-name">${provider.name}</h2>
+                </a>
+
                 <p class="provider-location"><i class="fas fa-map-marker-alt"></i> ${provider.location}</p>
                 <div class="price-display">UGX ${service.price.toLocaleString()} <span>/ ${service.priceUnit}</span></div>
                 <a href="${contactLink}" id="contact-provider-btn" class="btn-contact"><i class="fas fa-envelope"></i> Contact Provider</a>
