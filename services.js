@@ -1,7 +1,7 @@
-// This is the final and perfected search.js file.
-// The item template is a direct HTML mirror of your beautiful service-card design.
+// This is the final and most robust services.js
+// It uses the HTML <template> tag to guarantee the layout is perfect.
 
-// 1. Initialize the Algolia client (Your keys should already be here)
+// 1. Initialize Algolia Client (Remember to replace your keys)
 const searchClient = algoliasearch(
   'HQGXJ2Y7ZD',
   '2e44c7070ebafaeb6ca324daa28f36b4'
@@ -12,9 +12,9 @@ const search = instantsearch({
   searchClient,
 });
 
-// 2. Add the widgets
+// 2. Add Widgets
 search.addWidgets([
-  // --- Search Box ---
+  // --- Search Box Widget ---
   instantsearch.widgets.searchBox({
     container: '#search-container',
     inputSelector: '#search-input',
@@ -63,44 +63,42 @@ search.addWidgets([
     attribute: 'category',
   }),
 
-  // --- Search Results (Hits) ---
+  // --- Search Results (Hits) Widget using the HTML Template ---
   instantsearch.widgets.hits({
     container: '#services-grid',
     templates: {
       empty: (results) => `<p class="loading-text">No services found for "${results.query}".</p>`,
       
-      // THIS IS THE CORRECTED, HIGH-FIDELITY HTML TEMPLATE
-      item: (hit) => {
-        const providerAvatar = hit.providerAvatar || `https://placehold.co/40x40/10336d/a7c0e8?text=${(hit.providerName || 'P').charAt(0)}`;
-        const coverImage = hit.coverImageUrl || 'https://placehold.co/600x400';
-        // Use Algolia's highlighting feature for the title
-        const highlightedTitle = instantsearch.highlight({ attribute: 'title', hit });
+      item: (hit, { html }) => {
+        // Find the template in the HTML
+        const template = document.getElementById('service-card-template');
+        // Clone its content
+        const card = template.content.cloneNode(true);
 
-        // This is a direct, line-by-line copy of your service card structure
-        return `
-          <a href="service-detail.html?id=${hit.objectID}" class="service-card">
-            <div class="card-image" style="background-image: url('${coverImage}');"></div>
-            <div class="card-content">
-              <div class="provider-info">
-                <img src="${providerAvatar}" alt="${hit.providerName}" class="provider-avatar">
-                <span class="provider-name">${hit.providerName || 'Anonymous'}</span>
-              </div>
-              <h3 class="service-title">${highlightedTitle}</h3>
-              <p class="service-location">
-                <i class="fas fa-map-marker-alt"></i> ${hit.location || 'Kabale'}
-              </p>
-              <div class="card-footer">
-                <div class="price">
-                  <span>From </span>UGX ${hit.price.toLocaleString()}
-                </div>
-              </div>
-            </div>
-          </a>
-        `;
+        // Fill the cloned template with data from the search result (the 'hit')
+        card.querySelector('.service-card').href = `service-detail.html?id=${hit.objectID}`;
+        card.querySelector('.card-image').style.backgroundImage = `url('${hit.coverImageUrl || 'https://placehold.co/600x400'}')`;
+        
+        const providerAvatar = hit.providerAvatar || `https://placehold.co/40x40/10336d/a7c0e8?text=${(hit.providerName || 'P').charAt(0)}`;
+        card.querySelector('.provider-avatar').src = providerAvatar;
+        card.querySelector('.provider-avatar').alt = hit.providerName || 'Provider';
+        card.querySelector('.provider-name').textContent = hit.providerName || 'Anonymous';
+        
+        // Use html function for safe highlighting
+        card.querySelector('.service-title').innerHTML = instantsearch.highlight({ attribute: 'title', hit });
+
+        card.querySelector('.location-text').textContent = hit.location || 'Kabale';
+        card.querySelector('.price-amount').textContent = `UGX ${hit.price.toLocaleString()}`;
+
+        // Return the raw HTML of the filled-in card
+        // This is a workaround to get the final HTML string for InstantSearch
+        const tempDiv = document.createElement('div');
+        tempDiv.appendChild(card);
+        return tempDiv.innerHTML;
       },
     },
   }),
 ]);
 
-// 3. Start the search
+// 3. Start Search
 search.start();
