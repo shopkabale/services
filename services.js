@@ -1,5 +1,5 @@
 // This is the final code to power your services page with Algolia.
-// It replaces the old services.js file entirely.
+// It replaces your old services.js file entirely.
 
 // 1. Initialize the Algolia client
 // IMPORTANT: Replace these placeholders with your actual Algolia credentials.
@@ -28,8 +28,11 @@ search.addWidgets([
     showReset: false,
     templates: {
       submit({ cssClasses }, { html }) {
-        return html`<button type="${cssClasses.submit}" type="submit"><i class="fas fa-search"></i></button>`;
+        return html`<button class="${cssClasses.submit}" type="submit"><i class="fas fa-search"></i></button>`;
       },
+      reset() {
+        return ''; // Hides the reset button
+      }
     },
   }),
 
@@ -45,11 +48,18 @@ search.addWidgets([
     operator: 'or', // Allow selecting multiple categories
     templates: {
       item(item, { html }) {
-        return html`
+        // We add a special "All" button that is not part of the data
+        const buttonHTML = html`
           <button class="filter-btn ${item.isRefined ? 'active' : ''}" @click="${item.value}">
             ${item.label}
           </button>
         `;
+        // This logic is to ensure the "All" button is handled correctly
+        // by the refinement list logic.
+        if (item.label === 'All') {
+            return ''; // Hide the default 'All' if it appears
+        }
+        return buttonHTML;
       },
     },
   }),
@@ -70,7 +80,7 @@ search.addWidgets([
       item(hit, { html }) {
         // Use a placeholder if the provider's avatar is missing
         const providerAvatar = hit.providerAvatar || `https://placehold.co/40x40/10336d/a7c0e8?text=${(hit.providerName || 'P').charAt(0)}`;
-        
+
         return html`
           <a href="service-detail.html?id=${hit.objectID}" class="service-card">
             <div class="card-image" style="background-image: url('${hit.coverImageUrl || 'https://placehold.co/600x400'}');"></div>
@@ -90,6 +100,31 @@ search.addWidgets([
       },
     },
   }),
+
+  /**
+   * Custom widget to manage the "All" button's state
+   * and clear other filters when it's clicked.
+   */
+  instantsearch.connectors.connectCurrentRefinements(
+    (renderOptions, isFirstRender) => {
+      const { items, refine } = renderOptions;
+      if (isFirstRender) {
+        const allButton = document.querySelector('.filter-btn'); // Assumes "All" is the first button
+        allButton.addEventListener('click', () => {
+          // When "All" is clicked, clear all refinements for the 'category' attribute
+          refine(items.filter(item => item.attribute !== 'category'));
+        });
+      }
+      
+      const allButton = document.querySelector('.filter-btn');
+      // If there are no category refinements, make the "All" button active
+      const isAllActive = !items.some(item => item.attribute === 'category');
+      if (allButton) {
+        allButton.classList.toggle('active', isAllActive);
+      }
+    }
+  )(),
+
 ]);
 
 // 4. Start the search experience
