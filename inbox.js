@@ -1,9 +1,10 @@
 import { app } from './firebase-init.js';
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { collection, query, where, onSnapshot, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+// THIS IS THE FIX: I have added 'getFirestore' to the import list.
+import { getFirestore, collection, query, where, onSnapshot, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 const auth = getAuth(app);
-const db = getFirestore(app);
+const db = getFirestore(app); // This line will now work correctly.
 
 const conversationList = document.getElementById('conversation-list');
 
@@ -16,7 +17,7 @@ onAuthStateChanged(auth, user => {
 });
 
 function loadConversations(currentUserId) {
-  // THIS IS THE FIX: Use the correct collection name 'conversations'
+  // Use the correct collection name: 'conversations'
   const convosRef = collection(db, 'conversations');
   const q = query(convosRef, where('participants', 'array-contains', currentUserId));
   
