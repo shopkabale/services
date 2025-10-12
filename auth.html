@@ -60,9 +60,96 @@
         #photo-preview { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--border-color); background-color: var(--bg-primary); display: block; margin: 0 auto 15px; }
         .photo-upload-label { cursor: pointer; color: var(--accent-primary); font-weight: 600; }
         #profile-photo-input { display: none; }
-        .verification-notice { text-align: center; }
-        .verification-notice i { font-size: 3rem; color: var(--accent-primary); margin-bottom: 20px; }
-        .verification-notice p { line-height: 1.7; }
+        /*
+ * ===============================================
+ * STYLES FOR THE INTERACTIVE VERIFICATION NOTICE
+ * ===============================================
+ */
+
+/* The main title with the emoji */
+#verification-notice .form-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+}
+
+/* General paragraph text */
+#verification-notice .form-text {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+/* The highlighted email display, adapted for your theme */
+.highlighted-email {
+    display: inline-block;
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    color: var(--accent-primary);
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+    margin: 10px 0 25px 0;
+    word-break: break-all;
+}
+
+/* Styling for the "or" separator */
+.separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: var(--text-secondary);
+    margin: 25px 0;
+}
+
+.separator::before,
+.separator::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.separator:not(:empty)::before {
+    margin-right: .5em;
+}
+
+.separator:not(:empty)::after {
+    margin-left: .5em;
+}
+
+/* Styling for the secondary "Resend" button to match your theme */
+#resend-verification-btn {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#resend-verification-btn:hover {
+    background-color: var(--accent-primary);
+    color: #ffffff;
+    border-color: var(--accent-primary);
+}
+
+/* Styling for the "Go back" link */
+#go-back-to-signup {
+    color: var(--accent-primary);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+#go-back-to-signup:hover {
+    text-decoration: underline;
+}
         footer { width: 100%; text-align: center; padding: 20px; font-size: 0.9rem; color: var(--text-secondary); }
         /* --- NEW: FOOTER STYLES --- */
 footer {
