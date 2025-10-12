@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Provider Profile | KabaleOnline</title>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
@@ -65,7 +65,7 @@
         @media (min-width: 768px) {
             .profile-header-card { flex-direction: row; text-align: left; gap: 30px; }
         }
-        
+
         .profile-picture {
             width: 140px; height: 140px; border-radius: 50%;
             object-fit: cover; border: 4px solid var(--accent-primary);
@@ -93,7 +93,7 @@
             margin-bottom: 20px;
         }
         .about-me p { line-height: 1.8; }
-        
+
         .services-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -103,12 +103,16 @@
             background-color: var(--bg-primary); border-radius: 12px;
             border: 1px solid var(--border-color); overflow: hidden;
             text-decoration: none;
+            transition: transform 0.2s ease-in-out;
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
         }
         .service-card-img { width: 100%; height: 150px; object-fit: cover; }
         .service-card-content { padding: 15px; }
         .service-card-title { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 10px; }
         .service-card-price { font-weight: 500; color: var(--accent-primary); }
-        
+
         .review {
             display: flex; gap: 15px; padding: 20px 0;
             border-bottom: 1px solid var(--border-color);
@@ -139,66 +143,16 @@
     </header>
 
     <main class="profile-layout">
-        <div class="container">
-            <div class="profile-header-card">
-                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Provider Avatar" class="profile-picture">
-                <div class="profile-info">
-                    <h1 class="profile-name">David Musinguzi</h1>
-                    <p class="profile-tagline">Web Developer & IT Consultant</p>
-                    <div class="profile-meta">
-                        <span class="meta-item"><i class="fas fa-map-marker-alt"></i> Kabale Town</span>
-                        <span class="meta-item"><i class="fas fa-star"></i> 4.9 Stars (32 Reviews)</span>
-                        <span class="meta-item"><i class="fas fa-user-check"></i> Verified</span>
-                    </div>
-                    <a href="#" class="btn-contact"><i class="fas fa-envelope"></i> Contact David</a>
-                </div>
-            </div>
-
-            <div class="content-section about-me">
-                <h2 class="section-title">About Me</h2>
-                <p>Hello! I'm a passionate web developer with over 5 years of experience based right here in Kabale. I help local businesses and individuals build a strong online presence through modern, fast, and beautiful websites. My goal is to provide high-quality technical solutions that are affordable and tailored to the needs of our community.</p>
-            </div>
-
-            <div class="content-section">
-                <h2 class="section-title">My Services</h2>
-                <div class="services-grid">
-                    <a href="service-detail.html" class="service-card">
-                        <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=400&auto=format&fit=crop" class="service-card-img" alt="Service">
-                        <div class="service-card-content">
-                            <h3 class="service-card-title">Custom Website Design</h3>
-                            <p class="service-card-price">From UGX 500,000</p>
-                        </div>
-                    </a>
-                     <a href="#" class="service-card">
-                        <img src="https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=400&auto=format&fit=crop" class="service-card-img" alt="Service">
-                        <div class="service-card-content">
-                            <h3 class="service-card-title">Laptop Repair & Maintenance</h3>
-                            <p class="service-card-price">From UGX 30,000</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            
-            <div class="content-section">
-                <h2 class="section-title">Client Reviews</h2>
-                <div class="review">
-                    <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Reviewer Avatar" class="reviewer-avatar">
-                    <div class="review-content">
-                        <div class="review-header">
-                            <span class="reviewer-name">Hope K.</span>
-                            <div class="review-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                        </div>
-                        <p class="review-text">David built a fantastic website for my catering business. Highly recommended!</p>
-                    </div>
-                </div>
-            </div>
+        <div class="container" id="profile-container">
+            <p>Loading profile...</p>
         </div>
     </main>
-    
+
     <footer>
         <p>&copy; 2025 KabaleOnline. All Rights Reserved. <a href="#">Terms of Service</a></p>
     </footer>
 
     <script src="theme.js" defer></script>
+    <script src="profile.js" type="module"></script>
 </body>
 </html>
