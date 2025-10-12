@@ -7,7 +7,8 @@ import {
     GoogleAuthProvider,
     signInWithPopup,
     sendEmailVerification,
-    applyActionCode 
+    applyActionCode,
+    sendPasswordResetEmail // NEW: Import password reset function
 } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { 
     getFirestore, 
@@ -35,19 +36,35 @@ const googleSignupBtn = document.getElementById('google-signup-btn');
 const photoInput = document.getElementById('profile-photo-input');
 const photoPreview = document.getElementById('photo-preview');
 const passwordToggles = document.querySelectorAll('.password-toggle');
-// NEW: Elements for the interactive verification view
 const verificationEmailDisplay = document.getElementById('verification-email-display');
 const resendVerificationBtn = document.getElementById('resend-verification-btn');
 const goBackToSignupLink = document.getElementById('go-back-to-signup');
 
-// NEW: A variable to hold the user object for verification actions (like resending email)
+// --- NEW: Elements for Password Reset ---
+const forgotPasswordLink = document.getElementById('forgot-password-link');
+const passwordResetModal = document.getElementById('password-reset-modal');
+const closeResetModalBtn = document.getElementById('close-reset-modal-btn');
+const passwordResetForm = document.getElementById('password-reset-form');
+
 let userForVerification = null;
 
 // --- REDIRECT LOGIC FOR LOGGED-IN USERS ---
 onAuthStateChanged(auth, (user) => {
     if (user && user.emailVerified) {
-        console.log("User is already logged in and verified. Redirecting to dashboard...");
-        window.location.href = 'dashboard.html';
+        console.log("User is already logged in and verified. Redirecting...");
+        
+        // Check if user is an admin to redirect to the correct dashboard
+        const userDocRef = doc(db, "users", user.uid);
+        getDoc(userDocRef).then(userDoc => {
+            if (userDoc.exists() && userDoc.data().isAdmin === true) {
+                window.location.href = 'admin.html';
+            } else {
+                window.location.href = 'dashboard.html';
+            }
+        }).catch(() => {
+            // Default redirect if Firestore check fails
+            window.location.href = 'dashboard.html';
+        });
     }
 });
 
@@ -66,11 +83,10 @@ const showSignupView = (e) => {
     signupContainer.style.display = 'block'; 
 };
 
-// MODIFIED: This function now accepts the user object to dynamically update the view
 const showVerificationView = (user) => {
-    userForVerification = user; // Store the user for the "Resend" action
+    userForVerification = user;
     if (user && user.email) {
-        verificationEmailDisplay.textContent = user.email; // Display the user's email
+        verificationEmailDisplay.textContent = user.email;
     }
     loginContainer.style.display = 'none';
     signupContainer.style.display = 'none';
@@ -80,39 +96,25 @@ const showVerificationView = (user) => {
 // --- Event Listeners ---
 showSignupLink.addEventListener('click', showSignupView);
 showLoginLink.addEventListener('click', showLoginView);
-// NEW: Link to go back to signup from verification view
 goBackToSignupLink.addEventListener('click', showSignupView);
 
-
-// NEW: Event listener for the "Resend Verification Email" button
 resendVerificationBtn.addEventListener('click', async () => {
     if (!userForVerification) {
         showToast("Could not find user data. Please try signing up again.", "error");
         return;
     }
-
     const resendButton = resendVerificationBtn;
     showButtonLoader(resendButton);
-    showToast("Sending a new verification link...", "progress");
-
     try {
-        const actionCodeSettings = { url: window.location.origin, handleCodeInApp: true }; // Use origin for link
+        const actionCodeSettings = { url: window.location.origin, handleCodeInApp: true };
         await sendEmailVerification(userForVerification, actionCodeSettings);
-        hideToast();
-        showToast("A new verification link has been sent to your email!", "success");
+        showToast("A new verification link has been sent!", "success");
     } catch (error) {
-        hideToast();
-        // Firebase has built-in throttling to prevent spamming
-        if (error.code === 'auth/too-many-requests') {
-            showToast("You've requested this too many times. Please wait a while before trying again.", "error");
-        } else {
-            showToast(`Error: ${error.message}`, "error");
-        }
+        showToast(`Error: ${error.message}`, "error");
     } finally {
         hideButtonLoader(resendButton);
     }
 });
-
 
 photoInput.addEventListener('change', () => {
     if (photoInput.files && photoInput.files[0]) {
@@ -128,18 +130,51 @@ passwordToggles.forEach(toggle => {
         const icon = toggle.querySelector('i');
         if (passwordInput.type === 'password') {
             passwordInput.type = 'text';
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
         } else {
             passwordInput.type = 'password';
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
         }
     });
 });
 
+// --- NEW: Event Listeners for Password Reset Modal ---
+forgotPasswordLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    passwordResetModal.classList.add('show');
+});
+
+closeResetModalBtn.addEventListener('click', () => {
+    passwordResetModal.classList.remove('show');
+});
+
+passwordResetModal.addEventListener('click', (e) => {
+    if (e.target === passwordResetModal) {
+        passwordResetModal.classList.remove('show');
+    }
+});
+
 // --- Main Auth Logic ---
 
+// NEW: Password Reset Form Submission
+passwordResetForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitButton = passwordResetForm.querySelector('.btn-submit');
+    showButtonLoader(submitButton);
+    const email = document.getElementById('reset-email').value;
+
+    try {
+        await sendPasswordResetEmail(auth, email);
+        showToast('Password reset link sent! Please check your email.', 'success');
+        passwordResetModal.classList.remove('show');
+    } catch (error) {
+        showToast(`Error: ${error.message}`, 'error');
+    } finally {
+        hideButtonLoader(submitButton);
+    }
+});
+
+// Signup Form Submission
 signupForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const submitButton = signupForm.querySelector('.btn-submit');
@@ -160,65 +195,51 @@ signupForm.addEventListener('submit', async (e) => {
     }
 
     try {
-        showToast("Creating your account...", "progress");
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-
         let profilePicUrl = '';
         if (photoFile) {
-            showToast("Uploading profile picture...", "progress");
             profilePicUrl = await uploadToCloudinary(photoFile);
         }
-
-        showToast("Saving your profile...", "progress");
         const userProfile = { 
             uid: user.uid, name, email, role: 'user', isProvider: false,
             location, telephone, profilePicUrl, createdAt: new Date() 
         };
         await setDoc(doc(db, "users", user.uid), userProfile);
-
-        showToast("Sending verification email...", "progress");
         const actionCodeSettings = { url: window.location.origin, handleCodeInApp: true };
         await sendEmailVerification(user, actionCodeSettings);
-
-        hideToast();
-        // MODIFIED: Pass the new user object to the verification view
         showVerificationView(user); 
-
     } catch (error) {
-        hideToast();
         showToast(`Error: ${error.message}`, "error");
     } finally {
         hideButtonLoader(submitButton);
     }
 });
 
+// Login Form Submission
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const submitButton = loginForm.querySelector('.btn-submit');
     showButtonLoader(submitButton);
-
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-
-        // MODIFIED: Handle the case where the user exists but hasn't verified their email
         if (!user.emailVerified) {
             showToast("Your email is not verified. Please check your inbox.", "warning");
-            showVerificationView(user); // Take them to the interactive verification screen
+            showVerificationView(user);
             hideButtonLoader(submitButton);
             return;
         }
-        // If verified, proceed to dashboard
-        window.location.href = 'dashboard.html';
+        // Redirect logic is now handled by onAuthStateChanged
     } catch (error) {
         showToast(`Login Error: ${error.message}`, "error");
         hideButtonLoader(submitButton);
     }
 });
 
+// Google Sign-In
 const handleGoogleSignIn = async () => {
     try {
         const result = await signInWithPopup(auth, googleProvider);
@@ -233,33 +254,27 @@ const handleGoogleSignIn = async () => {
             };
             await setDoc(userDocRef, userProfile);
         }
-        window.location.href = 'dashboard.html';
+        // Redirect logic is now handled by onAuthStateChanged
     } catch (error) {
         showToast(`Google Sign-In Error: ${error.message}`, "error");
     }
 };
-
 googleLoginBtn.addEventListener('click', handleGoogleSignIn);
 googleSignupBtn.addEventListener('click', handleGoogleSignIn);
 
+// Verification Link Handling
 const handleVerificationRedirect = async () => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('mode') === 'verifyEmail') {
         const oobCode = urlParams.get('oobCode');
         if (!oobCode) return;
-
         try {
-            showToast('Verifying your email...', 'progress');
             await applyActionCode(auth, oobCode);
-            hideToast();
             showToast('Email verified successfully! You can now log in.', 'success');
-            // Show the login form after successful verification
             showLoginView();
         } catch (error) {
-            hideToast();
             showToast('Error: The verification link is invalid or expired.', 'error');
         }
-        // Clean the URL
         window.history.replaceState({}, document.title, window.location.pathname);
     }
 };
