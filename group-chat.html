@@ -102,6 +102,171 @@
 .btn-send:hover {
     background-color: #0056b3; /* A slightly darker shade for hover */
 }
+/* --- Style for the Reply Button on each message --- */
+
+.reply-btn {
+
+    background: none;
+
+    border: none;
+
+    color: var(--text-secondary);
+
+    cursor: pointer;
+
+    font-size: 0.9rem;
+
+    opacity: 0; /* Hidden by default */
+
+    transition: opacity 0.2s;
+
+    padding: 5px;
+
+}
+
+/* Show reply button on hover */
+
+.message:hover .reply-btn {
+
+    opacity: 0.7;
+
+}
+
+.message.own-message:hover .reply-btn {
+
+    display: none; /* Don't show reply button on your own messages */
+
+}
+
+.message-content {
+
+    display: flex; /* This helps position the reply button */
+
+    align-items: flex-start;
+
+    gap: 10px;
+
+}
+
+
+
+/* --- Style for the "Replying to..." Banner --- */
+
+.reply-banner {
+
+    background-color: var(--bg-primary);
+
+    border-top: 1px solid var(--border-color);
+
+    padding: 0 15px;
+
+    flex-shrink: 0;
+
+}
+
+.reply-banner-content {
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 10px 0;
+
+}
+
+.reply-banner-text {
+
+    flex-grow: 1;
+
+    overflow: hidden;
+
+    border-left: 3px solid var(--accent-primary);
+
+    padding-left: 10px;
+
+}
+
+.reply-banner-title {
+
+    font-weight: 600;
+
+    color: var(--text-primary);
+
+    font-size: 0.9rem;
+
+}
+
+.reply-banner-preview {
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    font-size: 0.9rem;
+
+    color: var(--text-secondary);
+
+}
+
+.reply-banner-close {
+
+    background: none;
+
+    border: none;
+
+    font-size: 1.8rem;
+
+    color: var(--text-secondary);
+
+    cursor: pointer;
+
+    padding: 0 10px;
+
+}
+
+
+
+/* --- Style for the Quoted Message in a bubble --- */
+
+.reply-quote {
+
+    background-color: rgba(0,0,0,0.2);
+
+    border-left: 3px solid var(--accent-primary);
+
+    padding: 8px 12px;
+
+    border-radius: 6px;
+
+    margin-bottom: 8px;
+
+    font-size: 0.9rem;
+
+}
+
+.reply-quote-sender {
+
+    font-weight: 600;
+
+    color: var(--text-primary);
+
+}
+
+.reply-quote-text {
+
+    color: var(--text-secondary);
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    display: block;
+
+}
     </style>
 </head>
 <body class="dark-mode">
@@ -121,6 +286,23 @@
             <input type="text" class="chat-input" id="message-input" placeholder="Type a message..." autocomplete="off" required>
             <button type="submit" class="btn-send" aria-label="Send Message"><i class="fas fa-paper-plane"></i></button>
         </form>
+<div class="reply-banner" id="reply-banner" style="display: none;">
+
+        <div class="reply-banner-content">
+
+            <div class="reply-banner-text">
+
+                <div class="reply-banner-title">Replying to <strong id="reply-to-name"></strong></div>
+
+                <p id="reply-to-preview"></p>
+
+            </div>
+
+            <button class="reply-banner-close" id="cancel-reply-btn" aria-label="Cancel reply">&times;</button>
+
+        </div>
+
+    </div>
     </footer>
 
     <script src="group-chat.js" type="module"></script>
