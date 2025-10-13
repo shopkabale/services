@@ -35,10 +35,7 @@ async function initializeChat() {
                     name: userDoc.data().name,
                     profilePicUrl: userDoc.data().profilePicUrl
                 };
-                
-                // This is now safe because the script runs at the end of the body
                 backButton.href = 'dashboard.html';
-                
                 listenForMessages();
             } else {
                  window.location.href = 'auth.html';
@@ -59,11 +56,9 @@ function listenForMessages() {
                 renderMessage(change.doc.data());
             }
         });
-        
         setTimeout(() => {
             messageArea.scrollTop = messageArea.scrollHeight;
         }, 100);
-            
     }, (error) => {
         console.error("Error fetching messages:", error);
         messageArea.innerHTML = `<p style="padding: 20px; text-align: center;">Error: Could not load messages.</p>`;
@@ -81,10 +76,16 @@ function renderMessage(data) {
 
     const avatar = data.profilePicUrl || `https://placehold.co/45x45/10336d/a7c0e8?text=${(data.userName || 'U').charAt(0)}`;
 
+    // --- UPDATED PART ---
+    // The avatar and message sender are now wrapped in an <a> tag linking to the profile.
     messageDiv.innerHTML = `
-        <img src="${avatar}" alt="${data.userName}" class="message-avatar">
+        <a href="profile.html?id=${data.userId}" class="message-profile-link">
+            <img src="${avatar}" alt="${data.userName}" class="message-avatar">
+        </a>
         <div class="message-content">
-            <div class="message-sender">${data.userName}</div>
+            <a href="profile.html?id=${data.userId}" class="message-profile-link">
+                <div class="message-sender">${data.userName}</div>
+            </a>
             <p class="message-bubble">${data.text}</p>
         </div>
     `;
