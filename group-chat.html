@@ -19,7 +19,11 @@
         .header { background-color: var(--bg-secondary); border-bottom: 1px solid var(--border-color); padding: 10px 15px; display: flex; align-items: center; gap: 15px; flex-shrink: 0; position: fixed; top: 0; left: 0; width: 100%; z-index: 100; }
         .back-button { background: none; border: none; font-size: 1.5rem; color: var(--text-primary); cursor: pointer; }
         .header-title { font-size: 1.2rem; font-weight: 600; color: var(--text-primary); }
-        .message-area { flex-grow: 1; overflow-y: auto; padding: 95px 15px 20px; }
+        .message-area {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 95px 15px 90px; /* Increased bottom padding to 90px */
+}
         .message { display: flex; gap: 10px; margin-bottom: 15px; max-width: 85%; }
         /* NEW: Style for the profile link */
         .message-profile-link { text-decoration: none; }
