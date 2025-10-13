@@ -32,6 +32,76 @@
         .message.own-message .message-sender { display: none; }
         /* Don't make your own avatar/name clickable */
         .message.own-message .message-profile-link { pointer-events: none; }
+/*
+ * ===============================================
+ * NEW STYLES FOR THE CHAT INPUT AREA
+ * ===============================================
+*/
+
+.chat-input-area {
+    background-color: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+    padding: 10px 15px; /* Adjusted padding */
+    display: flex;
+    align-items: center; /* Vertically align items */
+    gap: 10px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+}
+
+/* This is the form that wraps the input and button */
+#chat-form {
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+    background-color: var(--bg-primary); /* Darker background for the input group */
+    border-radius: 50px;
+    border: 1px solid var(--border-color);
+    padding: 5px; /* Add some padding around the input and button */
+    transition: border-color 0.3s ease;
+}
+
+/* Add a focus effect to the entire form */
+#chat-form:focus-within {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.chat-input {
+    flex-grow: 1;
+    background: transparent; /* Make background fully transparent */
+    border: none; /* Remove the border from the input itself */
+    color: var(--text-primary);
+    font-size: 1rem;
+    padding: 10px 15px; /* Adjust padding */
+}
+
+/* Remove the default focus outline since we have a custom one on the form */
+.chat-input:focus {
+    outline: none;
+}
+
+.btn-send {
+    background-color: var(--accent-primary);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 44px; /* Slightly smaller button */
+    height: 44px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.btn-send:hover {
+    background-color: #0056b3; /* A slightly darker shade for hover */
+}
     </style>
 </head>
 <body class="dark-mode">
