@@ -2,78 +2,104 @@ import { app } from './firebase-init.js';
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-const auth = getAuth(app);
 const db = getFirestore(app);
+const auth = getAuth();
 
-const contentContainer = document.getElementById('content-container');
-const loadingState = document.getElementById('loading-state');
-const jobTitleEl = document.getElementById('job-title');
-const jobCategoryEl = document.getElementById('job-category');
-const jobDateEl = document.getElementById('job-date');
-const jobBudgetEl = document.getElementById('job-budget');
-const jobDescriptionTextEl = document.getElementById('job-description-text');
-const seekerAvatarEl = document.getElementById('seeker-avatar');
-const seekerNameEl = document.getElementById('seeker-name');
-const seekerLocationEl = document.getElementById('seeker-location');
+// --- DOM ELEMENT REFERENCES ---
+const container = document.getElementById('job-detail-container');
 
+// --- STATE ---
+const urlParams = new URLSearchParams(window.location.search);
+const jobId = urlParams.get('id');
+let currentUser = null;
+
+// --- INITIALIZATION ---
+// Listen for user login status changes
 onAuthStateChanged(auth, user => {
-    if (!user) {
-        // Protect this page, only logged-in users can see job details
-        window.location.href = 'auth.html';
+    currentUser = user;
+    // Reload the content to ensure the correct button state is shown
+    if (jobId) {
+        loadJobDetails(); 
     }
 });
 
-const loadJobDetails = async () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const jobId = urlParams.get('id');
+// Check if a job ID exists in the URL
+if (!jobId) {
+    container.innerHTML = '<h1>Job Not Found</h1><p>The job ID is missing from the URL.</p>';
+}
 
-    if (!jobId) {
-        loadingState.innerHTML = '<p>Error: No job specified.</p>';
-        return;
-    }
-
+/**
+ * Fetches the job and the poster's data from Firestore.
+ */
+async function loadJobDetails() {
     try {
-        // Fetch the job post document
-        const jobDocRef = doc(db, "job_posts", jobId);
-        const jobDoc = await getDoc(jobDocRef);
+        const jobRef = doc(db, 'job_posts', jobId);
+        const jobSnap = await getDoc(jobRef);
 
-        if (!jobDoc.exists()) {
-            loadingState.innerHTML = '<p>Error: Job post not found.</p>';
+        if (!jobSnap.exists()) {
+            container.innerHTML = '<h1>Job Not Found</h1><p>This job may have been removed.</p>';
             return;
         }
 
-        const jobData = jobDoc.data();
+        const jobData = jobSnap.data();
+        const seekerRef = doc(db, 'users', jobData.seekerId);
+        const seekerSnap = await getDoc(seekerRef);
+        const seekerData = seekerSnap.exists() ? seekerSnap.data() : { name: 'Unknown User' };
 
-        // Fetch the profile of the seeker who posted the job
-        const seekerDocRef = doc(db, "users", jobData.seekerId);
-        const seekerDoc = await getDoc(seekerDocRef);
-        
-        if (!seekerDoc.exists()) {
-            loadingState.innerHTML = '<p>Error: Job poster not found.</p>';
-            return;
-        }
-        
-        const seekerData = seekerDoc.data();
-
-        // Populate the page with the fetched data
-        document.title = `${jobData.title} | KabaleOnline`;
-        jobTitleEl.textContent = jobData.title;
-        jobCategoryEl.innerHTML = `<i class="fas fa-tag"></i> ${jobData.category}`;
-        jobDateEl.innerHTML = `<i class="fas fa-calendar-alt"></i> Posted: ${jobData.createdAt.toDate().toLocaleDateString()}`;
-        jobBudgetEl.innerHTML = `<i class="fas fa-money-bill-wave"></i> Budget: ${jobData.budget > 0 ? `UGX ${jobData.budget.toLocaleString()}` : 'Not Specified'}`;
-        jobDescriptionTextEl.textContent = jobData.description;
-        
-        seekerAvatarEl.src = seekerData.profilePicUrl || `https://placehold.co/100x100/10336d/a7c0e8?text=${seekerData.name.charAt(0)}`;
-        seekerNameEl.textContent = seekerData.name;
-        seekerLocationEl.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${seekerData.location || 'Location not specified'}`;
-
-        loadingState.style.display = 'none';
-        contentContainer.style.display = 'block';
-
+        renderJobDetails(jobData, seekerData);
     } catch (error) {
         console.error("Error loading job details:", error);
-        loadingState.innerHTML = '<p>An error occurred while loading this job.</p>';
+        container.innerHTML = '<h1>Error</h1><p>Could not load job details.</p>';
     }
-};
+}
 
-loadJobDetails();
+/**
+ * Renders the fetched data into the page.
+ * @param {object} job - The job data object from Firestore.
+ * @param {object} seeker - The user data object for the job poster.
+ */
+function renderJobDetails(job, seeker) {
+    container.innerHTML = ''; // Clear "Loading..." message
+
+    const layout = document.createElement('div');
+    layout.className = 'job-detail-layout';
+
+    const isOwnJob = currentUser && currentUser.uid === job.seekerId;
+    let buttonHtml;
+
+    if (!currentUser) {
+        // Case 1: User is not logged in
+        buttonHtml = `<a href="auth.html" class="btn-action">Login to Send Proposal</a>`;
+    } else if (isOwnJob) {
+        // Case 2: User is viewing their own job post
+        buttonHtml = `<a href="#" class="btn-action" disabled>This is Your Post</a>`;
+    } else {
+        // Case 3: Logged-in user viewing someone else's post
+        buttonHtml = `<a href="chat.html?recipientId=${job.seekerId}" class="btn-action">Send Proposal</a>`;
+    }
+
+    // Construct the page's inner HTML
+    layout.innerHTML = `
+        <div class="job-main-content">
+            <p class="job-category">${job.category || 'General'}</p>
+            <h1>${job.title}</h1>
+            <h2 class="section-title">Job Description</h2>
+            <p class="job-description">${job.description.replace(/\n/g, '<br>')}</p>
+        </div>
+        <aside class="poster-sidebar">
+            <div class="card">
+                <h3>Posted By</h3>
+                <a href="profile.html?id=${job.seekerId}">
+                    <img src="${seeker.profilePicUrl || `https://placehold.co/100x100?text=${seeker.name.charAt(0)}`}" alt="${seeker.name}" class="poster-avatar">
+                </a>
+                <a href="profile.html?id=${job.seekerId}" class="poster-name">${seeker.name}</a>
+                <div class="budget-display">
+                    <span>Budget</span>
+                    <p class="price">UGX ${job.budget.toLocaleString()}</p>
+                </div>
+                ${buttonHtml}
+            </div>
+        </aside>
+    `;
+    container.appendChild(layout);
+}
