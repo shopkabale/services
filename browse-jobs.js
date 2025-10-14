@@ -1,5 +1,3 @@
-// browse-jobs.js
-
 import { app } from './firebase-init.js';
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { 
@@ -19,7 +17,7 @@ const proposalForm = document.getElementById('proposal-form');
 const proposalMessageTextarea = document.getElementById('proposal-message');
 
 let currentUser = null;
-let selectedJob = null; 
+let selectedJob = null; // To store data of the job being applied for
 
 // --- INITIALIZATION ---
 onAuthStateChanged(auth, (user) => {
@@ -27,7 +25,7 @@ onAuthStateChanged(auth, (user) => {
         currentUser = user;
         fetchAndDisplayJobs();
     } else {
-        window.location.href = 'auth.html';
+        window.location.href = 'auth.html'; // Redirect if not logged in
     }
 });
 
@@ -49,19 +47,25 @@ async function fetchAndDisplayJobs() {
         jobsGrid.innerHTML = '';
         for (const jobDoc of snapshot.docs) {
             const job = { id: jobDoc.id, ...jobDoc.data() };
-            
+
             const seekerDoc = await getDoc(doc(db, "users", job.seekerId));
             const seekerData = seekerDoc.exists() ? seekerDoc.data() : { name: 'Anonymous' };
             
             const card = document.createElement('div');
             card.className = 'job-card';
+            // Disable the proposal button if the current user is the one who posted the job
+            const isOwnJob = currentUser.uid === job.seekerId;
+            const buttonHtml = isOwnJob 
+                ? `<button class="btn-primary" disabled>Your Post</button>`
+                : `<button class="btn-primary send-proposal-btn" data-job-id="${job.id}">Send Proposal</button>`;
+
             card.innerHTML = `
                 <h3>${job.title}</h3>
                 <p class="job-poster">Posted by: ${seekerData.name}</p>
                 <p class="job-description">${job.description.substring(0, 100)}...</p>
                 <div class="job-footer">
                     <span class="job-budget">Budget: UGX ${job.budget.toLocaleString()}</span>
-                    <button class="btn-primary send-proposal-btn" data-job-id="${job.id}">Send Proposal</button>
+                    ${buttonHtml}
                 </div>
             `;
             jobsGrid.appendChild(card);
@@ -74,6 +78,7 @@ async function fetchAndDisplayJobs() {
 
 // --- PROPOSAL MODAL LOGIC ---
 
+// Open the modal and pre-fill the form
 jobsGrid.addEventListener('click', async (e) => {
     if (e.target.classList.contains('send-proposal-btn')) {
         const jobId = e.target.dataset.jobId;
@@ -82,6 +87,7 @@ jobsGrid.addEventListener('click', async (e) => {
             if (jobDoc.exists()) {
                 selectedJob = { id: jobDoc.id, ...jobDoc.data() };
                 proposalJobTitle.textContent = selectedJob.title;
+                // Pre-fill the message with a template
                 proposalMessageTextarea.value = `Hello, I'm interested in your job post for "${selectedJob.title}". I believe I have the skills and experience to deliver great results.\n\n[Please add more details about your qualifications here].\n\nI look forward to hearing from you.`;
                 proposalModal.classList.add('show');
             }
@@ -91,6 +97,7 @@ jobsGrid.addEventListener('click', async (e) => {
     }
 });
 
+// Close the modal
 closeProposalModalBtn.addEventListener('click', () => {
     proposalModal.classList.remove('show');
 });
@@ -114,7 +121,6 @@ proposalForm.addEventListener('submit', async (e) => {
     }
 
     try {
-        // --- THIS IS THE FIX ---
         // 1. Define the conversation document
         const conversationId = [currentUser.uid, selectedJob.seekerId].sort().join('_');
         const conversationRef = doc(db, "conversations", conversationId);
@@ -124,7 +130,7 @@ proposalForm.addEventListener('submit', async (e) => {
             participants: [currentUser.uid, selectedJob.seekerId],
             lastMessage: messageText,
             updatedAt: serverTimestamp()
-        }, { merge: true }); // Use merge to avoid overwriting if it already exists
+        }, { merge: true });
 
         // 3. Now, add the message to the subcollection
         const messagesRef = collection(conversationRef, "messages");
@@ -134,15 +140,14 @@ proposalForm.addEventListener('submit', async (e) => {
             createdAt: serverTimestamp()
         });
         
-        showToast('Proposal sent successfully!', 'success');
-        proposalModal.classList.remove('show');
-        // Optional: Redirect to the chat page
-        // window.location.href = `chat.html?conversationId=${conversationId}`;
+        showToast('Proposal sent! Redirecting to chat...', 'success');
+        
+        // 4. Redirect the sender to the chat
+        window.location.href = `chat.html?conversationId=${conversationId}`;
 
     } catch (error) {
         console.error("Error sending proposal:", error);
         showToast('Failed to send proposal.', 'error');
-    } finally {
         hideButtonLoader(submitButton);
     }
 });
