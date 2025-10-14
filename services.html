@@ -9,8 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        :root { --bg-primary: #0d2857; --bg-secondary: #10336d; --text-primary: #ffffff; --text-secondary: #a7c0e8; --accent-primary: #007bff; --border-color: #1f4287; --font-family: 'Poppins', sans-serif; --shadow-color: rgba(0, 0, 0, 0.2); }
-        body.light-mode { --bg-primary: #f0f4f9; --bg-secondary: #ffffff; --text-primary: #0d2857; --text-secondary: #6c757d; --border-color: #e9ecef; --shadow-color: rgba(0, 0, 0, 0.08); }
+        :root { --bg-primary: #0d2857; --bg-secondary: #10336d; --bg-card: #0a214d; --text-primary: #ffffff; --text-secondary: #a7c0e8; --accent-primary: #007bff; --border-color: #1f4287; --font-family: 'Poppins', sans-serif; --shadow-color: rgba(0, 0, 0, 0.2); }
+        body.light-mode { --bg-primary: #f0f4f9; --bg-secondary: #ffffff; --bg-card: #ffffff; --text-primary: #0d2857; --text-secondary: #6c757d; --border-color: #e9ecef; --shadow-color: rgba(0, 0, 0, 0.08); }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: var(--font-family); background-color: var(--bg-primary); color: var(--text-secondary); }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
@@ -18,7 +18,7 @@
         .navbar { display: flex; justify-content: space-between; align-items: center; }
         .nav-logo { font-size: 1.6rem; font-weight: 800; color: var(--accent-primary); text-decoration: none; flex-shrink: 0; }
         .nav-menu { display: flex; align-items: center; gap: 15px; }
-        .btn-header { padding: 8px 20px; font-size: 0.9rem; background-color: var(--accent-primary); color: #ffffff; border-radius: 50px; text-decoration: none; font-weight: 600; border: 2px solid var(--accent-primary); white-space: nowrap; }
+        .btn-header { display: inline-flex; align-items: center; padding: 8px 20px; font-size: 0.9rem; background-color: var(--accent-primary); color: #ffffff; border-radius: 50px; text-decoration: none; font-weight: 600; border: 2px solid var(--accent-primary); white-space: nowrap; }
         .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; }
         .page-header { padding: 80px 15px 60px; text-align: center; }
         .page-header h1 { font-size: 3rem; color: var(--text-primary); margin-bottom: 15px; }
@@ -48,11 +48,34 @@
         .price { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
         .price span { font-size: 0.9rem; font-weight: 400; color: var(--text-secondary); }
         .loading-text { text-align: center; font-size: 1.2rem; padding: 40px; grid-column: 1 / -1; }
-        footer { background-color: var(--bg-secondary); border-top: 1px solid var(--border-color); padding: 40px 0 20px 0; }
+        footer { background-color: var(--bg-card); color: var(--text-primary); padding: 60px 0 20px 0; border-top: 1px solid var(--border-color); }
+        .footer-grid { display: grid; grid-template-columns: 1fr; gap: 40px; margin-bottom: 40px; text-align: center; }
+        @media (min-width: 768px) { .footer-grid { grid-template-columns: 2fr 1fr 1fr 1fr; text-align: left; } }
+        .footer-grid h4 { color: var(--text-primary); font-size: 1.2rem; margin-bottom: 20px; }
+        .footer-about p { color: var(--text-secondary); margin-bottom: 20px; }
+        .footer-socials a { color: var(--text-primary); font-size: 1.3rem; margin: 0 10px; transition: color 0.3s; }
+        .footer-socials a:hover { color: var(--accent-primary); }
+        .footer-links ul { list-style: none; padding: 0; }
+        .footer-links li { margin-bottom: 12px; }
+        .footer-links a { color: var(--text-secondary); text-decoration: none; transition: all 0.3s; }
+        .footer-links a:hover { color: var(--accent-primary); padding-left: 5px; }
+        .footer-links ul li i { margin-right: 10px; color: var(--accent-primary); }
+        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid var(--border-color); color: var(--text-secondary); }
     </style>
 </head>
 <body class="dark-mode">
-    <header class="header"> </header>
+
+    <header class="header">
+        <div class="container navbar">
+            <a href="index.html" class="nav-logo">KabaleOnline</a>
+            <div class="nav-menu">
+                <a href="auth.html" class="btn-header" id="login-link">Login / Sign Up</a>
+                <a href="dashboard.html" class="btn-header" id="dashboard-link" style="display: none;">My Dashboard</a>
+                <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
+            </div>
+        </div>
+    </header>
+
     <main>
         <section class="page-header">
             <div class="container">
@@ -81,11 +104,11 @@
 
     <template id="service-card-template">
       <div class="service-card">
-        <a class="card-image-link">
+        <a class="card-image-link" style="text-decoration: none;">
             <div class="card-image"></div>
         </a>
         <div class="card-content">
-          <a class="provider-info-link">
+          <a class="provider-info-link" style="text-decoration: none;">
             <div class="provider-info">
                 <img class="provider-avatar">
                 <span class="provider-name"></span>
@@ -108,7 +131,51 @@
         </div>
       </div>
     </template>
-    <footer></footer>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-about">
+                    <h4 class="nav-logo" style="font-size: 2rem;">KabaleOnline</h4>
+                    <p>Connecting our community by making it easy to find and offer skilled services across the Kigezi region.</p>
+                    <div class="footer-socials">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul id="footer-quick-links">
+                        <li><a href="services.html">Browse Services</a></li>
+                        <li><a href="browse-jobs.html">Browse Jobs</a></li>
+                        <li><a href="group-chat.html">Community Chat</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Help & FAQ</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                 <div class="footer-links">
+                    <h4>Contact Us</h4>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Kabale, Uganda</li>
+                        <li><i class="fas fa-phone-alt"></i> +256 123 456789</li>
+                        <li><i class="fas fa-envelope"></i> help@kabaleonline.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 KabaleOnline Services. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
     <script src="theme.js" defer></script>
     <script src="global-auth.js" type="module"></script>
     <script src="services.js" type="module"></script>
