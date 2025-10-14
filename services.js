@@ -1,6 +1,3 @@
-// This is the final and most robust services.js
-// It uses the HTML <template> tag to guarantee the layout is perfect.
-
 const searchClient = algoliasearch(
   'HQGXJ2Y7ZD',
   '2e44c7070ebafaeb6ca324daa28f36b4'
@@ -21,7 +18,6 @@ search.addWidgets([
       reset: () => '',
     },
   }),
-
   instantsearch.connectors.connectRefinementList(
     (renderOptions, isFirstRender) => {
       const { items, refine } = renderOptions;
@@ -47,40 +43,32 @@ search.addWidgets([
       });
     }
   )({ attribute: 'category' }),
-
   instantsearch.widgets.hits({
     container: '#services-grid',
     templates: {
       empty: (results) => `<p class="loading-text">No services found for "${results.query}".</p>`,
-      
-      item: (hit, { html }) => {
+      item: (hit) => {
         const template = document.getElementById('service-card-template');
         const cardNode = template.content.cloneNode(true);
-        
-        // --- Set all links ---
-        const serviceUrl = `service-detail.html?id=${hit.objectID}`;
-        const providerUrl = `profile.html?id=${hit.providerId}`;
-        cardNode.querySelector('.card-image-link').href = serviceUrl;
-        cardNode.querySelector('.provider-info-link').href = providerUrl;
-        cardNode.querySelector('.card-content-link').href = serviceUrl;
 
-        // --- Populate the card ---
+        const cardLink = cardNode.querySelector('.service-card');
+        cardLink.href = `service-detail.html?id=${hit.objectID}`;
+
         cardNode.querySelector('.card-image').style.backgroundImage = `url('${hit.coverImageUrl || 'https://placehold.co/600x400'}')`;
+        
+        const providerLink = cardNode.querySelector('.provider-info-link');
+        providerLink.href = `profile.html?id=${hit.providerId}`;
         
         const providerAvatar = hit.providerAvatar || `https://placehold.co/40x40/10336d/a7c0e8?text=${(hit.providerName || 'P').charAt(0)}`;
         cardNode.querySelector('.provider-avatar').src = providerAvatar;
-        cardNode.querySelector('.provider-avatar').alt = hit.providerName || 'Provider';
         cardNode.querySelector('.provider-name').textContent = hit.providerName || 'Anonymous';
         
         cardNode.querySelector('.service-title').innerHTML = instantsearch.highlight({ attribute: 'title', hit });
 
-        const rating = hit.averageRating || 0;
-        const reviewCount = hit.reviewCount || 0;
         const ratingContainer = cardNode.querySelector('.service-rating');
-        if (reviewCount > 0) {
-            const roundedRating = Math.round(rating);
-            const stars = '★'.repeat(roundedRating) + '☆'.repeat(5 - roundedRating);
-            ratingContainer.innerHTML = `${stars} <span class="review-count">(${reviewCount})</span>`;
+        if (hit.reviewCount > 0) {
+            const roundedRating = Math.round(hit.averageRating || 0);
+            ratingContainer.innerHTML = `${'★'.repeat(roundedRating)}${'☆'.repeat(5 - roundedRating)} <span class="review-count">(${hit.reviewCount})</span>`;
         } else {
             ratingContainer.innerHTML = `<span class="review-count">No reviews yet</span>`;
         }
