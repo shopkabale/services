@@ -73,6 +73,34 @@
         .footer-links a:hover { color: var(--accent-primary); padding-left: 5px; }
         .footer-links ul li i { margin-right: 10px; color: var(--accent-primary); }
         .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid var(--border-color); color: var(--text-secondary); }
+/*
+ * ===============================================
+ * RESPONSIVE FIX FOR SMALL DEVICES
+ * ===============================================
+*/
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 2.2rem; /* Reduce the main title size */
+    }
+    .subtitle {
+        font-size: 1rem; /* Reduce the subtitle size */
+    }
+    .countdown {
+        gap: 10px; /* Reduce the space between countdown items */
+    }
+    .countdown-item {
+        padding: 15px;
+        min-width: 65px; /* Allow items to be smaller */
+    }
+    .countdown-item .value {
+        font-size: 1.8rem; /* Reduce the number size */
+    }
+    .countdown-item .label {
+        font-size: 0.7rem; /* Reduce the label size */
+    }
+}
+
     </style>
 </head>
 <body class="dark-mode">
