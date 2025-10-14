@@ -32,33 +32,134 @@
         .filter-btn { background-color: var(--bg-secondary); color: var(--text-secondary); border: 1px solid var(--border-color); border-radius: 50px; padding: 10px 20px; margin: 0; cursor: pointer; font-weight: 500; }
         .filter-btn.active { background-color: var(--accent-primary); color: #fff; border-color: var(--accent-primary); }
 
-        .services-section { padding: 0 15px 80px; }
-        .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; min-height: 300px; }
-        .service-card {
-  background: linear-gradient(135deg, rgba(0,123,255,0.15), rgba(0,123,255,0.05)) !important;
+        /* Services Section */
+.services-section {
+  padding: 0 15px 80px;
+}
+
+/* Grid of Cards */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 40px; /* space between cards */
+  min-height: 300px;
+}
+
+/* Service Card */
+.service-card {
+  background: linear-gradient(135deg, rgba(0,123,255,0.15), rgba(0,123,255,0.05));
   border-radius: 16px;
   border: 1px solid var(--border-color);
   overflow: hidden;
   text-decoration: none;
-  box-shadow: 0 5px 15px var(--shadow-color);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15); /* floating shadow effect */
   display: block;
-  transition: transform 0.3s, box-shadow 0.3s, background 0.35s;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.35s ease;
 }
-        .service-card:hover { transform: translateY(-8px); box-shadow: 0 12px 25px var(--shadow-color); }
-        .card-image { height: 200px; background-size: cover; background-position: center; }
-        .card-content { padding: 20px; }
-        .provider-info { display: flex; align-items: center; margin-bottom: 15px; }
-        .provider-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 12px; border: 2px solid var(--bg-primary); }
-        .provider-name { font-weight: 600; color: var(--text-primary); font-size: 1rem; }
-        .service-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; line-height: 1.4; }
-        .service-rating { margin-bottom: 10px; font-size: 0.9rem; color: #ffc107; }
-        .service-rating .review-count { color: var(--text-secondary); margin-left: 8px; font-size: 0.8rem; }
-        .service-location { color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9rem; }
-        .service-location i { margin-right: 5px; }
-        .card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid var(--border-color); }
-        .price { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
-        .price span { font-size: 0.9rem; font-weight: 400; color: var(--text-secondary); }
-        .loading-text { text-align: center; font-size: 1.2rem; padding: 40px; grid-column: 1 / -1; }
+
+/* Hover Effect */
+.service-card:hover {
+  transform: translateY(-10px); /* lift */
+  box-shadow: 0 15px 30px rgba(0,0,0,0.25); /* stronger shadow */
+  background: linear-gradient(135deg, rgba(0,123,255,0.25), rgba(0,123,255,0.1));
+}
+
+/* Card Image */
+.card-image {
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Card Content */
+.card-content {
+  padding: 20px;
+}
+
+/* Provider Info */
+.provider-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.provider-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 12px;
+  border: 2px solid var(--bg-primary);
+}
+
+.provider-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+/* Service Title */
+.service-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+/* Rating */
+.service-rating {
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  color: #ffc107;
+}
+
+.service-rating .review-count {
+  color: var(--text-secondary);
+  margin-left: 8px;
+  font-size: 0.8rem;
+}
+
+/* Location */
+.service-location {
+  color: var(--text-secondary);
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+}
+
+.service-location i {
+  margin-right: 5px;
+}
+
+/* Card Footer */
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 15px;
+  border-top: 1px solid var(--border-color);
+}
+
+.price {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.price span {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+/* Loading Text */
+.loading-text {
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 40px;
+  grid-column: 1 / -1;
+}
 
         .search-container { max-width: 700px; margin: 40px auto 0 auto; }
         .ais-SearchBox-form { display: flex; border-radius: 50px; border: 1px solid var(--border-color); background-color: var(--bg-secondary); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
@@ -119,14 +220,24 @@
         </section>
     </main>
 
-    <template id="service-card-template">
-  <a class="service-card" style="background: linear-gradient(135deg, rgba(0,123,255,0.15), rgba(0,123,255,0.05));">
+    <!-- Services Section -->
+<section class="services-section">
+  <div class="container">
+    <div class="services-grid" id="services-grid">
+      <!-- Service cards will be injected here by services.js -->
+    </div>
+  </div>
+</section>
+
+<!-- Service Card Template (hidden) -->
+<template id="service-card-template">
+  <a class="service-card">
     <div class="card-image"></div>
     <div class="card-content">
       <a class="provider-info-link" style="text-decoration: none;">
         <div class="provider-info">
-            <img class="provider-avatar">
-            <span class="provider-name"></span>
+          <img class="provider-avatar" alt="Provider Avatar">
+          <span class="provider-name"></span>
         </div>
       </a>
       <h3 class="service-title"></h3>
