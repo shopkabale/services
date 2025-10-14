@@ -1,4 +1,4 @@
-// This script performs a backend search and renders the results. No InstantSearch.
+// This script performs a backend search and renders the results.
 
 const searchInput = document.getElementById('search-input');
 const searchButton = document.getElementById('search-button');
@@ -8,13 +8,11 @@ const cardTemplate = document.getElementById('service-card-template');
 
 let currentQuery = '';
 let currentCategory = 'All';
-let searchTimeout;
 
 // Function to fetch data from your Cloudflare worker and render it
 async function fetchAndRenderServices() {
     servicesGrid.innerHTML = '<p class="loading-text">Loading...</p>';
 
-    // Build the search URL for your worker
     const searchUrl = `/search?query=${encodeURIComponent(currentQuery)}&category=${encodeURIComponent(currentCategory)}`;
 
     try {
@@ -22,10 +20,10 @@ async function fetchAndRenderServices() {
         if (!response.ok) throw new Error('Search request failed');
         
         const hits = await response.json();
-        servicesGrid.innerHTML = ''; // Clear loading message
+        servicesGrid.innerHTML = ''; 
 
         if (hits.length === 0) {
-            servicesGrid.innerHTML = `<p class="loading-text">No services found for "${currentQuery || 'this category'}".</p>`;
+            servicesGrid.innerHTML = `<p class="loading-text">No services found.</p>`;
             return;
         }
 
@@ -69,7 +67,6 @@ searchButton.addEventListener('click', () => {
 });
 
 searchInput.addEventListener('keyup', (event) => {
-    // Search on Enter key
     if (event.key === 'Enter') {
         currentQuery = searchInput.value.trim();
         fetchAndRenderServices();
@@ -79,6 +76,7 @@ searchInput.addEventListener('keyup', (event) => {
 categoryFilters.addEventListener('click', (event) => {
     const button = event.target.closest('.filter-btn');
     if (button) {
+        // This is the corrected logic for the filters
         categoryFilters.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
         currentCategory = button.dataset.category;
