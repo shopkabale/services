@@ -1,44 +1,58 @@
-// functions/search.js
+// functions/search.js (Dependency-Free Version)
 
-// This function ONLY searches Algolia and returns the results.
-// It gives your frontend 100% control over the display.
+// This function ONLY uses the built-in fetch command and has no imports.
+// This will resolve the "Could not resolve" build error.
+
 async function handleSearch(context) {
-  // Get secrets
+  // Get secrets from the Cloudflare dashboard
   const { env } = context;
   const ALGOLIA_APP_ID = env.VITE_ALGOLIA_APP_ID;
-  const ALGOLIA_ADMIN_KEY = env.ALGOLIA_ADMIN_API_KEY; // Use admin key for searching on the server
+  const ALGOLIA_ADMIN_KEY = env.ALGOLIA_ADMIN_API_KEY;
   const ALGOLIA_INDEX_NAME = 'services';
 
-  // Lazy load the algoliasearch library
-  const algoliasearch = (await import('algoliasearch')).default;
-  const client = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_ADMIN_KEY);
-  const index = client.initIndex(ALGOLIA_INDEX_NAME);
-
-  // Get search parameters from the URL (e.g., /search?query=plumber&category=Home)
+  // Get search parameters from the incoming URL
   const url = new URL(context.request.url);
   const query = url.searchParams.get('query') || '';
   const category = url.searchParams.get('category') || '';
 
+  // Prepare the search options for Algolia's API
   const searchOptions = {
+    query: query,
     filters: ''
   };
 
-  // If a category is specified, add it as a filter for Algolia
   if (category && category !== 'All') {
     searchOptions.filters = `category:'${category}'`;
   }
 
+  // This is the direct URL to Algolia's search API
+  const algoliaUrl = `https://${ALGOLIA_APP_ID}-dsn.algolia.net/1/indexes/${ALGOLIA_INDEX_NAME}/query`;
+
   try {
-    // Perform the search in Algolia
-    const { hits } = await index.search(query, searchOptions);
+    // Perform the search by making a POST request to Algolia's API
+    const response = await fetch(algoliaUrl, {
+        method: 'POST',
+        headers: {
+            'X-Algolia-Application-ID': ALGOLIA_APP_ID,
+            'X-Algolia-API-Key': ALGOLIA_ADMIN_KEY, // Use Admin key for server-side search
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(searchOptions)
+    });
+
+    if (!response.ok) {
+        throw new Error(`Algolia API Error: ${await response.text()}`);
+    }
+
+    const { hits } = await response.json();
     
-    // Return the results as JSON
+    // Return the results to your frontend
     return new Response(JSON.stringify(hits), {
       headers: { 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
-    console.error("Algolia search error:", error);
+    console.error("Search function error:", error);
     return new Response(JSON.stringify({ error: "Search failed" }), { status: 500 });
   }
 }
