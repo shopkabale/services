@@ -4,29 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Browse Local Services in Kabale | KabaleOnline</title>
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
     <style>
-        /* --- Base & Theme Styles --- */
         :root { --bg-primary: #0d2857; --bg-secondary: #10336d; --text-primary: #ffffff; --text-secondary: #a7c0e8; --accent-primary: #007bff; --border-color: #1f4287; --font-family: 'Poppins', sans-serif; --shadow-color: rgba(0, 0, 0, 0.2); }
         body.light-mode { --bg-primary: #f0f4f9; --bg-secondary: #ffffff; --text-primary: #0d2857; --text-secondary: #6c757d; --border-color: #e9ecef; --shadow-color: rgba(0, 0, 0, 0.08); }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: var(--font-family); background-color: var(--bg-primary); color: var(--text-secondary); }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
-
-        /* --- Header & Navigation --- */
         .header { position: sticky; top: 0; z-index: 1000; background-color: var(--bg-secondary); border-bottom: 1px solid var(--border-color); padding: 15px 0; }
         .navbar { display: flex; justify-content: space-between; align-items: center; }
         .nav-logo { font-size: 1.6rem; font-weight: 800; color: var(--accent-primary); text-decoration: none; flex-shrink: 0; }
         .nav-menu { display: flex; align-items: center; gap: 15px; }
         .btn-header { padding: 8px 20px; font-size: 0.9rem; background-color: var(--accent-primary); color: #ffffff; border-radius: 50px; text-decoration: none; font-weight: 600; border: 2px solid var(--accent-primary); white-space: nowrap; }
         .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; }
-
-        /* --- Page Header & Search --- */
         .page-header { padding: 80px 15px 60px; text-align: center; }
         .page-header h1 { font-size: 3rem; color: var(--text-primary); margin-bottom: 15px; }
         .page-header p { font-size: 1.2rem; max-width: 600px; margin: 0 auto; }
@@ -39,141 +32,34 @@
         .ais-SearchBox-input:focus { outline: none; }
         .ais-SearchBox-submit { background-color: var(--accent-primary); color: #fff; border: none; padding: 0 25px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .ais-SearchBox-reset { display: none; }
+
+        /* --- FINAL LAYOUT FIXES --- */
+        .services-section { padding: 0 15px 80px; }
+        .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; min-height: 300px; }
+        /* This rule is CRITICAL for the gap to work with Algolia */
         .ais-Hits-list, .ais-Hits-item { display: contents; }
-
-        /*
- * ===============================================
- * FINAL & CORRECTED LAYOUT FIXES
- * ===============================================
-*/
-
-.services-section { 
-    padding: 0 15px 80px; 
-}
-
-/* --- 1. FIX FOR THE MISSING GAP --- */
-.services-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 30px; /* This is the rule for the gap */
-    min-height: 300px;
-}
-/* This rule is CRITICAL. It makes the grid gap work with Algolia. */
-.ais-Hits-list, .ais-Hits-item {
-    display: contents;
-}
-
-
-/* --- 2. FIX FOR THE FLOATING CARD LAYOUT --- */
-.service-card {
-    display: flex; /* Use flexbox for robust layout */
-    flex-direction: column; /* Stack image and content vertically */
-    background-color: var(--bg-secondary);
-    border-radius: 16px;
-    border: 1px solid var(--border-color);
-    text-decoration: none;
-    box-shadow: 0 5px 15px var(--shadow-color);
-    transition: transform 0.3s, box-shadow 0.3s;
-    overflow: hidden; /* Hide anything that goes outside the rounded corners */
-}
-.service-card:hover { 
-    transform: translateY(-8px); 
-    box-shadow: 0 12px 25px var(--shadow-color);
-}
-
-/* This new wrapper is the key to the floating effect */
-.card-header-wrapper {
-    position: relative; /* This is the positioning parent */
-}
-
-.card-image {
-    height: 200px;
-    background-size: cover;
-    background-position: center;
-    display: block;
-}
-
-.provider-info-wrapper {
-    position: absolute; /* Position this relative to the wrapper above */
-    bottom: 0;          /* Align it to the bottom of the image area */
-    left: 20px;
-    transform: translateY(50%); /* Pull it down by half its own height, creating the float */
-    z-index: 2;
-}
-.provider-info-link { 
-    text-decoration: none; 
-}
-.provider-info { 
-    display: flex; 
-    align-items: center; 
-}
-.provider-avatar { 
-    width: 40px; 
-    height: 40px; 
-    border-radius: 50%;
-    object-fit: cover; 
-    margin-right: 12px; 
-    border: 3px solid var(--bg-secondary);
-}
-.provider-name { 
-    font-weight: 600; 
-    color: var(--text-primary); 
-    font-size: 1rem; 
-}
-
-.card-content { 
-    padding: 20px;
-    padding-top: 30px; /* Add space at the top for the floating avatar */
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1; /* This makes the content area fill the remaining space */
-}
-
-.service-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; line-height: 1.4; }
-.service-rating { margin-bottom: 10px; font-size: 0.9rem; color: #ffc107; }
-.service-rating .review-count { color: var(--text-secondary); margin-left: 8px; font-size: 0.8rem; }
-.service-location { color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9rem; }
-.service-location i { margin-right: 5px; }
-
-.card-footer { 
-    margin-top: auto; /* This pushes the footer to the bottom of the card */
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    padding-top: 15px; 
-    border-top: 1px solid var(--border-color); 
-}
-.price { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
-.price span { font-size: 0.9rem; font-weight: 400; color: var(--text-secondary); }
-.loading-text { text-align: center; font-size: 1.2rem; padding: 40px; grid-column: 1 / -1; }
-        
-        /* --- Footer Styles --- */
-        footer { background-color: var(--bg-secondary); color: var(--text-primary); padding: 60px 0 20px 0; border-top: 1px solid var(--border-color); }
-        .footer-container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
-        .footer-grid { display: grid; grid-template-columns: 1fr; gap: 40px; margin-bottom: 40px; text-align: center; }
-        @media (min-width: 768px) { .footer-grid { grid-template-columns: 2fr 1fr 1fr 1fr; text-align: left; } }
-        .footer-grid h4 { color: var(--text-primary); font-size: 1.2rem; margin-bottom: 20px; }
-        .footer-about p { color: var(--text-secondary); margin-bottom: 20px; }
-        .footer-socials a { color: var(--text-primary); font-size: 1.3rem; margin: 0 10px; }
-        .footer-links ul { list-style: none; padding: 0; }
-        .footer-links li { margin-bottom: 12px; }
-        .footer-links a { color: var(--text-secondary); text-decoration: none; }
-        .footer-links ul li i { margin-right: 10px; color: var(--accent-primary); }
-        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid var(--border-color); color: var(--text-secondary); }
+        .service-card { background-color: var(--bg-secondary); border-radius: 16px; border: 1px solid var(--border-color); overflow: hidden; text-decoration: none; box-shadow: 0 5px 15px var(--shadow-color); transition: transform 0.3s, box-shadow 0.3s; display: flex; flex-direction: column; }
+        .service-card:hover { transform: translateY(-8px); box-shadow: 0 12px 25px var(--shadow-color); }
+        .card-image { height: 200px; background-size: cover; background-position: center; }
+        .card-content { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+        .provider-info { display: flex; align-items: center; margin-bottom: 15px; text-decoration: none; }
+        .provider-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 12px; }
+        .provider-name { font-weight: 600; color: var(--text-primary); font-size: 1rem; }
+        .service-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; line-height: 1.4; }
+        .service-rating { margin-bottom: 10px; font-size: 0.9rem; color: #ffc107; }
+        .service-rating .review-count { color: var(--text-secondary); margin-left: 8px; font-size: 0.8rem; }
+        .service-location { color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9rem; }
+        .service-location i { margin-right: 5px; }
+        .card-footer { margin-top: auto; display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid var(--border-color); }
+        .price { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+        .price span { font-size: 0.9rem; font-weight: 400; color: var(--text-secondary); }
+        .loading-text { text-align: center; font-size: 1.2rem; padding: 40px; grid-column: 1 / -1; }
+        footer { background-color: var(--bg-secondary); }
     </style>
 </head>
 <body class="dark-mode">
 
-    <header class="header">
-        <div class="container navbar">
-            <a href="index.html" class="nav-logo">KabaleOnline</a>
-            <div class="nav-menu">
-                <a href="auth.html" class="btn-header" id="login-link">Login / Sign Up</a>
-                <a href="dashboard.html" class="btn-header" id="dashboard-link" style="display: none;">My Dashboard</a>
-                <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
-            </div>
-        </div>
-    </header>
+    <header class="header"> </header>
 
     <main>
         <section class="page-header">
@@ -191,7 +77,6 @@
                 </div>
             </div>
         </section>
-
         <section class="services-section">
             <div class="container">
                 <div class="services-grid" id="services-grid"></div>
@@ -200,22 +85,15 @@
     </main>
 
     <template id="service-card-template">
-  <div class="service-card">
-    <div class="card-header-wrapper">
-        <a href="#" class="card-image-link" style="display: block; text-decoration: none;">
-            <div class="card-image"></div>
-        </a>
-        <div class="provider-info-wrapper">
-            <a href="#" class="provider-info-link">
-                <div class="provider-info">
-                    <img class="provider-avatar">
-                    <span class="provider-name"></span>
-                </div>
-            </a>
-        </div>
-    </div>
-    <div class="card-content">
-      <a href="#" class="card-content-link" style="text-decoration: none; color: inherit;">
+      <a class="service-card">
+        <div class="card-image"></div>
+        <div class="card-content">
+          <a class="provider-info-link">
+            <div class="provider-info">
+                <img class="provider-avatar">
+                <span class="provider-name"></span>
+            </div>
+          </a>
           <h3 class="service-title"></h3>
           <div class="service-rating"></div>
           <p class="service-location">
@@ -228,57 +106,16 @@
               <span class="price-amount"></span>
             </div>
           </div>
-      </a>
-    </div>
-  </div>
-</template>
-
-    <footer>
-        <div class="footer-container">
-            <div class="footer-grid">
-                <div class="footer-about">
-                    <h4 class="nav-logo" style="font-size: 2rem;">KabaleOnline</h4>
-                    <p>Connecting our community by making it easy to find and offer skilled services across the Kigezi region.</p>
-                     <div class="footer-socials">
-                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    </div>
-                </div>
-                <div class="footer-links">
-                    <h4>Quick Links</h4>
-                    <ul id="footer-quick-links">
-                        <li><a href="services.html">Browse Services</a></li>
-                        <li><a href="browse-jobs.html">Browse Jobs</a></li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h4>Support</h4>
-                    <ul>
-                        <li><a href="#">Contact Us</a></li>
-                        <li><a href="#">Help & FAQ</a></li>
-                    </ul>
-                </div>
-                 <div class="footer-links">
-                    <h4>Contact Us</h4>
-                    <ul>
-                        <li><i class="fas fa-map-marker-alt"></i> Kabale, Uganda</li>
-                        <li><a href="tel:+256123456789"><i class="fas fa-phone-alt"></i> +256 123 456789</a></li>
-                        <li><a href="mailto:kabaleservices@gmail.com"><i class="fas fa-envelope"></i> kabaleservices@gmail.com</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 KabaleOnline. All Rights Reserved.</p>
-            </div>
         </div>
-    </footer>
+      </a>
+    </template>
+
+    <footer></footer>
 
     <script src="theme.js" defer></script>
     <script src="global-auth.js" type="module"></script>
     <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js" type="module"></script>
     <script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4" type="module"></script>
     <script src="services.js" type="module"></script>
-    
 </body>
 </html>
