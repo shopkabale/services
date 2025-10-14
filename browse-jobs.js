@@ -17,7 +17,7 @@ const proposalForm = document.getElementById('proposal-form');
 const proposalMessageTextarea = document.getElementById('proposal-message');
 
 let currentUser = null;
-let selectedJob = null; // To store data of the job being applied for
+let selectedJob = null; 
 
 // --- INITIALIZATION ---
 onAuthStateChanged(auth, (user) => {
@@ -25,7 +25,7 @@ onAuthStateChanged(auth, (user) => {
         currentUser = user;
         fetchAndDisplayJobs();
     } else {
-        window.location.href = 'auth.html'; // Redirect if not logged in
+        window.location.href = 'auth.html';
     }
 });
 
@@ -47,16 +47,17 @@ async function fetchAndDisplayJobs() {
         jobsGrid.innerHTML = '';
         for (const jobDoc of snapshot.docs) {
             const job = { id: jobDoc.id, ...jobDoc.data() };
-
+            
             const seekerDoc = await getDoc(doc(db, "users", job.seekerId));
             const seekerData = seekerDoc.exists() ? seekerDoc.data() : { name: 'Anonymous' };
             
             const card = document.createElement('div');
             card.className = 'job-card';
+            
             // Disable the proposal button if the current user is the one who posted the job
             const isOwnJob = currentUser.uid === job.seekerId;
             const buttonHtml = isOwnJob 
-                ? `<button class="btn-primary" disabled>Your Post</button>`
+                ? `<button class="btn-primary" disabled>This is Your Post</button>`
                 : `<button class="btn-primary send-proposal-btn" data-job-id="${job.id}">Send Proposal</button>`;
 
             card.innerHTML = `
@@ -77,8 +78,6 @@ async function fetchAndDisplayJobs() {
 }
 
 // --- PROPOSAL MODAL LOGIC ---
-
-// Open the modal and pre-fill the form
 jobsGrid.addEventListener('click', async (e) => {
     if (e.target.classList.contains('send-proposal-btn')) {
         const jobId = e.target.dataset.jobId;
@@ -87,7 +86,6 @@ jobsGrid.addEventListener('click', async (e) => {
             if (jobDoc.exists()) {
                 selectedJob = { id: jobDoc.id, ...jobDoc.data() };
                 proposalJobTitle.textContent = selectedJob.title;
-                // Pre-fill the message with a template
                 proposalMessageTextarea.value = `Hello, I'm interested in your job post for "${selectedJob.title}". I believe I have the skills and experience to deliver great results.\n\n[Please add more details about your qualifications here].\n\nI look forward to hearing from you.`;
                 proposalModal.classList.add('show');
             }
@@ -97,7 +95,6 @@ jobsGrid.addEventListener('click', async (e) => {
     }
 });
 
-// Close the modal
 closeProposalModalBtn.addEventListener('click', () => {
     proposalModal.classList.remove('show');
 });
@@ -107,7 +104,7 @@ proposalModal.addEventListener('click', (e) => {
     }
 });
 
-// Handle form submission
+// --- HANDLE PROPOSAL FORM SUBMISSION ---
 proposalForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const submitButton = proposalForm.querySelector('.btn-submit');
@@ -121,28 +118,30 @@ proposalForm.addEventListener('submit', async (e) => {
     }
 
     try {
-        // 1. Define the conversation document
         const conversationId = [currentUser.uid, selectedJob.seekerId].sort().join('_');
         const conversationRef = doc(db, "conversations", conversationId);
-        
-        // 2. Create the conversation document if it doesn't exist
+
+        // This object now perfectly matches what inbox.js expects
         await setDoc(conversationRef, {
             participants: [currentUser.uid, selectedJob.seekerId],
-            lastMessage: messageText,
-            updatedAt: serverTimestamp()
+            lastMessageText: messageText,
+            lastMessageTimestamp: serverTimestamp(),
+            lastSenderId: currentUser.uid,
+            lastRead: {
+                [currentUser.uid]: serverTimestamp()
+            }
         }, { merge: true });
 
-        // 3. Now, add the message to the subcollection
         const messagesRef = collection(conversationRef, "messages");
         await addDoc(messagesRef, {
             text: messageText,
             senderId: currentUser.uid,
             createdAt: serverTimestamp()
         });
-        
+
         showToast('Proposal sent! Redirecting to chat...', 'success');
         
-        // 4. Redirect the sender to the chat
+        // Redirect the sender to the new chat conversation
         window.location.href = `chat.html?conversationId=${conversationId}`;
 
     } catch (error) {
