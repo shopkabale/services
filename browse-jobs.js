@@ -51,7 +51,7 @@ async function fetchAndDisplayJobs() {
             const job = { id: jobDoc.id, ...jobDoc.data() };
             
             // Don't show jobs posted by the current user
-            if (job.seekerId === currentUser.uid) continue;
+           // if (job.seekerId === currentUser.uid) continue;
 
             const seekerDoc = await getDoc(doc(db, "users", job.seekerId));
             const seekerData = seekerDoc.exists() ? seekerDoc.data() : { name: 'Anonymous' };
