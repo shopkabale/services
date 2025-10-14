@@ -1,93 +1,144 @@
+// browse-jobs.js
+
 import { app } from './firebase-init.js';
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { getFirestore, collection, query, where, orderBy, onSnapshot, getDoc, doc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { 
+    getFirestore, collection, getDocs, doc, getDoc, query, where, addDoc, serverTimestamp, orderBy 
+} from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { showToast, hideToast, showButtonLoader, hideButtonLoader } from './notifications.js';
 
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const jobPostsListEl = document.getElementById('job-posts-list');
-const filterButtons = document.querySelectorAll('.filter-btn');
+// --- DOM ELEMENTS ---
+const jobsGrid = document.getElementById('jobs-grid');
+const proposalModal = document.getElementById('proposal-modal');
+const closeProposalModalBtn = document.getElementById('close-proposal-modal-btn');
+const proposalJobTitle = document.getElementById('proposal-job-title');
+const proposalForm = document.getElementById('proposal-form');
+const proposalMessageTextarea = document.getElementById('proposal-message');
 
-onAuthStateChanged(auth, user => {
-    if (user) {
-        listenForJobPosts();
+let currentUser = null;
+let selectedJob = null; // To store data of the job being applied for
+
+// --- INITIALIZATION ---
+onAuthStateChanged(auth, (user) => {
+    if (user && user.emailVerified) {
+        currentUser = user;
+        fetchAndDisplayJobs();
     } else {
-        window.location.href = 'auth.html';
+        window.location.href = 'auth.html'; // Redirect if not logged in
     }
 });
 
-function listenForJobPosts(categoryFilter = 'All') {
-    const jobPostsRef = collection(db, "job_posts");
-    let q;
-
-    if (categoryFilter === 'All' || !categoryFilter) {
-        q = query(jobPostsRef, where("status", "==", "Open"), orderBy("createdAt", "desc"));
-    } else {
-        q = query(jobPostsRef, where("status", "==", "Open"), where("category", "==", categoryFilter), orderBy("createdAt", "desc"));
-    }
+// --- FETCH AND DISPLAY JOBS ---
+async function fetchAndDisplayJobs() {
+    if (!jobsGrid) return;
+    jobsGrid.innerHTML = '<p>Loading job posts...</p>';
     
-    jobPostsListEl.innerHTML = '<p style="text-align: center; padding: 20px;">Loading open jobs...</p>';
+    try {
+        const jobsRef = collection(db, "job_posts");
+        const q = query(jobsRef, orderBy("createdAt", "desc"));
+        const snapshot = await getDocs(q);
 
-    onSnapshot(q, async (snapshot) => {
         if (snapshot.empty) {
-            jobPostsListEl.innerHTML = `<p style="text-align: center; padding: 20px;">No open jobs found in the "${categoryFilter}" category.</p>`;
+            jobsGrid.innerHTML = '<p>No jobs posted yet. Be the first!</p>';
             return;
         }
 
-        jobPostsListEl.innerHTML = ''; 
+        jobsGrid.innerHTML = '';
         for (const jobDoc of snapshot.docs) {
-            const jobPost = { id: jobDoc.id, ...jobDoc.data() };
+            const job = { id: jobDoc.id, ...jobDoc.data() };
             
-            const userDoc = await getDoc(doc(db, "users", jobPost.seekerId));
-            if (userDoc.exists()) {
-                const seekerData = userDoc.data();
-                renderJobPostCard(jobPost, seekerData);
-            }
+            // Don't show jobs posted by the current user
+            if (job.seekerId === currentUser.uid) continue;
+
+            const seekerDoc = await getDoc(doc(db, "users", job.seekerId));
+            const seekerData = seekerDoc.exists() ? seekerDoc.data() : { name: 'Anonymous' };
+            
+            const card = document.createElement('div');
+            card.className = 'job-card';
+            card.innerHTML = `
+                <h3>${job.title}</h3>
+                <p class="job-poster">Posted by: ${seekerData.name}</p>
+                <p class="job-description">${job.description.substring(0, 100)}...</p>
+                <div class="job-footer">
+                    <span class="job-budget">Budget: UGX ${job.budget.toLocaleString()}</span>
+                    <button class="btn-primary send-proposal-btn" data-job-id="${job.id}">Send Proposal</button>
+                </div>
+            `;
+            jobsGrid.appendChild(card);
         }
-    }, (error) => {
-        console.error("Error fetching job posts:", error);
-        jobPostsListEl.innerHTML = '<p style="text-align: center; padding: 20px; color: #dc3545;">Could not load job posts.</p>';
-    });
+    } catch (error) {
+        console.error("Error fetching jobs:", error);
+        jobsGrid.innerHTML = '<p>Could not load jobs at this time.</p>';
+    }
 }
 
-function renderJobPostCard(jobPost, seekerData) {
-    const card = document.createElement('div');
-    card.className = 'job-post-card';
-    card.dataset.id = jobPost.id;
+// --- PROPOSAL MODAL LOGIC ---
 
-    const date = jobPost.createdAt?.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) || 'N/A';
-    const budget = jobPost.budget > 0 ? `UGX ${jobPost.budget.toLocaleString()}` : 'Not specified';
-    const avatar = seekerData.profilePicUrl || `https://placehold.co/80x80/10336d/a7c0e8?text=${seekerData.name.charAt(0)}`;
+// Open the modal and pre-fill the form
+jobsGrid.addEventListener('click', async (e) => {
+    if (e.target.classList.contains('send-proposal-btn')) {
+        const jobId = e.target.dataset.jobId;
+        try {
+            const jobDoc = await getDoc(doc(db, "job_posts", jobId));
+            if (jobDoc.exists()) {
+                selectedJob = { id: jobDoc.id, ...jobDoc.data() };
+                proposalJobTitle.textContent = selectedJob.title;
+                // Pre-fill the message with a template
+                proposalMessageTextarea.value = `Hello, I'm interested in your job post for "${selectedJob.title}". I believe I have the skills and experience to deliver great results.\n\n[Please add more details about your qualifications here].\n\nI look forward to hearing from you.`;
+                proposalModal.classList.add('show');
+            }
+        } catch (error) {
+            showToast('Could not load job details.', 'error');
+        }
+    }
+});
 
-    card.innerHTML = `
-        <div class="seeker-info">
-            <img src="${avatar}" alt="${seekerData.name}" class="seeker-avatar">
-            <span class="seeker-name">${seekerData.name}</span>
-        </div>
-        <div class="job-details">
-            <h2 class="job-title">${jobPost.title}</h2>
-            <div class="job-meta">
-                <span><i class="fas fa-tag"></i> ${jobPost.category}</span>
-                <span><i class="fas fa-calendar-alt"></i> Posted: ${date}</span>
-                <span><i class="fas fa-money-bill-wave"></i> Budget: ${budget}</span>
-            </div>
-            <p class="job-description">${jobPost.description}</p>
-        </div>
-        <div class="job-actions">
-            <a href="#" class="btn btn-primary">Send Proposal</a>
-            <a href="job-post-detail.html?id=${jobPost.id}" class="btn btn-secondary">View Details</a>
-        </div>
-    `;
+// Close the modal
+closeProposalModalBtn.addEventListener('click', () => {
+    proposalModal.classList.remove('show');
+});
+proposalModal.addEventListener('click', (e) => {
+    if (e.target === proposalModal) {
+        proposalModal.classList.remove('show');
+    }
+});
 
-    jobPostsListEl.appendChild(card);
-}
+// Handle form submission
+proposalForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitButton = proposalForm.querySelector('.btn-submit');
+    showButtonLoader(submitButton);
 
-// Add event listeners for filter buttons
-filterButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        filterButtons.forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-        const category = button.textContent;
-        listenForJobPosts(category);
-    });
+    const messageText = proposalMessageTextarea.value.trim();
+    if (!messageText || !selectedJob || !currentUser) {
+        showToast('Something went wrong. Please try again.', 'error');
+        hideButtonLoader(submitButton);
+        return;
+    }
+
+    try {
+        // Find or create a one-on-one conversation
+        const conversationId = [currentUser.uid, selectedJob.seekerId].sort().join('_');
+        const conversationRef = doc(db, "conversations", conversationId);
+        
+        const messagesRef = collection(conversationRef, "messages");
+        
+        // Send the proposal as a message
+        await addDoc(messagesRef, {
+            text: messageText,
+            senderId: currentUser.uid,
+            createdAt: serverTimestamp()
+        });
+        
+        showToast('Proposal sent successfully!', 'success');
+        proposalModal.classList.remove('show');
+    } catch (error) {
+        console.error("Error sending proposal:", error);
+        showToast('Failed to send proposal.', 'error');
+    } finally {
+        hideButtonLoader(submitButton);
+    }
 });
