@@ -41,27 +41,111 @@
         .ais-SearchBox-reset { display: none; }
         .ais-Hits-list, .ais-Hits-item { display: contents; }
 
-        /* --- Floating Card Styles --- */
-        .services-section { padding: 0 15px 80px; }
-        .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; min-height: 300px; }
-        .service-card { position: relative; background-color: var(--bg-secondary); border-radius: 16px; border: 1px solid var(--border-color); text-decoration: none; box-shadow: 0 5px 15px var(--shadow-color); transition: transform 0.3s, box-shadow 0.3s; display: block; overflow: visible; }
-        .service-card:hover { transform: translateY(-8px); box-shadow: 0 12px 25px var(--shadow-color); }
-        .card-image { height: 200px; background-size: cover; background-position: center; border-radius: 16px 16px 0 0; }
-        .provider-info-wrapper { margin-top: -30px; padding: 0 20px; position: relative; z-index: 2; }
-        .provider-info-link { text-decoration: none; }
-        .provider-info { display: flex; align-items: center; }
-        .provider-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 12px; border: 3px solid var(--bg-secondary); }
-        .provider-name { font-weight: 600; color: var(--text-primary); font-size: 1rem; }
-        .card-content { padding: 20px; }
-        .service-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; line-height: 1.4; }
-        .service-rating { margin-bottom: 10px; font-size: 0.9rem; color: #ffc107; }
-        .service-rating .review-count { color: var(--text-secondary); margin-left: 8px; font-size: 0.8rem; }
-        .service-location { color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9rem; }
-        .service-location i { margin-right: 5px; }
-        .card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid var(--border-color); }
-        .price { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
-        .price span { font-size: 0.9rem; font-weight: 400; color: var(--text-secondary); }
-        .loading-text { text-align: center; font-size: 1.2rem; padding: 40px; grid-column: 1 / -1; }
+        /*
+ * ===============================================
+ * FINAL & CORRECTED LAYOUT FIXES
+ * ===============================================
+*/
+
+.services-section { 
+    padding: 0 15px 80px; 
+}
+
+/* --- 1. FIX FOR THE MISSING GAP --- */
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px; /* This is the rule for the gap */
+    min-height: 300px;
+}
+/* This rule is CRITICAL. It makes the grid gap work with Algolia. */
+.ais-Hits-list, .ais-Hits-item {
+    display: contents;
+}
+
+
+/* --- 2. FIX FOR THE FLOATING CARD LAYOUT --- */
+.service-card {
+    display: flex; /* Use flexbox for robust layout */
+    flex-direction: column; /* Stack image and content vertically */
+    background-color: var(--bg-secondary);
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    text-decoration: none;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    transition: transform 0.3s, box-shadow 0.3s;
+    overflow: hidden; /* Hide anything that goes outside the rounded corners */
+}
+.service-card:hover { 
+    transform: translateY(-8px); 
+    box-shadow: 0 12px 25px var(--shadow-color);
+}
+
+/* This new wrapper is the key to the floating effect */
+.card-header-wrapper {
+    position: relative; /* This is the positioning parent */
+}
+
+.card-image {
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+    display: block;
+}
+
+.provider-info-wrapper {
+    position: absolute; /* Position this relative to the wrapper above */
+    bottom: 0;          /* Align it to the bottom of the image area */
+    left: 20px;
+    transform: translateY(50%); /* Pull it down by half its own height, creating the float */
+    z-index: 2;
+}
+.provider-info-link { 
+    text-decoration: none; 
+}
+.provider-info { 
+    display: flex; 
+    align-items: center; 
+}
+.provider-avatar { 
+    width: 40px; 
+    height: 40px; 
+    border-radius: 50%;
+    object-fit: cover; 
+    margin-right: 12px; 
+    border: 3px solid var(--bg-secondary);
+}
+.provider-name { 
+    font-weight: 600; 
+    color: var(--text-primary); 
+    font-size: 1rem; 
+}
+
+.card-content { 
+    padding: 20px;
+    padding-top: 30px; /* Add space at the top for the floating avatar */
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* This makes the content area fill the remaining space */
+}
+
+.service-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; line-height: 1.4; }
+.service-rating { margin-bottom: 10px; font-size: 0.9rem; color: #ffc107; }
+.service-rating .review-count { color: var(--text-secondary); margin-left: 8px; font-size: 0.8rem; }
+.service-location { color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9rem; }
+.service-location i { margin-right: 5px; }
+
+.card-footer { 
+    margin-top: auto; /* This pushes the footer to the bottom of the card */
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding-top: 15px; 
+    border-top: 1px solid var(--border-color); 
+}
+.price { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+.price span { font-size: 0.9rem; font-weight: 400; color: var(--text-secondary); }
+.loading-text { text-align: center; font-size: 1.2rem; padding: 40px; grid-column: 1 / -1; }
         
         /* --- Footer Styles --- */
         footer { background-color: var(--bg-secondary); color: var(--text-primary); padding: 60px 0 20px 0; border-top: 1px solid var(--border-color); }
