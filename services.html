@@ -32,24 +32,92 @@
         .filter-btn { background-color: var(--bg-secondary); color: var(--text-secondary); border: 1px solid var(--border-color); border-radius: 50px; padding: 10px 20px; margin: 0; cursor: pointer; font-weight: 500; }
         .filter-btn.active { background-color: var(--accent-primary); color: #fff; border-color: var(--accent-primary); }
 
-        .services-section { padding: 0 15px 80px; }
-        .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; min-height: 300px; }
-        .service-card { background-color: var(--bg-secondary); border-radius: 16px; border: 1px solid var(--border-color); overflow: hidden; text-decoration: none; box-shadow: 0 5px 15px var(--shadow-color); transition: transform 0.3s, box-shadow 0.3s; display: block; }
-        .service-card:hover { transform: translateY(-8px); box-shadow: 0 12px 25px var(--shadow-color); }
-        .card-image { height: 200px; background-size: cover; background-position: center; }
-        .card-content { padding: 20px; }
-        .provider-info { display: flex; align-items: center; margin-bottom: 15px; }
-        .provider-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 12px; border: 2px solid var(--bg-primary); }
-        .provider-name { font-weight: 600; color: var(--text-primary); font-size: 1rem; }
-        .service-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; line-height: 1.4; }
-        .service-rating { margin-bottom: 10px; font-size: 0.9rem; color: #ffc107; }
-        .service-rating .review-count { color: var(--text-secondary); margin-left: 8px; font-size: 0.8rem; }
-        .service-location { color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9rem; }
-        .service-location i { margin-right: 5px; }
-        .card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid var(--border-color); }
-        .price { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
-        .price span { font-size: 0.9rem; font-weight: 400; color: var(--text-secondary); }
-        .loading-text { text-align: center; font-size: 1.2rem; padding: 40px; grid-column: 1 / -1; }
+        /*
+ * ===============================================
+ * NEW FLOATING CARD STYLES
+ * ===============================================
+*/
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+    min-height: 300px;
+}
+
+.service-card {
+    /* Set up a positioning context for the floating elements */
+    position: relative; 
+    
+    background-color: var(--bg-secondary);
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    text-decoration: none;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: block;
+}
+.service-card:hover { 
+    transform: translateY(-8px); 
+    box-shadow: 0 12px 25px var(--shadow-color);
+}
+
+.card-image {
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+    /* Round the top corners of the image */
+    border-radius: 16px 16px 0 0; 
+}
+
+/* This is the new wrapper for the provider info */
+.provider-info-wrapper {
+    /* Pull the wrapper up to overlap the image */
+    margin-top: -30px; 
+    padding: 0 20px;
+    position: relative; /* Keep it in the flow but allow z-index */
+    z-index: 2;
+}
+
+.provider-info { 
+    display: flex;
+    align-items: center; 
+}
+.provider-avatar { 
+    width: 40px; 
+    height: 40px; 
+    border-radius: 50%;
+    object-fit: cover; 
+    margin-right: 12px; 
+    /* Give the avatar a border matching the card background for a clean look */
+    border: 3px solid var(--bg-secondary); 
+}
+.provider-name { 
+    font-weight: 600; 
+    color: var(--text-primary); 
+    font-size: 1rem; 
+}
+
+.card-content { 
+    padding: 20px; 
+}
+.service-title { 
+    font-size: 1.3rem; 
+    font-weight: 700; 
+    color: var(--text-primary); 
+    line-height: 1.4;
+    /* Add some margin to the top now that provider info is gone */
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+.service-rating { margin-bottom: 10px; font-size: 0.9rem; color: #ffc107; }
+.service-rating .review-count { color: var(--text-secondary); margin-left: 8px; font-size: 0.8rem; }
+.service-location { color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9rem; }
+.service-location i { margin-right: 5px; }
+.card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid var(--border-color); }
+.price { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+.price span { font-size: 0.9rem; font-weight: 400; color: var(--text-secondary); }
+.loading-text { text-align: center; font-size: 1.2rem; padding: 40px; grid-column: 1 / -1; }
 
         .search-container { max-width: 700px; margin: 40px auto 0 auto; }
         .ais-SearchBox-form { display: flex; border-radius: 50px; border: 1px solid var(--border-color); background-color: var(--bg-secondary); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
@@ -113,13 +181,17 @@
     <template id="service-card-template">
   <a class="service-card">
     <div class="card-image"></div>
+    
+    <div class="provider-info-wrapper">
+        <a class="provider-info-link" style="text-decoration: none;">
+            <div class="provider-info">
+                <img class="provider-avatar">
+                <span class="provider-name"></span>
+            </div>
+        </a>
+    </div>
+
     <div class="card-content">
-      <a class="provider-info-link" style="text-decoration: none;">
-        <div class="provider-info">
-            <img class="provider-avatar">
-            <span class="provider-name"></span>
-        </div>
-      </a>
       <h3 class="service-title"></h3>
       <div class="service-rating"></div>
       <p class="service-location">
