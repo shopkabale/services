@@ -34,7 +34,16 @@
 
         .services-section { padding: 0 15px 80px; }
         .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; min-height: 300px; }
-        .service-card { background-color: var(--bg-secondary); border-radius: 16px; border: 1px solid var(--border-color); overflow: hidden; text-decoration: none; box-shadow: 0 5px 15px var(--shadow-color); transition: transform 0.3s, box-shadow 0.3s; display: block; }
+        .service-card {
+  background: linear-gradient(135deg, rgba(0,123,255,0.15), rgba(0,123,255,0.05)) !important;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  text-decoration: none;
+  box-shadow: 0 5px 15px var(--shadow-color);
+  display: block;
+  transition: transform 0.3s, box-shadow 0.3s, background 0.35s;
+}
         .service-card:hover { transform: translateY(-8px); box-shadow: 0 12px 25px var(--shadow-color); }
         .card-image { height: 200px; background-size: cover; background-position: center; }
         .card-content { padding: 20px; }
