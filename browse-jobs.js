@@ -51,7 +51,9 @@ async function fetchAndDisplayJobs() {
             const seekerDoc = await getDoc(doc(db, "users", job.seekerId));
             const seekerData = seekerDoc.exists() ? seekerDoc.data() : { name: 'Anonymous' };
             
-            const card = document.createElement('div');
+            // The entire card is a link to the job detail page
+            const card = document.createElement('a');
+            card.href = `job-post-detail.html?id=${job.id}`;
             card.className = 'job-card';
             
             // Disable the proposal button if the current user is the one who posted the job
@@ -61,9 +63,11 @@ async function fetchAndDisplayJobs() {
                 : `<button class="btn-primary send-proposal-btn" data-job-id="${job.id}">Send Proposal</button>`;
 
             card.innerHTML = `
-                <h3>${job.title}</h3>
-                <p class="job-poster">Posted by: ${seekerData.name}</p>
-                <p class="job-description">${job.description.substring(0, 100)}...</p>
+                <div>
+                    <h3>${job.title}</h3>
+                    <p class="job-poster">Posted by: ${seekerData.name}</p>
+                    <p class="job-description">${job.description.substring(0, 100)}...</p>
+                </div>
                 <div class="job-footer">
                     <span class="job-budget">Budget: UGX ${job.budget.toLocaleString()}</span>
                     ${buttonHtml}
@@ -79,7 +83,9 @@ async function fetchAndDisplayJobs() {
 
 // --- PROPOSAL MODAL LOGIC ---
 jobsGrid.addEventListener('click', async (e) => {
+    // Check if a proposal button was clicked
     if (e.target.classList.contains('send-proposal-btn')) {
+        e.preventDefault(); // IMPORTANT: Prevent the card's link from navigating
         const jobId = e.target.dataset.jobId;
         try {
             const jobDoc = await getDoc(doc(db, "job_posts", jobId));
@@ -95,6 +101,7 @@ jobsGrid.addEventListener('click', async (e) => {
     }
 });
 
+// --- MODAL CLOSE HANDLERS ---
 closeProposalModalBtn.addEventListener('click', () => {
     proposalModal.classList.remove('show');
 });
