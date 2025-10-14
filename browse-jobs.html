@@ -12,17 +12,18 @@
 
     <style>
         :root {
-            --bg-primary: #0d2857; --bg-secondary: #10336d; --text-primary: #ffffff;
-            --text-secondary: #a7c0e8; --accent-primary: #007bff; --border-color: #1f4287;
-            --font-family: 'Poppins', sans-serif;
+            --bg-primary: #0d2857; --bg-secondary: #10336d; --bg-card: #0a214d;
+            --text-primary: #ffffff; --text-secondary: #a7c0e8; --accent-primary: #007bff;
+            --border-color: #1f4287; --font-family: 'Poppins', sans-serif;
         }
         body.light-mode {
-            --bg-primary: #f0f4f9; --bg-secondary: #ffffff; --text-primary: #0d2857;
-            --text-secondary: #6c757d; --border-color: #e9ecef;
+            --bg-primary: #f0f4f9; --bg-secondary: #ffffff; --bg-card: #ffffff;
+            --text-primary: #0d2857; --text-secondary: #6c757d; --border-color: #e9ecef;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: var(--font-family); background-color: var(--bg-primary); color: var(--text-secondary); }
         .container { max-width: 900px; margin: 0 auto; padding: 0 15px; }
+        .footer-container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
 
         .header { position: sticky; top: 0; z-index: 1000; background-color: var(--bg-secondary); border-bottom: 1px solid var(--border-color); padding: 15px 0; }
         .navbar { display: flex; justify-content: space-between; align-items: center; max-width:1200px; margin: 0 auto; padding: 0 15px; }
@@ -37,74 +38,45 @@
         
         .job-posts-section { padding: 0 15px 80px; }
         #jobs-grid { min-height: 400px; }
-        
-        /* --- STYLES FOR THE JOB CARD --- */
-        .job-card {
-            background-color: var(--bg-secondary);
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 20px;
-            border: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .job-card h3 {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-        .job-poster {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-        .job-description {
-            line-height: 1.6;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .job-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-        }
-        .job-budget {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-        .btn-primary {
-            padding: 10px 20px;
-            background-color: var(--accent-primary);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-        }
+        .job-card { background-color: var(--bg-secondary); border-radius: 12px; padding: 25px; margin-bottom: 20px; border: 1px solid var(--border-color); text-decoration: none; color: inherit; display: block; transition: background-color 0.3s; }
+        .job-card:hover { background-color: var(--bg-primary); }
+        .job-card h3 { font-size: 1.4rem; font-weight: 600; color: var(--text-primary); }
+        .job-poster { font-size: 0.9rem; color: var(--text-secondary); font-weight: 500; margin-top: 5px; }
+        .job-description { margin-top: 15px; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
+        .job-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-color); }
+        .job-budget { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); }
+        .btn-primary { padding: 10px 20px; background-color: var(--accent-primary); color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none; }
+        .btn-primary[disabled] { background-color: #555; cursor: not-allowed; }
 
-        /* --- STYLES FOR THE MODAL --- */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; align-items: center; justify-content: center; }
         .modal-overlay.show { display: flex; }
         .modal-content { position: relative; background: var(--bg-secondary); padding: 30px; border-radius: 12px; max-width: 500px; width: 90%; }
         .modal-close-btn { position: absolute; top: 10px; right: 20px; background: none; border: none; font-size: 2rem; color: var(--text-secondary); cursor: pointer; }
-        .highlighted-text { font-weight: bold; color: var(--accent-primary); margin-bottom: 20px; }
+        .highlighted-text { font-weight: bold; color: var(--accent-primary); margin-bottom: 20px; font-size: 1.2rem; }
         .form-group { margin-bottom: 15px; }
-        .form-control { width: 100%; padding: 12px; background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 1rem; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-secondary); }
+        .form-control { width: 100%; padding: 12px; background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 1rem; resize: vertical; }
         .btn-submit { width: 100%; padding: 12px; background-color: var(--accent-primary); color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
-        footer { background-color: var(--bg-secondary); }
+        
+        footer { background-color: var(--bg-card); color: var(--text-primary); padding: 60px 0 20px 0; border-top: 1px solid var(--border-color); }
+        .footer-grid { display: grid; grid-template-columns: 1fr; gap: 40px; margin-bottom: 40px; text-align: center; }
+        @media (min-width: 768px) { .footer-grid { grid-template-columns: 2fr 1fr 1fr 1fr; text-align: left; } }
+        .footer-grid h4 { color: var(--text-primary); font-size: 1.2rem; margin-bottom: 20px; }
+        .footer-about p { color: var(--text-secondary); margin-bottom: 20px; }
+        .footer-socials a { color: var(--text-primary); font-size: 1.3rem; margin: 0 10px; transition: color 0.3s; }
+        .footer-socials a:hover { color: var(--accent-primary); }
+        .footer-links ul { list-style: none; padding: 0; }
+        .footer-links li { margin-bottom: 12px; }
+        .footer-links a { color: var(--text-secondary); text-decoration: none; transition: all 0.3s; }
+        .footer-links a:hover { color: var(--accent-primary); padding-left: 5px; }
+        .footer-links ul li i { margin-right: 10px; color: var(--accent-primary); }
+        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid var(--border-color); color: var(--text-secondary); }
     </style>
 </head>
 <body class="dark-mode">
 
     <header class="header">
-        <div class="navbar container">
+        <div class="navbar">
             <a href="index.html" class="nav-logo">KabaleOnline</a>
             <div class="nav-menu">
                 <a href="auth.html" class="btn-header" id="login-link">Login / Sign Up</a>
@@ -114,7 +86,7 @@
         </div>
     </header>
 
-    <main class="main-content">
+    <main>
          <section class="page-header">
             <div class="container">
                 <h1>Browse the Job Board</h1>
@@ -145,7 +117,49 @@
         </div>
     </div>
 
-    <footer></footer>
+    <footer>
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-about">
+                    <h4 class="nav-logo" style="font-size: 2rem;">KabaleOnline</h4>
+                    <p>Connecting our community by making it easy to find and offer skilled services across the Kigezi region.</p>
+                    <div class="footer-socials">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul id="footer-quick-links">
+                        <li><a href="services.html">Browse Services</a></li>
+                        <li><a href="browse-jobs.html">Browse Jobs</a></li>
+                        <li><a href="group-chat.html">Community Chat</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Help & FAQ</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                 <div class="footer-links">
+                    <h4>Contact Us</h4>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Kabale, Uganda</li>
+                        <li><i class="fas fa-phone-alt"></i> +256 123 456789</li>
+                        <li><i class="fas fa-envelope"></i> help@kabaleonline.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 KabaleOnline Services. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
 
     <script src="theme.js" defer></script>
     <script src="global-auth.js" type="module"></script>
