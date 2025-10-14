@@ -200,36 +200,38 @@
     </main>
 
     <template id="service-card-template">
-      <div class="service-card">
+  <div class="service-card">
+    <div class="card-header-wrapper">
         <a href="#" class="card-image-link" style="display: block; text-decoration: none;">
             <div class="card-image"></div>
         </a>
         <div class="provider-info-wrapper">
-            <a href="#" class="provider-info-link" style="text-decoration: none;">
+            <a href="#" class="provider-info-link">
                 <div class="provider-info">
                     <img class="provider-avatar">
                     <span class="provider-name"></span>
                 </div>
             </a>
         </div>
-        <div class="card-content">
-          <a href="#" class="card-content-link" style="text-decoration: none; color: inherit;">
-              <h3 class="service-title"></h3>
-              <div class="service-rating"></div>
-              <p class="service-location">
-                <i class="fas fa-map-marker-alt"></i>
-                <span class="location-text"></span>
-              </p>
-              <div class="card-footer">
-                <div class="price">
-                  <span>From </span>
-                  <span class="price-amount"></span>
-                </div>
-              </div>
-          </a>
-        </div>
-      </div>
-    </template>
+    </div>
+    <div class="card-content">
+      <a href="#" class="card-content-link" style="text-decoration: none; color: inherit;">
+          <h3 class="service-title"></h3>
+          <div class="service-rating"></div>
+          <p class="service-location">
+            <i class="fas fa-map-marker-alt"></i>
+            <span class="location-text"></span>
+          </p>
+          <div class="card-footer">
+            <div class="price">
+              <span>From </span>
+              <span class="price-amount"></span>
+            </div>
+          </div>
+      </a>
+    </div>
+  </div>
+</template>
 
     <footer>
         <div class="footer-container">
