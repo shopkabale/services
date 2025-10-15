@@ -16,10 +16,10 @@ const logoutTriggers = document.querySelectorAll('#logout-btn, #footer-logout-li
 
 // Create footer list items once
 const footerLoginLi = document.createElement('li');
-footerLoginLi.innerHTML = `<a href="auth.html">Login / Sign Up</a>`;
+footerLoginLi.innerHTML = `<a href="auth.html">Login</a>`;
 
 const footerDashboardLi = document.createElement('li');
-footerDashboardLi.innerHTML = `<a href="dashboard.html">My Dashboard</a>`;
+footerDashboardLi.innerHTML = `<a href="dashboard.html">My Dash</a>`;
 
 const footerLogoutLi = document.createElement('li');
 footerLogoutLi.innerHTML = `<a href="#" id="footer-logout-link">Logout</a>`;
@@ -36,7 +36,10 @@ onAuthStateChanged(auth, (user) => {
     if (user && user.emailVerified) {
         // --- USER IS LOGGED IN ---
         if (loginLinkHeader) loginLinkHeader.style.display = 'none';
-        if (dashboardLinkHeader) dashboardLinkHeader.style.display = 'inline-flex';
+        if (dashboardLinkHeader) {
+    dashboardLinkHeader.style.display = 'inline-flex';
+    dashboardLinkHeader.textContent = 'Dash'; // This changes the text
+}
 
         if (footerQuickLinks) {
             footerDashboardLi.className = 'dynamic-link';
