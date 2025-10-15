@@ -32,7 +32,7 @@ onAuthStateChanged(auth, (user) => {
 // --- FETCH AND DISPLAY JOBS ---
 async function fetchAndDisplayJobs() {
     if (!jobsGrid) return;
-    jobsGrid.innerHTML = '<p>Loading job posts...</p>';
+    jobsGrid.innerHTML = '<div class="spinner-container"><div class="spinner"></div></div>';
     
     try {
         const jobsRef = collection(db, "job_posts");
