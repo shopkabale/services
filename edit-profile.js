@@ -2,6 +2,8 @@ import { app } from './firebase-init.js';
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 import { uploadToCloudinary } from './cloudinary-upload.js';
+import { showToast, hideToast, showButtonLoader, hideButtonLoader } from './notifications.js';
+
 
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -13,13 +15,11 @@ const fullNameInput = document.getElementById('full-name');
 const emailInput = document.getElementById('email');
 const telephoneInput = document.getElementById('telephone');
 const locationInput = document.getElementById('location');
+const taglineInput = document.getElementById('tagline');
+const aboutInput = document.getElementById('about');
 const editProfileForm = document.getElementById('edit-profile-form');
 const backToDashboardBtn = document.getElementById('back-to-dashboard-btn');
 const submitBtn = document.getElementById('submit-btn');
-
-// --- NEW: Selectors for new fields ---
-const taglineInput = document.getElementById('tagline');
-const aboutInput = document.getElementById('about');
 
 let currentUser = null;
 
@@ -27,37 +27,38 @@ let currentUser = null;
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         currentUser = user;
+        // Fetch and populate the form with existing user data
         const userDocRef = doc(db, "users", user.uid);
         const userDoc = await getDoc(userDocRef);
 
         if (userDoc.exists()) {
             populateForm(userDoc.data());
         } else {
-            console.error("No profile document found for this user.");
-            alert("Could not load your profile data.");
+            // This can happen for a brand new Google user
+            console.warn("No profile document found, using auth data as a fallback.");
+            populateForm(user); // Populate with basic data from auth
         }
     } else {
+        // Not logged in, redirect
         window.location.href = 'auth.html';
     }
 });
 
 // --- FUNCTION to populate form with user data ---
 function populateForm(userData) {
-    photoPreview.src = userData.profilePicUrl || `https://placehold.co/100x100/10336d/a7c0e8?text=${(userData.name || 'U').charAt(0)}`;
-    fullNameInput.value = userData.name || '';
+    photoPreview.src = userData.profilePicUrl || userData.photoURL || `https://placehold.co/100x100/10336d/a7c0e8?text=${(userData.name || userData.displayName || 'U').charAt(0)}`;
+    fullNameInput.value = userData.name || userData.displayName || '';
     emailInput.value = userData.email || '';
     telephoneInput.value = userData.telephone || '';
     locationInput.value = userData.location || '';
-    
-    // --- NEW: Populate the new fields ---
     taglineInput.value = userData.tagline || '';
     aboutInput.value = userData.about || '';
 
     // Set back button based on role
-    if (userData.isProvider) { // Assuming you have an 'isProvider' boolean field
+    if (userData.isProvider) {
         backToDashboardBtn.href = 'provider-dashboard.html';
     } else {
-        backToDashboardBtn.href = 'seeker-dashboard.html';
+        backToDashboardBtn.href = 'dashboard.html';
     }
 }
 
@@ -79,35 +80,43 @@ editProfileForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!currentUser) return;
 
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Saving...';
+    showButtonLoader(submitBtn);
 
     try {
         const updatedData = {
             name: fullNameInput.value,
             telephone: telephoneInput.value,
             location: locationInput.value,
-            // --- NEW: Add the new fields to the data object to be saved ---
             tagline: taglineInput.value,
             about: aboutInput.value,
         };
 
+        // Check if a new photo was uploaded
         const photoFile = photoInput.files[0];
         if (photoFile) {
+            showToast('Uploading photo...', 'progress');
             const imageUrl = await uploadToCloudinary(photoFile);
             updatedData.profilePicUrl = imageUrl;
+            hideToast();
         }
 
+        // Update the user's document in Firestore
+        showToast('Saving profile...', 'progress');
         const userDocRef = doc(db, "users", currentUser.uid);
         await updateDoc(userDocRef, updatedData);
+        hideToast();
+        showToast('Profile updated successfully!', 'success');
 
-        alert('Profile updated successfully!');
+        // After saving, send the user to their dashboard.
+        setTimeout(() => {
+            window.location.href = 'dashboard.html';
+        }, 1500); // Wait 1.5 seconds to allow user to see success message
 
     } catch (error) {
+        hideToast();
         console.error("Error updating profile:", error);
-        alert("There was an error updating your profile. Please try again.");
+        showToast("Error updating profile. Please try again.", 'error');
     } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Save Changes';
+        hideButtonLoader(submitBtn);
     }
 });
