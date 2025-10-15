@@ -21,7 +21,7 @@ function loadConversations(currentUserId) {
   const convosRef = collection(db, 'conversations');
   const q = query(convosRef, where('participants', 'array-contains', currentUserId));
   
-  conversationList.innerHTML = '<p style="padding:20px;text-align:center;">Loading conversations...</p>';
+  conversationList.innerHTML = '<div class="spinner-container"><div class="spinner"></div></div>';
 
   onSnapshot(q, async (snapshot) => {
     if (snapshot.empty) {
