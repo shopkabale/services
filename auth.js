@@ -4,8 +4,6 @@ import {
     onAuthStateChanged,
     createUserWithEmailAndPassword, 
     signInWithEmailAndPassword,
-    GoogleAuthProvider,
-    signInWithPopup,
     sendEmailVerification,
     applyActionCode,
     sendPasswordResetEmail
@@ -21,7 +19,6 @@ import { showToast, hideToast, showButtonLoader, hideButtonLoader } from './noti
 
 const auth = getAuth(app);
 const db = getFirestore(app);
-const googleProvider = new GoogleAuthProvider();
 
 // --- UI Elements ---
 const loginContainer = document.getElementById('login-form-container');
@@ -31,8 +28,6 @@ const showSignupLink = document.getElementById('show-signup-link');
 const showLoginLink = document.getElementById('show-login-link');
 const loginForm = document.getElementById('login-form');
 const signupForm = document.getElementById('signup-form');
-const googleLoginBtn = document.getElementById('google-login-btn');
-const googleSignupBtn = document.getElementById('google-signup-btn');
 const photoInput = document.getElementById('profile-photo-input');
 const photoPreview = document.getElementById('photo-preview');
 const passwordToggles = document.querySelectorAll('.password-toggle');
@@ -82,8 +77,7 @@ async function redirectUser(user) {
 
 // --- REDIRECT LOGIC FOR USERS ALREADY LOGGED IN ---
 onAuthStateChanged(auth, (user) => {
-    // This only handles users who are already logged in when they first land on the auth page.
-    if (user && user.emailVerified) {
+    if (user && user.emailVerified && window.location.pathname.includes('auth.html')) {
         redirectUser(user);
     }
 });
@@ -229,7 +223,7 @@ signupForm.addEventListener('submit', async (e) => {
         const actionCodeSettings = { url: window.location.origin, handleCodeInApp: true };
         await sendEmailVerification(user, actionCodeSettings);
         showVerificationView(user); 
-    } catch (error) {
+    } catch (error) => {
         showToast(getFriendlyAuthError(error.code), "error");
     } finally {
         hideButtonLoader(submitButton);
@@ -253,42 +247,11 @@ loginForm.addEventListener('submit', async (e) => {
             return;
         }
         await redirectUser(user);
-    } catch (error) {
+    } catch (error) => {
         showToast(getFriendlyAuthError(error.code), "error");
         hideButtonLoader(submitButton);
     }
 });
-
-// Google Sign-In
-const handleGoogleSignIn = async () => {
-    try {
-        const result = await signInWithPopup(auth, googleProvider);
-        const user = result.user;
-        const userDocRef = doc(db, "users", user.uid);
-        const userDoc = await getDoc(userDocRef);
-        
-        if (userDoc.exists()) {
-            // Returning user, send to dashboard
-            await redirectUser(user);
-        } else {
-            // New user, create basic profile and send to edit profile page
-            const userProfile = {
-                uid: user.uid, name: user.displayName || '', email: user.email,
-                role: 'user', isProvider: false, createdAt: new Date(), 
-                profilePicUrl: user.photoURL || '',
-                telephone: '', location: '', tagline: '', about: ''
-            };
-            await setDoc(userDocRef, userProfile);
-            // Redirect to complete profile
-            window.location.href = 'edit-profile.html';
-        }
-
-    } catch (error) {
-        showToast(getFriendlyAuthError(error.code), "error");
-    }
-};
-googleLoginBtn.addEventListener('click', handleGoogleSignIn);
-googleSignupBtn.addEventListener('click', handleGoogleSignIn);
 
 // Verification Link Handling
 const handleVerificationRedirect = async () => {
