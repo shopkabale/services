@@ -8,7 +8,7 @@ import {
     signInWithPopup,
     sendEmailVerification,
     applyActionCode,
-    sendPasswordResetEmail // NEW: Import password reset function
+    sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { 
     getFirestore, 
@@ -39,8 +39,6 @@ const passwordToggles = document.querySelectorAll('.password-toggle');
 const verificationEmailDisplay = document.getElementById('verification-email-display');
 const resendVerificationBtn = document.getElementById('resend-verification-btn');
 const goBackToSignupLink = document.getElementById('go-back-to-signup');
-
-// --- NEW: Elements for Password Reset ---
 const forgotPasswordLink = document.getElementById('forgot-password-link');
 const passwordResetModal = document.getElementById('password-reset-modal');
 const closeResetModalBtn = document.getElementById('close-reset-modal-btn');
@@ -48,23 +46,45 @@ const passwordResetForm = document.getElementById('password-reset-form');
 
 let userForVerification = null;
 
-// --- REDIRECT LOGIC FOR LOGGED-IN USERS ---
-onAuthStateChanged(auth, (user) => {
-    if (user && user.emailVerified) {
-        console.log("User is already logged in and verified. Redirecting...");
-        
-        // Check if user is an admin to redirect to the correct dashboard
-        const userDocRef = doc(db, "users", user.uid);
-        getDoc(userDocRef).then(userDoc => {
-            if (userDoc.exists() && userDoc.data().isAdmin === true) {
-                window.location.href = 'admin.html';
-            } else {
-                window.location.href = 'dashboard.html';
-            }
-        }).catch(() => {
-            // Default redirect if Firestore check fails
+// --- Helper function for friendly error messages ---
+function getFriendlyAuthError(errorCode) {
+    switch (errorCode) {
+        case 'auth/invalid-credential':
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+            return 'Invalid email or password. Please try again.';
+        case 'auth/email-already-in-use':
+            return 'An account with this email address already exists.';
+        case 'auth/weak-password':
+            return 'Your password should be at least 6 characters long.';
+        case 'auth/too-many-requests':
+            return 'Access to this account has been temporarily disabled. Please reset your password or try again later.';
+        default:
+            return 'An unexpected error occurred. Please try again.';
+    }
+}
+
+// --- Centralized Redirect Function ---
+async function redirectUser(user) {
+    const userDocRef = doc(db, "users", user.uid);
+    try {
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists() && userDoc.data().isAdmin === true) {
+            window.location.href = 'admin.html';
+        } else {
             window.location.href = 'dashboard.html';
-        });
+        }
+    } catch (error) {
+        console.error("Redirect check failed:", error);
+        window.location.href = 'dashboard.html'; // Default redirect
+    }
+}
+
+// --- REDIRECT LOGIC FOR USERS ALREADY LOGGED IN ---
+onAuthStateChanged(auth, (user) => {
+    // This only handles users who are already logged in when they first land on the auth page.
+    if (user && user.emailVerified) {
+        redirectUser(user);
     }
 });
 
@@ -110,7 +130,7 @@ resendVerificationBtn.addEventListener('click', async () => {
         await sendEmailVerification(userForVerification, actionCodeSettings);
         showToast("A new verification link has been sent!", "success");
     } catch (error) {
-        showToast(`Error: ${error.message}`, "error");
+        showToast(getFriendlyAuthError(error.code), "error");
     } finally {
         hideButtonLoader(resendButton);
     }
@@ -138,7 +158,7 @@ passwordToggles.forEach(toggle => {
     });
 });
 
-// --- NEW: Event Listeners for Password Reset Modal ---
+// Event Listeners for Password Reset Modal
 forgotPasswordLink.addEventListener('click', (e) => {
     e.preventDefault();
     passwordResetModal.classList.add('show');
@@ -156,7 +176,7 @@ passwordResetModal.addEventListener('click', (e) => {
 
 // --- Main Auth Logic ---
 
-// NEW: Password Reset Form Submission
+// Password Reset Form Submission
 passwordResetForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const submitButton = passwordResetForm.querySelector('.btn-submit');
@@ -168,7 +188,7 @@ passwordResetForm.addEventListener('submit', async (e) => {
         showToast('Password reset link sent! Please check your email.', 'success');
         passwordResetModal.classList.remove('show');
     } catch (error) {
-        showToast(`Error: ${error.message}`, 'error');
+        showToast(getFriendlyAuthError(error.code), "error");
     } finally {
         hideButtonLoader(submitButton);
     }
@@ -210,7 +230,7 @@ signupForm.addEventListener('submit', async (e) => {
         await sendEmailVerification(user, actionCodeSettings);
         showVerificationView(user); 
     } catch (error) {
-        showToast(`Error: ${error.message}`, "error");
+        showToast(getFriendlyAuthError(error.code), "error");
     } finally {
         hideButtonLoader(submitButton);
     }
@@ -232,9 +252,9 @@ loginForm.addEventListener('submit', async (e) => {
             hideButtonLoader(submitButton);
             return;
         }
-        // Redirect logic is now handled by onAuthStateChanged
+        await redirectUser(user);
     } catch (error) {
-        showToast(`Login Error: ${error.message}`, "error");
+        showToast(getFriendlyAuthError(error.code), "error");
         hideButtonLoader(submitButton);
     }
 });
@@ -246,6 +266,7 @@ const handleGoogleSignIn = async () => {
         const user = result.user;
         const userDocRef = doc(db, "users", user.uid);
         const userDoc = await getDoc(userDocRef);
+        
         if (!userDoc.exists()) {
             const userProfile = {
                 uid: user.uid, name: user.displayName, email: user.email,
@@ -254,9 +275,11 @@ const handleGoogleSignIn = async () => {
             };
             await setDoc(userDocRef, userProfile);
         }
-        // Redirect logic is now handled by onAuthStateChanged
+        
+        await redirectUser(user);
+
     } catch (error) {
-        showToast(`Google Sign-In Error: ${error.message}`, "error");
+        showToast(getFriendlyAuthError(error.code), "error");
     }
 };
 googleLoginBtn.addEventListener('click', handleGoogleSignIn);
@@ -279,6 +302,6 @@ const handleVerificationRedirect = async () => {
     }
 };
 
-// Initial setup
+// --- Initial Setup ---
 handleVerificationRedirect();
 showLoginView();
