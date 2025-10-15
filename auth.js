@@ -267,16 +267,21 @@ const handleGoogleSignIn = async () => {
         const userDocRef = doc(db, "users", user.uid);
         const userDoc = await getDoc(userDocRef);
         
-        if (!userDoc.exists()) {
+        if (userDoc.exists()) {
+            // Returning user, send to dashboard
+            await redirectUser(user);
+        } else {
+            // New user, create basic profile and send to edit profile page
             const userProfile = {
-                uid: user.uid, name: user.displayName, email: user.email,
+                uid: user.uid, name: user.displayName || '', email: user.email,
                 role: 'user', isProvider: false, createdAt: new Date(), 
-                profilePicUrl: user.photoURL || ''
+                profilePicUrl: user.photoURL || '',
+                telephone: '', location: '', tagline: '', about: ''
             };
             await setDoc(userDocRef, userProfile);
+            // Redirect to complete profile
+            window.location.href = 'edit-profile.html';
         }
-        
-        await redirectUser(user);
 
     } catch (error) {
         showToast(getFriendlyAuthError(error.code), "error");
