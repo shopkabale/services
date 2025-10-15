@@ -1,9 +1,5 @@
+# robots.txt
 User-agent: *
 Allow: /
 
-# Sitemap location for KabaleOnline Services
 Sitemap: https://services.kabaleonline.com/sitemap.xml
-
-# Crawl-delay helps prevent too frequent requests (optional)
-Crawl-delay: 5
-
