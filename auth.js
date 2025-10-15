@@ -223,7 +223,7 @@ signupForm.addEventListener('submit', async (e) => {
         const actionCodeSettings = { url: window.location.origin, handleCodeInApp: true };
         await sendEmailVerification(user, actionCodeSettings);
         showVerificationView(user); 
-    } catch (error) => {
+    } catch (error) {
         showToast(getFriendlyAuthError(error.code), "error");
     } finally {
         hideButtonLoader(submitButton);
@@ -247,7 +247,7 @@ loginForm.addEventListener('submit', async (e) => {
             return;
         }
         await redirectUser(user);
-    } catch (error) => {
+    } catch (error) {
         showToast(getFriendlyAuthError(error.code), "error");
         hideButtonLoader(submitButton);
     }
