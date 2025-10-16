@@ -465,6 +465,7 @@ document.addEventListener("DOMContentLoaded", function() {
   let slideInterval;
   const totalSlides = slides.length;
 
+  // === Create slide dots ===
   function createDots() {
     for (let i = 0; i < totalSlides; i++) {
       const dot = document.createElement('div');
@@ -477,33 +478,46 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
 
+  // === Update dot state ===
   function updateDots() {
     const dots = dotsContainer.querySelectorAll('.hero-dot');
     dots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
   }
 
+  // === Move to a specific slide ===
   function goToSlide(n) {
     currentSlide = (n + totalSlides) % totalSlides;
     wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
     updateDots();
-    animateTyping(slides[currentSlide].querySelector('h1'));
+
+    // Wait for slide animation to finish (0.7s), then type
+    const h1 = slides[currentSlide].querySelector('h1');
+    h1.classList.remove('typing');
+    h1.textContent = h1.dataset.fulltext || h1.textContent;
+
+    setTimeout(() => animateTyping(h1), 700);
   }
 
+  // === Start automatic slide show ===
   function startSlideShow() {
     clearInterval(slideInterval);
     slideInterval = setInterval(() => goToSlide(currentSlide + 1), 6000);
   }
 
-  nextBtn.addEventListener('click', () => { goToSlide(currentSlide + 1); startSlideShow(); });
-  prevBtn.addEventListener('click', () => { goToSlide(currentSlide - 1); startSlideShow(); });
-
-  createDots();
-  goToSlide(0);
-  startSlideShow();
+  // === Button events ===
+  nextBtn.addEventListener('click', () => {
+    goToSlide(currentSlide + 1);
+    startSlideShow();
+  });
+  prevBtn.addEventListener('click', () => {
+    goToSlide(currentSlide - 1);
+    startSlideShow();
+  });
 
   // === Typing animation ===
   function animateTyping(element) {
-    const text = element.textContent;
+    const text = element.textContent.trim();
+    element.dataset.fulltext = text; // store the original text
     element.textContent = '';
     element.classList.add('typing');
     let i = 0;
@@ -516,8 +530,10 @@ document.addEventListener("DOMContentLoaded", function() {
     }, speed);
   }
 
-  // Run typing animation initially on first slide
-  animateTyping(slides[0].querySelector('h1'));
+  // === Initialize ===
+  createDots();
+  goToSlide(0);
+  startSlideShow();
 });
 </script>
 </body>
