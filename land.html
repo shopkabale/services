@@ -57,16 +57,148 @@
             .nav-links.active { right: 0; }
         }
 
-        /* --- ANIMATED HERO SECTION --- */
-        .hero { min-height: 90vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0; background-image: linear-gradient(rgba(13, 40, 87, 0.8), rgba(13, 40, 87, 0.8)), url('https://images.unsplash.com/photo-1556740714-a8395b3bf30f?q=80&w=2070&auto=format&fit=crop'); background-size: cover; background-position: center; }
-        .hero-content { display: flex; flex-direction: column; align-items: center; }
-        @media (min-width: 768px) { .hero-content { flex-direction: row; text-align: left; } }
-        .hero-text-left { font-size: 3rem; font-weight: 800; line-height: 1.2; color: var(--text-primary); }
-        .hero-text-right { font-size: 3rem; font-weight: 800; line-height: 1.2; color: var(--accent-primary); }
-        .hero-subtitle { font-size: 1.2rem; margin: 20px 0 30px 0; max-width: 600px; }
-        @media (max-width: 767px) { .hero-text-left, .hero-text-right { font-size: 2.5rem; } .hero-subtitle { font-size: 1rem; } }
+        /* --- NEW HERO SECTION BASED ON EXAMPLE IMAGE --- */
+        .hero {
+            position: relative;
+            min-height: 85vh; /* Adjust height as needed */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 0; /* Padding for mobile */
+            color: var(--text-primary);
+            overflow: hidden; /* Important for curved background */
+            background-color: var(--bg-primary); /* Fallback */
+            border-bottom-left-radius: 50px; /* Curve bottom left */
+            border-bottom-right-radius: 50px; /* Curve bottom right */
+            margin-bottom: 40px; /* Space between hero and next section */
+        }
 
-        /* --- "HOW IT WORKS" & "WHY US" SECTIONS --- */
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1556740714-a8395b3bf30f?q=80&w=2070&auto=format&fit=crop'); /* Your main background image */
+            background-size: cover;
+            background-position: center;
+            opacity: 0.3; /* Subtle overlay for text readability */
+            z-index: 1;
+        }
+
+        .hero-content-wrapper {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column; /* Stack on mobile */
+            gap: 40px;
+            align-items: center;
+            max-width: 1200px;
+            width: 100%;
+            padding: 0 15px;
+        }
+
+        @media (min-width: 768px) {
+            .hero-content-wrapper {
+                flex-direction: row; /* Two columns on desktop */
+                text-align: left;
+                justify-content: space-between;
+            }
+        }
+
+        .hero-left {
+            flex: 1;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        @media (min-width: 768px) {
+            .hero-left {
+                align-items: flex-start;
+                text-align: left;
+                padding-right: 30px;
+            }
+        }
+
+        .hero-left h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+        .hero-left .description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            max-width: 500px; /* Constrain width for readability */
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap; /* Allow buttons to wrap on small screens */
+            justify-content: center; /* Center buttons on mobile */
+        }
+        @media (min-width: 768px) {
+            .hero-buttons {
+                justify-content: flex-start; /* Align left on desktop */
+            }
+        }
+
+        .hero-right {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px; /* Ensure it has height on mobile */
+            position: relative;
+        }
+
+        /* --- Placeholder for your visual element --- */
+        .hero-visual-element {
+            width: 100%;
+            height: 350px; /* Fixed height for consistency */
+            background-image: url('https://placehold.co/400x350/a7c0e8/0a214d?text=Dynamic+Visual+Here'); /* Replace with your actual image or SVG */
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            position: relative;
+            transition: transform 0.8s ease-out; /* Animation for subtle movement */
+            animation: floatEffect 4s ease-in-out infinite; /* Continuous subtle float */
+        }
+
+        @keyframes floatEffect {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* --- Optional: Add some overlays like in the example --- */
+        .hero-overlay-card {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 10px 15px;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            opacity: 0; /* Hidden by default */
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        .hero-overlay-card:nth-child(1) { top: 10%; left: 10%; animation-delay: 0.5s; }
+        .hero-overlay-card:nth-child(2) { bottom: 15%; right: 15%; animation-delay: 1s; }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* --- HOW IT WORKS & WHY US SECTIONS (PREVIOUSLY ANIMATED) --- */
         #how-it-works, #why-us, #providers { background-color: var(--bg-secondary); }
         .steps-grid, .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
         .step-card, .feature-card { background: var(--bg-primary); padding: 30px; border-radius: 12px; text-align: center; transition: transform var(--transition-speed); }
@@ -97,7 +229,16 @@
         footer { background-color: var(--bg-card); color: var(--text-primary); padding: 60px 0 20px 0; border-top: 1px solid var(--border-color); }
         .footer-grid { display: grid; grid-template-columns: 1fr; gap: 40px; margin-bottom: 40px; text-align: center; }
         @media (min-width: 768px) { .footer-grid { grid-template-columns: 2fr 1fr 1fr 1fr; } }
-        /* ... (Your other footer styles are preserved here) ... */
+        .footer-grid h4 { color: var(--text-primary); font-size: 1.2rem; margin-bottom: 20px; }
+        .footer-about p { color: var(--text-secondary); margin-bottom: 20px; }
+        .footer-socials a { color: var(--text-primary); font-size: 1.3rem; margin: 0 10px; transition: color 0.3s; }
+        .footer-socials a:hover { color: var(--accent-primary); }
+        .footer-links ul { list-style: none; padding: 0; }
+        .footer-links li { margin-bottom: 12px; }
+        .footer-links a { color: var(--text-secondary); text-decoration: none; transition: all 0.3s; }
+        .footer-links a:hover { color: var(--accent-primary); padding-left: 5px; }
+        .footer-links ul li i { margin-right: 10px; color: var(--accent-primary); }
+        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid var(--border-color); color: var(--text-secondary); }
     </style>
 </head>
 <body class="dark-mode">
@@ -110,7 +251,7 @@
                 <li><a href="services.html">Browse Services</a></li>
                 <li><a href="browse-jobs.html">Find Jobs</a></li>
                 <li><a href="#how-it-works">How It Works</a></li>
-            </ul>
+                <li><a href="#about-us">About Us</a></li> <li><a href="#contact">Contact</a></li> </ul>
             <div class="nav-actions">
                 <a href="auth.html" class="btn-header" id="login-link">Login</a>
                 <a href="dashboard.html" class="btn-header" id="dashboard-link" style="display: none;">Dash</a>
@@ -122,19 +263,24 @@
 
     <main>
         <section id="hero" class="hero">
-            <div class="container">
-                <div class="hero-content">
-                    <div class="hero-text-left">Find Any Service in&nbsp;</div>
-                    <div class="hero-text-right"><span id="typed-text"></span></div>
+            <div class="hero-content-wrapper container">
+                <div class="hero-left">
+                    <h1>Connecting Kabale: <br>Your Local Service Hub</h1>
+                    <p class="description">The #1 marketplace to discover and offer services right here in Kabale and the Kigezi region. Connect with trusted local plumbers, web developers, photographers, tutors, and more. Post a job or grow your business today!</p>
+                    <div class="hero-buttons">
+                        <a href="services.html" class="btn">Find a Service</a>
+                        <a href="auth.html" class="btn btn-secondary">Offer a Service</a>
+                    </div>
                 </div>
-                <p class="hero-subtitle">The #1 marketplace to connect with trusted local plumbers, developers, photographers, and more. Post a job or grow your business in the Kigezi region.</p>
-                <div>
-                    <a href="services.html" class="btn">Find a Service</a>
-                    <a href="auth.html" class="btn btn-secondary">Offer a Service</a>
+                <div class="hero-right">
+                    <div class="hero-visual-element">
+                         </div>
+                    <div class="hero-overlay-card" style="top: 15%; left: 5%;">Local Matchmaking <i class="fas fa-search"></i></div>
+                    <div class="hero-overlay-card" style="bottom: 20%; right: 10%;">Community Growth <i class="fas fa-users"></i></div>
                 </div>
             </div>
         </section>
-
+        
         <section id="how-it-works" class="animated-section">
             <div class="container">
                 <p class="section-subtitle">Our Process</p>
@@ -215,42 +361,105 @@
                  </div>
             </div>
         </section>
+
+        <section id="about-us" class="animated-section">
+            <div class="container">
+                <p class="section-subtitle">Our Story</p>
+                <h2 class="section-title">About KabaleOnline Services</h2>
+                <p class="section-description">KabaleOnline Services was founded with a clear vision: to empower our local community by creating a seamless connection between talented service providers and individuals or businesses in need of their skills. We believe in fostering local economic growth, building trust, and making everyday tasks easier for everyone in Kabale and the Kigezi region.</p>
+                <div style="text-align: center; margin-top: 40px;">
+                    <a href="about.html" class="btn btn-secondary">Learn More</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="animated-section" style="background-color: var(--bg-secondary);">
+            <div class="container">
+                <p class="section-subtitle">Get In Touch</p>
+                <h2 class="section-title">Contact Us</h2>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                    <p><i class="fas fa-map-marker-alt" style="margin-right: 10px; color: var(--accent-primary);"></i> Kabale, Uganda</p>
+                    <p><i class="fas fa-phone-alt" style="margin-right: 10px; color: var(--accent-primary);"></i> +256 123 456789</p>
+                    <p><i class="fas fa-envelope" style="margin-right: 10px; color: var(--accent-primary);"></i> help@kabaleonline.com</p>
+                    <a href="contact.html" class="btn">Send us a Message</a>
+                </div>
+            </div>
+        </section>
+
     </main>
     
     <footer>
         <div class="container">
             <div class="footer-grid">
+                <div class="footer-about">
+                    <h4 class="nav-logo" style="font-size: 2rem;">KabaleOnline</h4>
+                    <p>Connecting our community by making it easy to find and offer skilled services across the Kigezi region.</p>
+                    <div class="footer-socials">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    </div>
                 </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul id="footer-quick-links">
+                        <li><a href="services.html">Browse Services</a></li>
+                        <li><a href="browse-jobs.html">Browse Jobs</a></li>
+                        <li><a href="group-chat.html">Community Chat</a></li>
+                        <li><a href="#how-it-works">How It Works</a></li>
+                        </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#contact">Contact Us</a></li>
+                        <li><a href="#">Help & FAQ</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                 <div class="footer-links">
+                    <h4>Contact Us</h4>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Kabale, Uganda</li>
+                        <li><i class="fas fa-phone-alt"></i> +256 123 456789</li>
+                        <li><i class="fas fa-envelope"></i> help@kabaleonline.com</li>
+                    </ul>
+                </div>
+            </div>
             <div class="footer-bottom">
                 <p>&copy; 2025 KabaleOnline Services. All Rights Reserved.</p>
             </div>
         </div>
     </footer>
 
-    <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
     <script src="theme.js" defer></script>
     <script src="global-auth.js" type="module"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const typed = new Typed('#typed-text', {
-                strings: ['Kabale.', 'Web Design.', 'Photography.', 'Tutoring.', 'Anything.'],
-                typeSpeed: 70, backSpeed: 40, backDelay: 1500, loop: true
-            });
+            // --- Mobile Menu Toggle ---
             const mobileMenuBtn = document.getElementById('mobile-menu-btn');
             const navLinks = document.getElementById('nav-links');
             mobileMenuBtn.addEventListener('click', () => {
                 navLinks.classList.toggle('active');
             });
+            
+            // --- On-Scroll Reveal Animation ---
             const animatedSections = document.querySelectorAll('.animated-section');
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('visible');
-                        observer.unobserve(entry.target);
+                        observer.unobserve(entry.target); // Stop observing once visible
                     }
                 });
-            }, { threshold: 0.15 });
-            animatedSections.forEach(section => { observer.observe(section); });
+            }, {
+                threshold: 0.15 // Trigger when 15% of the section is visible
+            });
+
+            animatedSections.forEach(section => {
+                observer.observe(section);
+            });
         });
     </script>
 </body>
