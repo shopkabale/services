@@ -292,7 +292,40 @@ footer {
     display: none;
   }
 }
+/* Fix header layering & ensure clickability */
+.header {
+  position: relative;
+  z-index: 1000;
+}
 
+/* Desktop menu visible on large screens */
+.desktop-menu {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.btn-header {
+  background: var(--accent-primary);
+  color: #fff;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-header:hover {
+  background: var(--accent-dark);
+  transform: translateY(-2px);
+}
+
+/* Hide extra items on small screens */
+@media (max-width: 768px) {
+  .desktop-menu a:nth-child(-n+4) {
+    display: none;
+  }
+}
     </style>
 </head>
 <body class="dark-mode">
@@ -465,7 +498,7 @@ document.addEventListener("DOMContentLoaded", function() {
   let slideInterval;
   const totalSlides = slides.length;
 
-  // === Create slide dots ===
+  // Create dots
   function createDots() {
     for (let i = 0; i < totalSlides; i++) {
       const dot = document.createElement('div');
@@ -478,33 +511,46 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
 
-  // === Update dot state ===
+  // Update dots
   function updateDots() {
     const dots = dotsContainer.querySelectorAll('.hero-dot');
     dots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
   }
 
-  // === Move to a specific slide ===
+  // Typing animation
+  function animateTyping(element) {
+    const text = element.textContent.trim();
+    element.textContent = '';
+    element.classList.add('typing');
+    let i = 0;
+    const speed = 70;
+    const typingInterval = setInterval(() => {
+      element.textContent = text.substring(0, i + 1);
+      i++;
+      if (i === text.length) clearInterval(typingInterval);
+    }, speed);
+  }
+
+  // Go to slide
   function goToSlide(n) {
     currentSlide = (n + totalSlides) % totalSlides;
     wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
     updateDots();
 
-    // Wait for slide animation to finish (0.7s), then type
-    const h1 = slides[currentSlide].querySelector('h1');
-    h1.classList.remove('typing');
-    h1.textContent = h1.dataset.fulltext || h1.textContent;
-
-    setTimeout(() => animateTyping(h1), 700);
+    // Wait for slide transition to finish (0.7s)
+    setTimeout(() => {
+      const h1 = slides[currentSlide].querySelector('h1');
+      if (h1) animateTyping(h1);
+    }, 700);
   }
 
-  // === Start automatic slide show ===
+  // Auto slide
   function startSlideShow() {
     clearInterval(slideInterval);
     slideInterval = setInterval(() => goToSlide(currentSlide + 1), 6000);
   }
 
-  // === Button events ===
+  // Buttons
   nextBtn.addEventListener('click', () => {
     goToSlide(currentSlide + 1);
     startSlideShow();
@@ -514,23 +560,7 @@ document.addEventListener("DOMContentLoaded", function() {
     startSlideShow();
   });
 
-  // === Typing animation ===
-  function animateTyping(element) {
-    const text = element.textContent.trim();
-    element.dataset.fulltext = text; // store the original text
-    element.textContent = '';
-    element.classList.add('typing');
-    let i = 0;
-    const speed = 70;
-
-    const typingInterval = setInterval(() => {
-      element.textContent = text.substring(0, i + 1);
-      i++;
-      if (i === text.length) clearInterval(typingInterval);
-    }, speed);
-  }
-
-  // === Initialize ===
+  // Init
   createDots();
   goToSlide(0);
   startSlideShow();
