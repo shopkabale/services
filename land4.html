@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KabaleOnline Services | Find Local Pros in Kabale & Kigezi</title>
+    <meta name="description" content="The #1 marketplace to find and offer services in Kabale, Uganda.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #0d2857; --bg-secondary: #10336d; --bg-card: #0a214d;
+            --text-primary: #ffffff; --text-secondary: #a7c0e8; --accent-primary: #007bff;
+            --border-color: #1f4287; --transition-speed: 0.3s;
+        }
+        body.light-mode {
+            --bg-primary: #f0f4f9; --bg-secondary: #ffffff; --bg-card: #ffffff;
+            --text-primary: #0d2857; --text-secondary: #6c757d; --border-color: #dee2e6;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-primary); color: var(--text-secondary); }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 15px; }
+        section { padding: 80px 0; overflow-x: hidden; }
+        .section-title { font-size: 2.5rem; text-align: center; margin-bottom: 1rem; color: var(--text-primary); }
+        .section-subtitle { text-align: center; color: var(--accent-primary); font-weight: 600; text-transform: uppercase; }
+        .btn { display: inline-block; padding: 12px 28px; background-color: var(--accent-primary); color: #ffffff; border-radius: 50px; text-decoration: none; font-weight: 600; transition: transform var(--transition-speed), background-color var(--transition-speed); }
+        .btn:hover { transform: translateY(-3px); background-color: #0069d9; }
+        .btn-secondary { background-color: transparent; border: 2px solid var(--border-color); }
+        .btn-secondary:hover { background-color: var(--bg-secondary); border-color: var(--bg-secondary); }
+
+        /* --- ON-SCROLL ANIMATION STYLES --- */
+        .animated-section { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+        .animated-section.visible { opacity: 1; transform: translateY(0); }
+
+        /* --- HEADER WITH FULL NAVIGATION --- */
+        .header { position: sticky; top: 0; z-index: 1000; background-color: var(--bg-secondary); padding: 15px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .navbar { display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { font-size: 1.6rem; font-weight: 800; color: var(--accent-primary); text-decoration: none; }
+        .nav-links { display: none; list-style: none; gap: 25px; }
+        .nav-links a { color: var(--text-secondary); text-decoration: none; font-weight: 500; position: relative; }
+        .nav-links a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background-color: var(--accent-primary); transition: width var(--transition-speed); }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-actions { display: flex; align-items: center; gap: 15px; }
+        .btn-header { display: inline-flex; align-items: center; padding: 8px 20px; font-size: 0.9rem; background-color: var(--accent-primary); color: #ffffff; border-radius: 50px; text-decoration: none; font-weight: 600; }
+        .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; }
+        .mobile-menu-btn { display: none; background: none; border: none; color: var(--text-primary); font-size: 1.8rem; cursor: pointer; z-index: 1001; }
+
+        @media (min-width: 992px) { .nav-links { display: flex; } }
+        @media (max-width: 991px) {
+            .mobile-menu-btn { display: block; }
+            .nav-links { position: fixed; top: 0; right: -100%; width: 250px; height: 100vh; background-color: var(--bg-card); flex-direction: column; padding-top: 100px; align-items: center; transition: right 0.5s ease-in-out; }
+            .nav-links.active { right: 0; }
+        }
+
+        /* --- ANIMATED HERO SLIDER --- */
+        .hero { height: 95vh; position: relative; padding: 0; overflow: hidden; }
+        .hero-slider-wrapper { position: relative; width: 100%; height: 100%; }
+        .hero-slide { width: 100%; height: 100%; background-size: cover; background-position: center; position: absolute; top: 0; left: 0; display: flex; align-items: center; justify-content: center; text-align: center; color: #fff; opacity: 0; transition: opacity 1s ease-in-out; }
+        .hero-slide.active { opacity: 1; }
+        .hero-slide::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 40, 87, 0.7); }
+        .hero-content { max-width: 800px; position: relative; z-index: 2; padding: 0 20px; }
+        .hero-content h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.2; margin-bottom: 20px; }
+        /* Word animation styles */
+        .hero-content h1 .word { display: inline-block; opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .hero-slide.active h1 .word { opacity: 1; transform: translateY(0); }
+        .hero-content p { font-size: 1.2rem; margin-bottom: 30px; }
+        .hero-dots { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 3; display: flex; gap: 10px; }
+        .hero-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255, 255, 255, 0.5); cursor: pointer; }
+        .hero-dot.active { background: #ffffff; }
+
+        /* --- "HOW IT WORKS" & ZIG-ZAG SECTIONS --- */
+        #how-it-works, #providers { background-color: var(--bg-secondary); }
+        .steps-grid, .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+        .step-card, .feature-card { background: var(--bg-primary); padding: 30px; border-radius: 12px; text-align: center; transition: transform var(--transition-speed), box-shadow var(--transition-speed); }
+        .step-card:hover, .feature-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .icon { font-size: 3rem; color: var(--accent-primary); margin-bottom: 20px; }
+        h3 { font-size: 1.3rem; margin-bottom: 10px; color: var(--text-primary); }
+        
+        .content-row { display: flex; flex-direction: column; align-items: center; gap: 40px; margin-bottom: 40px; }
+        @media (min-width: 768px) { .content-row { flex-direction: row; } .content-row:nth-child(even) { flex-direction: row-reverse; } }
+        .content-image { flex: 1; }
+        .content-image img { width: 100%; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .content-text { flex: 1; }
+        .content-text h2 { text-align: left; font-size: 2.2rem; margin-bottom: 20px; }
+        .content-text p { line-height: 1.8; margin-bottom: 20px; }
+        
+        /* YOUR ORIGINAL SECTION STYLES ARE PRESERVED */
+        .category-card { transition: transform var(--transition-speed); }
+        .category-card:hover { transform: translateY(-5px); }
+        /* ... etc ... */
+
+        footer { background-color: var(--bg-card); /* ... etc ... */ }
+    </style>
+</head>
+<body class="dark-mode">
+
+    <header class="header">
+        <nav class="navbar container">
+            <a href="index.html" class="nav-logo">KabaleOnline</a>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="services.html">Browse</a></li>
+                <li><a href="browse-jobs.html">Jobs</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="auth.html" class="btn-header" id="login-link">Login</a>
+                <a href="dashboard.html" class="btn-header" id="dashboard-link" style="display: none;">Dash</a>
+                <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
+                <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open Menu"><i class="fas fa-bars"></i></button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero" class="hero">
+            <div class="hero-slider-wrapper">
+                <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1521791136064-7986c2920216?q=80&w=2070&auto=format&fit=crop');">
+                    <div class="hero-content"><h1>Need a Skill? Find a Local Pro.</h1><p>Connect with trusted experts in Kabale for any project.</p><div><a href="services.html" class="btn">Find a Service</a><a href="auth.html" class="btn btn-secondary">Offer a Service</a></div></div>
+                </div>
+                <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop');">
+                    <div class="hero-content"><h1>Your Home, Expertly Cared For.</h1><p>From plumbing to painting, find reliable help for home maintenance.</p><div><a href="services.html" class="btn">Find a Service</a><a href="auth.html" class="btn btn-secondary">Offer a Service</a></div></div>
+                </div>
+                </div>
+            <div class="hero-dots"></div>
+        </section>
+        
+        <section id="how-it-works" class="animated-section">
+            <div class="container">
+                <p class="section-subtitle">Our Process</p>
+                <h2 class="section-title">Get Started in 3 Easy Steps</h2>
+                <div class="steps-grid">
+                    <div class="step-card"><div class="icon"><i class="fas fa-search"></i></div><h3>1. Find Your Pro</h3><p>Use our powerful search to find exactly what you need.</p></div>
+                    <div class="step-card"><div class="icon"><i class="fas fa-comments"></i></div><h3>2. Connect Directly</h3><p>Contact providers to discuss details and agree on a price.</p></div>
+                    <div class="step-card"><div class="icon"><i class="fas fa-check-circle"></i></div><h3>3. Hire with Confidence</h3><p>Get your project completed by a trusted community member.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="why-us-new" class="animated-section">
+            <div class="container">
+                <div class="content-row">
+                    <div class="content-image"><img src="https://images.unsplash.com/photo-1521791136064-7986c2920216?q=80&w=800&auto=format&fit=crop" alt="Community members collaborating"></div>
+                    <div class="content-text">
+                        <h2>A Platform Built for Kigezi</h2>
+                        <p>By hiring on KabaleOnline, you're directly supporting local artisans and professionals, strengthening our community's economy. We encourage a community of trust with user reviews and profiles, so you can hire with confidence.</p>
+                        <a href="services.html" class="btn">Explore Services</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="why-us" class="animated-section"></section>
+        <section id="categories" class="animated-section"></section>
+        <section id="providers" class="animated-section"></section>
+        <section id="testimonials" class="animated-section"></section>
+    </main>
+    
+    <footer></footer>
+
+    <script src="theme.js" defer></script>
+    <script src="global-auth.js" type="module"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // --- Mobile Menu Toggle ---
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const navLinks = document.getElementById('nav-links');
+            mobileMenuBtn.addEventListener('click', () => navLinks.classList.toggle('active'));
+
+            // --- On-Scroll Reveal Animation ---
+            const animatedSections = document.querySelectorAll('.animated-section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15 });
+            animatedSections.forEach(section => observer.observe(section));
+            
+            // --- NEW ANIMATED HERO SLIDER ---
+            const slides = document.querySelectorAll('.hero-slide');
+            const dotsContainer = document.querySelector('.hero-dots');
+            if (slides.length > 0) {
+                let currentSlide = 0;
+                
+                // Wrap words in spans for animation
+                slides.forEach(slide => {
+                    const h1 = slide.querySelector('h1');
+                    if (h1) {
+                        h1.innerHTML = h1.textContent.split(' ').map(word => `<span class="word">${word}</span>`).join(' ');
+                    }
+                });
+
+                function createDots() {
+                    slides.forEach((_, i) => {
+                        const dot = document.createElement('div');
+                        dot.classList.add('hero-dot');
+                        dot.addEventListener('click', () => goToSlide(i));
+                        dotsContainer.appendChild(dot);
+                    });
+                }
+
+                function updateDots() {
+                    dotsContainer.querySelectorAll('.hero-dot').forEach((dot, i) => {
+                        dot.classList.toggle('active', i === currentSlide);
+                    });
+                }
+                
+                function animateWords(slide) {
+                    const words = slide.querySelectorAll('.word');
+                    words.forEach((word, index) => {
+                        word.style.transitionDelay = `${index * 0.05}s`;
+                    });
+                }
+
+                function goToSlide(n) {
+                    slides[currentSlide].classList.remove('active');
+                    currentSlide = (n + slides.length) % slides.length;
+                    slides[currentSlide].classList.add('active');
+                    animateWords(slides[currentSlide]);
+                    updateDots();
+                }
+
+                function nextSlide() {
+                    goToSlide(currentSlide + 1);
+                }
+
+                createDots();
+                goToSlide(0); // Initialize first slide
+                setInterval(nextSlide, 7000); // Change slide every 7 seconds
+            }
+        });
+    </script>
+</body>
+</html>
