@@ -39,6 +39,7 @@ async function loadServiceAndProvider() {
         const providerData = providerSnap.exists() ? { id: providerSnap.id, ...providerSnap.data() } : { name: 'Unknown Provider' };
 
         renderServiceDetails(serviceData, providerData);
+        setupShareButton(serviceData);
         loadReviews(serviceId, serviceData.providerId);
 
     } catch (error) {
@@ -66,15 +67,20 @@ function renderServiceDetails(service, provider) {
         </div>
         <aside class="provider-sidebar">
             <div class="provider-card">
-                
                 <a href="profile.html?id=${provider.id}" style="text-decoration: none; color: inherit;">
                     <img src="${provider.profilePicUrl || `https://placehold.co/100x100?text=${provider.name.charAt(0)}`}" alt="${provider.name}" class="provider-avatar">
                     <h2 class="provider-name">${provider.name}</h2>
                 </a>
-
                 <p class="provider-location"><i class="fas fa-map-marker-alt"></i> ${provider.location}</p>
                 <div class="price-display">UGX ${service.price.toLocaleString()} <span>/ ${service.priceUnit}</span></div>
-                <a href="${contactLink}" id="contact-provider-btn" class="btn-contact"><i class="fas fa-envelope"></i> Contact Provider</a>
+                <div class="sidebar-buttons">
+                    <a href="${contactLink}" id="contact-provider-btn" class="btn-contact btn-action">
+                        <i class="fas fa-envelope"></i> Contact Provider
+                    </a>
+                    <button id="share-service-btn" class="btn-share">
+                        <i class="fas fa-share-alt"></i> Share
+                    </button>
+                </div>
             </div>
         </aside>
     `;
@@ -91,6 +97,27 @@ function renderServiceDetails(service, provider) {
     }
 }
 
+function setupShareButton(service) {
+    const shareButton = document.getElementById('share-service-btn');
+    if (!shareButton) return;
+
+    if (navigator.share) {
+        shareButton.addEventListener('click', async () => {
+            try {
+                await navigator.share({
+                    title: service.title,
+                    text: `Check out this service on KabaleOnline: "${service.title}"`,
+                    url: window.location.href
+                });
+            } catch (error) {
+                console.error('Error sharing:', error);
+            }
+        });
+    } else {
+        shareButton.style.display = 'none';
+    }
+}
+
 async function loadReviews(serviceId, providerId) {
     const reviewsRef = collection(db, 'services', serviceId, 'reviews');
     const q = query(reviewsRef, orderBy('createdAt', 'desc'));
@@ -104,7 +131,6 @@ async function loadReviews(serviceId, providerId) {
                 const review = docSnap.data();
                 const reviewerDoc = await getDoc(doc(db, 'users', review.reviewerId));
                 const reviewerData = reviewerDoc.exists() ? reviewerDoc.data() : { name: 'Anonymous' };
-
                 const reviewEl = document.createElement('div');
                 reviewEl.className = 'review-item';
                 reviewEl.innerHTML = `
