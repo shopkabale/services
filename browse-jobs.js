@@ -15,22 +15,32 @@ const closeProposalModalBtn = document.getElementById('close-proposal-modal-btn'
 const proposalJobTitle = document.getElementById('proposal-job-title');
 const proposalForm = document.getElementById('proposal-form');
 const proposalMessageTextarea = document.getElementById('proposal-message');
+// --- NEW: Elements for Search and Filter ---
+const searchInput = document.getElementById('search-input');
+const searchButton = document.getElementById('search-button');
+const categoryFilters = document.getElementById('category-filters');
 
+// --- STATE MANAGEMENT ---
 let currentUser = null;
 let selectedJob = null; 
+let allJobs = []; // Cache all jobs to filter on the client-side
+let currentQuery = '';
+let currentCategory = 'All';
 
 // --- INITIALIZATION ---
 onAuthStateChanged(auth, (user) => {
     if (user && user.emailVerified) {
         currentUser = user;
-        fetchAndDisplayJobs();
+        fetchAllJobs(); // Fetch all jobs once on page load
     } else {
         window.location.href = 'auth.html';
     }
 });
 
-// --- FETCH AND DISPLAY JOBS ---
-async function fetchAndDisplayJobs() {
+// --- DATA FETCHING & RENDERING ---
+
+// Fetches all jobs from Firestore ONCE and stores them.
+async function fetchAllJobs() {
     if (!jobsGrid) return;
     jobsGrid.innerHTML = '<div class="spinner-container"><div class="spinner"></div></div>';
     
@@ -40,52 +50,102 @@ async function fetchAndDisplayJobs() {
         const snapshot = await getDocs(q);
 
         if (snapshot.empty) {
-            jobsGrid.innerHTML = '<p>No jobs posted yet. Be the first!</p>';
+            jobsGrid.innerHTML = '<p style="text-align:center;">No jobs posted yet. Be the first!</p>';
             return;
         }
 
-        jobsGrid.innerHTML = '';
-        for (const jobDoc of snapshot.docs) {
+        // Fetch all seeker data at once and store jobs in the cache
+        allJobs = await Promise.all(snapshot.docs.map(async (jobDoc) => {
             const job = { id: jobDoc.id, ...jobDoc.data() };
-            
             const seekerDoc = await getDoc(doc(db, "users", job.seekerId));
-            const seekerData = seekerDoc.exists() ? seekerDoc.data() : { name: 'Anonymous' };
-            
-            // The entire card is a link to the job detail page
-            const card = document.createElement('a');
-            card.href = `job-post-detail.html?id=${job.id}`;
-            card.className = 'job-card';
-            
-            // Disable the proposal button if the current user is the one who posted the job
-            const isOwnJob = currentUser.uid === job.seekerId;
-            const buttonHtml = isOwnJob 
-                ? `<button class="btn-primary" disabled>This is Your Post</button>`
-                : `<button class="btn-primary send-proposal-btn" data-job-id="${job.id}">Send Proposal</button>`;
+            job.seekerData = seekerDoc.exists() ? seekerDoc.data() : { name: 'Anonymous' };
+            return job;
+        }));
 
-            card.innerHTML = `
-                <div>
-                    <h3>${job.title}</h3>
-                    <p class="job-poster">Posted by: ${seekerData.name}</p>
-                    <p class="job-description">${job.description.substring(0, 100)}...</p>
-                </div>
-                <div class="job-footer">
-                    <span class="job-budget">Budget: UGX ${job.budget.toLocaleString()}</span>
-                    ${buttonHtml}
-                </div>
-            `;
-            jobsGrid.appendChild(card);
-        }
+        renderJobs(); // Render the initial, unfiltered view
+
     } catch (error) {
         console.error("Error fetching jobs:", error);
-        jobsGrid.innerHTML = '<p>Could not load jobs at this time.</p>';
+        jobsGrid.innerHTML = '<p style="text-align:center;">Could not load jobs at this time.</p>';
     }
 }
 
-// --- PROPOSAL MODAL LOGIC ---
+// Renders jobs from the cached 'allJobs' array based on current filters.
+function renderJobs() {
+    if (!jobsGrid) return;
+    jobsGrid.innerHTML = '';
+    
+    const filteredJobs = allJobs.filter(job => {
+        const jobTitle = job.title || '';
+        const jobCategory = job.category || '';
+        const matchesCategory = currentCategory === 'All' || jobCategory === currentCategory;
+        const matchesQuery = !currentQuery || jobTitle.toLowerCase().includes(currentQuery.toLowerCase());
+        return matchesCategory && matchesQuery;
+    });
+
+    if (filteredJobs.length === 0) {
+        jobsGrid.innerHTML = '<p style="text-align: center;">No jobs found matching your criteria.</p>';
+        return;
+    }
+
+    filteredJobs.forEach(job => {
+        const card = document.createElement('a');
+        card.href = `job-post-detail.html?id=${job.id}`;
+        card.className = 'job-card';
+        
+        const isOwnJob = currentUser.uid === job.seekerId;
+        const buttonHtml = isOwnJob 
+            ? `<button class="btn-primary" disabled>This is Your Post</button>`
+            : `<button class="btn-primary send-proposal-btn" data-job-id="${job.id}">Send Proposal</button>`;
+
+        const avatar = job.seekerData.profilePicUrl || `https://placehold.co/50x50?text=${job.seekerData.name.charAt(0)}`;
+        
+        card.innerHTML = `
+            <div class="job-header">
+                <img src="${avatar}" alt="${job.seekerData.name}" class="seeker-avatar">
+                <div class="job-title-group">
+                    <h3>${job.title}</h3>
+                    <p class="job-poster">Posted by: ${job.seekerData.name}</p>
+                </div>
+            </div>
+            <p class="job-description">${job.description.substring(0, 100)}...</p>
+            <div class="job-footer">
+                <span class="job-budget">Budget: UGX ${job.budget.toLocaleString()}</span>
+                ${buttonHtml}
+            </div>
+        `;
+        jobsGrid.appendChild(card);
+    });
+}
+
+// --- EVENT LISTENERS for Search and Filter ---
+searchButton.addEventListener('click', () => {
+    currentQuery = searchInput.value.trim();
+    renderJobs();
+});
+
+searchInput.addEventListener('keyup', (event) => {
+    if (event.key === 'Enter') {
+        currentQuery = searchInput.value.trim();
+        renderJobs();
+    }
+});
+
+categoryFilters.addEventListener('click', (event) => {
+    const button = event.target.closest('.filter-btn');
+    if (button) {
+        categoryFilters.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        currentCategory = button.dataset.category;
+        renderJobs();
+    }
+});
+
+
+// --- PROPOSAL MODAL LOGIC (UNCHANGED) ---
 jobsGrid.addEventListener('click', async (e) => {
-    // Check if a proposal button was clicked
     if (e.target.classList.contains('send-proposal-btn')) {
-        e.preventDefault(); // IMPORTANT: Prevent the card's link from navigating
+        e.preventDefault(); 
         const jobId = e.target.dataset.jobId;
         try {
             const jobDoc = await getDoc(doc(db, "job_posts", jobId));
@@ -101,7 +161,7 @@ jobsGrid.addEventListener('click', async (e) => {
     }
 });
 
-// --- MODAL CLOSE HANDLERS ---
+// --- MODAL CLOSE HANDLERS (UNCHANGED) ---
 closeProposalModalBtn.addEventListener('click', () => {
     proposalModal.classList.remove('show');
 });
@@ -111,7 +171,7 @@ proposalModal.addEventListener('click', (e) => {
     }
 });
 
-// --- HANDLE PROPOSAL FORM SUBMISSION ---
+// --- HANDLE PROPOSAL FORM SUBMISSION (UNCHANGED) ---
 proposalForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const submitButton = proposalForm.querySelector('.btn-submit');
@@ -128,15 +188,12 @@ proposalForm.addEventListener('submit', async (e) => {
         const conversationId = [currentUser.uid, selectedJob.seekerId].sort().join('_');
         const conversationRef = doc(db, "conversations", conversationId);
 
-        // This object matches what your inbox.js file expects
         await setDoc(conversationRef, {
             participants: [currentUser.uid, selectedJob.seekerId],
             lastMessageText: messageText,
             lastMessageTimestamp: serverTimestamp(),
             lastSenderId: currentUser.uid,
-            lastRead: {
-                [currentUser.uid]: serverTimestamp()
-            }
+            lastRead: { [currentUser.uid]: serverTimestamp() }
         }, { merge: true });
 
         const messagesRef = collection(conversationRef, "messages");
@@ -147,8 +204,6 @@ proposalForm.addEventListener('submit', async (e) => {
         });
 
         showToast('Proposal sent! Redirecting to chat...', 'success');
-        
-        // Redirect to the chat page using the recipient's ID
         window.location.href = `chat.html?recipientId=${selectedJob.seekerId}`;
 
     } catch (error) {
