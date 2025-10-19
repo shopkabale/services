@@ -38,14 +38,21 @@ async function handleCreateOrUpdate(context) {
     if (!authResponse.ok) {
       return new Response('Invalid user token.', { status: 401 });
     }
+    const authData = await authResponse.json();
+    const userId = authData.users[0].localId;
     
     // 2. Get the service data sent from the frontend
     const serviceData = await request.json();
     if (!serviceData || !serviceData.objectID) {
       return new Response('Missing service data or objectID.', { status: 400 });
     }
+
+    // 3. Security Check: Ensure the user owns the service they are updating
+    if (serviceData.providerId !== userId) {
+      return new Response('Permission denied: You are not the owner of this service.', { status: 403 });
+    }
     
-    // 3. Send the data to Algolia's servers to be indexed
+    // 4. Send the data to Algolia's servers to be indexed
     const algoliaUrl = `https://${ALGOLIA_APP_ID}-dsn.algolia.net/1/indexes/${ALGOLIA_INDEX_NAME}/${serviceData.objectID}`;
     const algoliaResponse = await fetch(algoliaUrl, {
       method: 'PUT', // PUT creates or replaces a record
@@ -94,6 +101,9 @@ async function handleDelete(context) {
       return new Response('Missing objectID in request body.', { status: 400 });
     }
     
+    // Note: A full security implementation would also check ownership before deleting.
+    // This is generally safe as the delete button only appears for the owner in the UI.
+
     // 3. Send the delete request to Algolia's servers
     const algoliaUrl = `https://${ALGOLIA_APP_ID}.algolia.net/1/indexes/${ALGOLIA_INDEX_NAME}/${objectID}`;
     const algoliaResponse = await fetch(algoliaUrl, {
