@@ -8,9 +8,10 @@ const db = getFirestore(app);
 const profilePictureEl = document.getElementById('profile-picture');
 const profileNameEl = document.getElementById('profile-name');
 const welcomeMessageEl = document.getElementById('welcome-message');
+// --- NEW: Get the badge element ---
+const foundingMemberBadge = document.getElementById('founding-member-badge');
 
 onAuthStateChanged(auth, async (user) => {
-    // Check if a user is logged in AND their email is verified
     if (user && user.emailVerified) {
         const userDocRef = doc(db, "users", user.uid);
         try {
@@ -21,8 +22,13 @@ onAuthStateChanged(auth, async (user) => {
                 profileNameEl.textContent = userData.name || 'User';
                 welcomeMessageEl.textContent = 'Welcome to your dashboard!';
                 profilePictureEl.src = userData.profilePicUrl || `https://placehold.co/120x120/10336d/a7c0e8?text=${(userData.name || 'U').charAt(0)}`;
+                
+                // --- NEW: Check for the founding member flag ---
+                if (userData.isFoundingMember === true) {
+                    foundingMemberBadge.style.display = 'inline-block'; // Show the badge
+                }
+
             } else {
-                // If the user's profile is missing, they can't use the dashboard properly
                 console.error("No profile document found for this user. Redirecting to login.");
                 window.location.href = 'auth.html';
             }
@@ -31,7 +37,6 @@ onAuthStateChanged(auth, async (user) => {
             window.location.href = 'auth.html';
         }
     } else {
-        // If there is no user or their email is not verified, redirect to the login page.
         console.log("User not logged in or email not verified. Redirecting...");
         window.location.href = 'auth.html';
     }
