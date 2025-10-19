@@ -9,29 +9,57 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        :root { --bg-primary: #0d2857; --bg-secondary: #10336d; --bg-card: #0a214d; --text-primary: #ffffff; --text-secondary: #a7c0e8; --accent-primary: #007bff; --border-color: #1f4287; --font-family: 'Poppins', sans-serif; --shadow-color: rgba(0, 0, 0, 0.2); }
-        body.light-mode { --bg-primary: #f0f4f9; --bg-secondary: #ffffff; --bg-card: #ffffff; --text-primary: #0d2857; --text-secondary: #6c757d; --border-color: #e9ecef; --shadow-color: rgba(0, 0, 0, 0.08); }
+        :root {
+            --bg-primary: #0d2857; --bg-secondary: #10336d; --bg-card: #0a214d;
+            --text-primary: #ffffff; --text-secondary: #a7c0e8; --accent-primary: #007bff;
+            --accent-secondary: #ffc107; /* Yellow accent color */
+            --border-color: #1f4287; --font-family: 'Poppins', sans-serif; --shadow-color: rgba(0, 0, 0, 0.2);
+        }
+        body.light-mode {
+            --bg-primary: #f0f4f9; --bg-secondary: #ffffff; --bg-card: #ffffff;
+            --text-primary: #0d2857; --text-secondary: #6c757d; --border-color: #e9ecef;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: var(--font-family); background-color: var(--bg-primary); color: var(--text-secondary); }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
+
+        /* --- HEADER WITH FULL NAVIGATION --- */
         .header { position: sticky; top: 0; z-index: 1000; background-color: var(--bg-secondary); border-bottom: 1px solid var(--border-color); padding: 15px 0; }
         .navbar { display: flex; justify-content: space-between; align-items: center; }
         .nav-logo { font-size: 1.6rem; font-weight: 800; color: var(--accent-primary); text-decoration: none; flex-shrink: 0; }
-        .nav-menu { display: flex; align-items: center; gap: 15px; }
-        .btn-header { display: inline-flex; align-items: center; padding: 8px 20px; font-size: 0.9rem; background-color: var(--accent-primary); color: #ffffff; border-radius: 50px; text-decoration: none; font-weight: 600; border: 2px solid var(--accent-primary); white-space: nowrap; }
+        .nav-links { display: none; list-style: none; gap: 25px; }
+        @media (min-width: 992px) { .nav-links { display: flex; } }
+        .nav-links a { color: var(--text-secondary); text-decoration: none; font-weight: 500; position: relative; }
+        .nav-links a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background-color: var(--accent-primary); transition: width 0.3s; }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-actions { display: flex; align-items: center; gap: 15px; }
+        .btn-header { display: inline-flex; align-items: center; padding: 8px 20px; font-size: 0.9rem; background-color: var(--accent-primary); color: #ffffff; border-radius: 50px; text-decoration: none; font-weight: 600; white-space: nowrap; }
         .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; }
+        .mobile-menu-btn { display: none; background: none; border: none; color: var(--text-primary); font-size: 1.8rem; cursor: pointer; z-index: 1001; }
+        @media (max-width: 991px) {
+            .mobile-menu-btn { display: block; }
+            .nav-links { position: fixed; top: 0; right: -100%; width: 250px; height: 100vh; background-color: var(--bg-card); flex-direction: column; padding-top: 100px; align-items: center; transition: right 0.5s ease-in-out; }
+            .nav-links.active { right: 0; }
+        }
+
+        /* --- PAGE HEADER & SEARCH --- */
         .page-header { padding: 80px 15px 60px; text-align: center; }
         .page-header h1 { font-size: 3rem; color: var(--text-primary); margin-bottom: 15px; }
         .page-header p { font-size: 1.2rem; max-width: 600px; margin: 0 auto; }
-        .search-container { display: flex; max-width: 700px; margin: 40px auto 0 auto; border-radius: 50px; border: 1px solid var(--border-color); background-color: var(--bg-secondary); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .search-container input { flex-grow: 1; border: none; background: transparent; padding: 15px 25px; font-size: 1rem; color: var(--text-primary); }
-        .search-container input:focus { outline: none; }
-        .search-container button { background-color: var(--accent-primary); color: #fff; border: none; padding: 0 25px; font-size: 1.2rem; cursor: pointer; }
+        .search-container { max-width: 700px; margin: 40px auto 0 auto; }
+        .ais-SearchBox-form { display: flex; border-radius: 50px; border: 1px solid var(--border-color); background-color: var(--bg-secondary); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .ais-SearchBox-input { flex-grow: 1; border: none; background: transparent; padding: 15px 25px; font-size: 1rem; color: var(--text-primary); }
+        .ais-SearchBox-input:focus { outline: none; }
+        .ais-SearchBox-submit { background-color: var(--accent-primary); color: #fff; border: none; padding: 0 25px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .ais-SearchBox-reset { display: none; }
         .filter-categories { margin-top: 30px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
         .filter-btn { background-color: var(--bg-secondary); color: var(--text-secondary); border: 1px solid var(--border-color); border-radius: 50px; padding: 10px 20px; margin: 0; cursor: pointer; font-weight: 500; }
         .filter-btn.active { background-color: var(--accent-primary); color: #fff; border-color: var(--accent-primary); }
+        
+        /* --- CARD & GRID STYLES --- */
         .services-section { padding: 0 15px 80px; }
         .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; min-height: 300px; }
+        .ais-Hits-list, .ais-Hits-item { display: contents; }
         .service-card { background-color: var(--bg-secondary); border-radius: 16px; overflow: hidden; text-decoration: none; box-shadow: 0 5px 15px var(--shadow-color); transition: transform 0.3s, box-shadow 0.3s; display: flex; flex-direction: column; }
         .service-card:hover { transform: translateY(-8px); box-shadow: 0 12px 25px var(--shadow-color); }
         .card-image { height: 200px; background-color: #ccc; background-size: cover; background-position: center; }
@@ -40,7 +68,7 @@
         .provider-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 12px; }
         .provider-name { font-weight: 600; color: var(--text-primary); font-size: 1rem; }
         .service-title { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; line-height: 1.3; }
-        .service-rating { margin-bottom: 10px; font-size: 0.9rem; color: #ffc107; }
+        .service-rating { margin-bottom: 10px; font-size: 0.9rem; color: var(--accent-secondary); }
         .service-rating .review-count { color: var(--text-secondary); margin-left: 8px; font-size: 0.8rem; }
         .service-location { color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9rem; }
         .service-location i { margin-right: 5px; }
@@ -48,6 +76,17 @@
         .price { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
         .price span { font-size: 0.9rem; font-weight: 400; color: var(--text-secondary); }
         .loading-text { text-align: center; font-size: 1.2rem; padding: 40px; grid-column: 1 / -1; }
+
+        /* --- QUICK LINKS SECTION STYLES --- */
+        .quick-links-section { background-color: var(--bg-secondary); padding: 80px 0; text-align: center; }
+        .quick-links-title { font-size: 2rem; color: var(--text-primary); margin-bottom: 40px; }
+        .quick-links-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 900px; margin: 0 auto; }
+        .quick-link-card { background-color: var(--bg-primary); padding: 30px 20px; border-radius: 12px; text-decoration: none; color: var(--text-secondary); border: 1px solid var(--border-color); transition: transform 0.3s, box-shadow 0.3s; }
+        .quick-link-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .quick-link-card .icon { font-size: 2.5rem; color: var(--accent-secondary); margin-bottom: 15px; }
+        .quick-link-card h3 { font-size: 1.2rem; color: var(--text-primary); font-weight: 600; }
+        
+        /* --- FOOTER STYLES --- */
         footer { background-color: var(--bg-card); color: var(--text-primary); padding: 60px 0 20px 0; border-top: 1px solid var(--border-color); }
         .footer-grid { display: grid; grid-template-columns: 1fr; gap: 40px; margin-bottom: 40px; text-align: center; }
         @media (min-width: 768px) { .footer-grid { grid-template-columns: 2fr 1fr 1fr 1fr; text-align: left; } }
@@ -68,10 +107,17 @@
     <header class="header">
         <div class="container navbar">
             <a href="index.html" class="nav-logo">KabaleOnline</a>
-            <div class="nav-menu">
+            <ul class="nav-links" id="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="services.html">Browse</a></li>
+                <li><a href="browse-jobs.html">Jobs</a></li>
+                <li><a href="group-chat.html">Community</a></li>
+            </ul>
+            <div class="nav-actions">
                 <a href="auth.html" class="btn-header" id="login-link">Login</a>
-                <a href="dashboard.html" class="btn-header" id="dashboard-link" style="display: none;">My Dashboard</a>
+                <a href="dashboard.html" class="btn-header" id="dashboard-link" style="display: none;">Dash</a>
                 <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
+                <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open Menu"><i class="fas fa-bars"></i></button>
             </div>
         </div>
     </header>
@@ -81,18 +127,15 @@
             <div class="container">
                 <h1>Find Local Services in Kabale</h1>
                 <p>From plumbers to programmers, discover talented professionals in our community ready to help you with your next project.</p>
-                <div class="search-container">
-                    <input type="text" id="search-input" placeholder="What service are you looking for?">
-                    <button type="submit" id="search-button"><i class="fas fa-search"></i></button>
-                </div>
+                <div class="search-container" id="search-container"></div>
                 <div class="filter-categories" id="category-filters">
-    <button class="filter-btn active" data-category="All">All</button>
-    <button class="filter-btn" data-category="Home">Home</button>
-    <button class="filter-btn" data-category="Creative">Creative</button>
-    <button class="filter-btn" data-category="Professional">Professional</button>
-    <button class="filter-btn" data-category="Events">Events</button>
-    <button class="filter-btn" data-category="Technical">Technical</button>
-</div>
+                    <button class="filter-btn active" data-category="All">All</button>
+                    <button class="filter-btn" data-category="Home">Home</button>
+                    <button class="filter-btn" data-category="Creative">Creative</button>
+                    <button class="filter-btn" data-category="Professional">Professional</button>
+                    <button class="filter-btn" data-category="Events">Events</button>
+                    <button class="filter-btn" data-category="Technical">Technical</button>
+                </div>
             </div>
         </section>
         <section class="services-section">
@@ -100,36 +143,56 @@
                 <div class="services-grid" id="services-grid"></div>
             </div>
         </section>
+
+        <section class="quick-links-section">
+            <div class="container">
+                <h2 class="quick-links-title">What's Next?</h2>
+                <div class="quick-links-grid">
+                    <a href="index.html" class="quick-link-card">
+                        <div class="icon"><i class="fas fa-home"></i></div>
+                        <h3>Return Home</h3>
+                    </a>
+                    <a href="browse-jobs.html" class="quick-link-card">
+                        <div class="icon"><i class="fas fa-briefcase"></i></div>
+                        <h3>Browse Jobs</h3>
+                    </a>
+                    <a href="group-chat.html" class="quick-link-card">
+                        <div class="icon"><i class="fas fa-users"></i></div>
+                        <h3>Join Community</h3>
+                    </a>
+                    <a href="auth.html" class="quick-link-card" id="quick-link-auth">
+                        <div class="icon"><i class="fas fa-sign-in-alt"></i></div>
+                        <h3 id="quick-link-auth-text">Login</h3>
+                    </a>
+                </div>
+            </div>
+        </section>
     </main>
 
     <template id="service-card-template">
-      <div class="service-card">
-        <a class="card-image-link" style="text-decoration: none;">
+        <a class="service-card">
             <div class="card-image"></div>
-        </a>
-        <div class="card-content">
-          <a class="provider-info-link" style="text-decoration: none;">
-            <div class="provider-info">
-                <img class="provider-avatar">
-                <span class="provider-name"></span>
-            </div>
-          </a>
-          <a class="card-content-link" style="text-decoration: none; color: inherit;">
-            <h3 class="service-title"></h3>
-            <div class="service-rating"></div>
-            <p class="service-location">
+            <div class="card-content">
+              <a class="provider-info-link" style="text-decoration: none;">
+                <div class="provider-info">
+                    <img class="provider-avatar">
+                    <span class="provider-name"></span>
+                </div>
+              </a>
+              <h3 class="service-title"></h3>
+              <div class="service-rating"></div>
+              <p class="service-location">
                 <i class="fas fa-map-marker-alt"></i>
                 <span class="location-text"></span>
-            </p>
-            <div class="card-footer">
+              </p>
+              <div class="card-footer">
                 <div class="price">
                   <span>From </span>
                   <span class="price-amount"></span>
                 </div>
+              </div>
             </div>
-          </a>
-        </div>
-      </div>
+        </a>
     </template>
 
     <footer>
@@ -166,7 +229,7 @@
                     <ul>
                         <li><i class="fas fa-map-marker-alt"></i> Kabale, Uganda</li>
                         <li><i class="fas fa-phone-alt"></i> +256784655792</li>
-                        <li><i class="fas fa-envelope"></i> kabaleservices@gmail.com</li>
+                        <li><a href="mailto:kabaleservices@gmail.com"><i class="fas fa-envelope"></i> kabaleservices@gmail.com</a></li>
                     </ul>
                 </div>
             </div>
@@ -175,9 +238,41 @@
             </div>
         </div>
     </footer>
-    
+
     <script src="theme.js" defer></script>
     <script src="global-auth.js" type="module"></script>
+    <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js" type="module"></script>
+    <script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4" type="module"></script>
     <script src="services.js" type="module"></script>
+    <script type="module">
+        // --- MOBILE MENU & QUICK LINK DYNAMIC LOGIC ---
+        import { app } from './firebase-init.js';
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const navLinks = document.getElementById('nav-links');
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+        
+        // Dynamic Quick Link
+        const auth = getAuth(app);
+        const quickLinkAuth = document.getElementById('quick-link-auth');
+        const quickLinkAuthText = document.getElementById('quick-link-auth-text');
+        const quickLinkAuthIcon = quickLinkAuth.querySelector('.icon i');
+
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.emailVerified) {
+                quickLinkAuth.href = 'dashboard.html';
+                quickLinkAuthText.textContent = 'Dashboard';
+                quickLinkAuthIcon.className = 'fas fa-tachometer-alt';
+            } else {
+                quickLinkAuth.href = 'auth.html';
+                quickLinkAuthText.textContent = 'Login';
+                quickLinkAuthIcon.className = 'fas fa-sign-in-alt';
+            }
+        });
+    </script>
 </body>
 </html>
