@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help & FAQ | KabaleOnline</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --ko-primary: #007bff; /* Using a consistent primary color */
+            --bg-primary: #0d2857; 
+            --bg-secondary: #10336d; 
+            --text-primary: #ffffff;
+            --text-secondary: #a7c0e8;
+            --border-color: #1f4287;
+            --font-family: 'Poppins', sans-serif;
+        }
+        body.light-mode {
+            --bg-primary: #f0f4f9; 
+            --bg-secondary: #ffffff; 
+            --text-primary: #0d2857;
+            --text-secondary: #6c757d;
+            --border-color: #e9ecef;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-family); background-color: var(--bg-primary); color: var(--text-secondary); line-height: 1.8; }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 15px; }
+
+        /* --- HEADER & NAVIGATION --- */
+        .sticky-header { position: sticky; top: 0; z-index: 1000; background-color: var(--bg-secondary); border-bottom: 1px solid var(--border-color); padding: 15px 0; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 0 15px; }
+        .site-title { font-size: 1.8rem; font-weight: 800; color: var(--ko-primary); text-decoration: none; }
+        .site-title span { color: var(--text-primary); }
+        .desktop-nav { display: none; }
+        @media (min-width: 992px) { .desktop-nav { display: flex; gap: 30px; } }
+        .nav-link { color: var(--text-secondary); text-decoration: none; font-weight: 500; position: relative; }
+        .nav-link::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background-color: var(--ko-primary); transition: width 0.3s; }
+        .nav-link:hover::after, .nav-link.active::after { width: 100%; }
+        .header-icons { display: flex; align-items: center; gap: 20px; }
+        .header-icons a { color: var(--text-primary); font-size: 1.2rem; }
+        .hamburger-menu { display: block; background: none; border: none; color: var(--text-primary); font-size: 1.8rem; cursor: pointer; }
+        @media (min-width: 992px) { .hamburger-menu { display: none; } }
+        
+        .mobile-nav { position: fixed; top: 0; right: -100%; width: 280px; height: 100vh; background-color: var(--bg-secondary); z-index: 2000; transition: right 0.4s ease; padding: 20px; display: flex; flex-direction: column; }
+        .mobile-nav.active { right: 0; }
+        .mobile-nav-header { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 30px; }
+        .mobile-nav-links { display: flex; flex-direction: column; gap: 5px; }
+        .mobile-nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 1.1rem; padding: 12px 15px; border-radius: 8px; display: flex; align-items: center; gap: 15px; }
+        .mobile-nav-links a:hover { background-color: var(--bg-primary); }
+        .mobile-nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1999; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+        .mobile-nav-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        /* --- MAIN FAQ CONTENT --- */
+        main { padding: 80px 0; }
+        .page-header { text-align: center; margin-bottom: 50px; }
+        .page-header h1 { font-size: 3rem; color: var(--text-primary); }
+        .page-header p { font-size: 1.2rem; max-width: 600px; margin: 10px auto 0; }
+        .faq-section h2 { font-size: 1.8rem; color: var(--text-primary); margin-top: 40px; margin-bottom: 20px; text-align: center; }
+        .accordion-item { background-color: var(--bg-secondary); border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border-color); overflow: hidden; }
+        .accordion-header { padding: 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .accordion-header h3 { font-size: 1.2rem; color: var(--text-primary); margin: 0; font-weight: 600; }
+        .accordion-icon { font-size: 1.2rem; transition: transform 0.3s; }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out; }
+        .accordion-content-inner { padding: 0 20px 20px; }
+        .accordion-item.active .accordion-content { max-height: 500px; }
+        .accordion-item.active .accordion-icon { transform: rotate(180deg); }
+        .accordion-content-inner a { color: var(--ko-primary); text-decoration: none; font-weight: 600; }
+        .accordion-content-inner a:hover { text-decoration: underline; }
+
+        /* --- FOOTER --- */
+        footer { background-color: var(--bg-secondary); border-top: 1px solid var(--border-color); padding: 40px 0; text-align: center; }
+        .footer-logo { font-size: 2rem; font-weight: 800; color: var(--ko-primary); text-decoration: none; margin-bottom: 15px; }
+        .footer-links { margin: 20px 0; }
+        .footer-links a { color: var(--text-secondary); text-decoration: none; margin: 0 15px; font-weight: 500; }
+        .footer-copyright { font-size: 0.9rem; }
+    </style>
+</head>
+<body class="dark-mode">
+
+    <header class="sticky-header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="site-title">Kabale <span>Online</span></a>
+                <nav class="desktop-nav">
+                    <a href="/shop/" class="nav-link">Shop</a>
+                    <a href="/rentals/" class="nav-link">Hostels</a>
+                    <a href="https://services.kabaleonline.com" class="nav-link">Services</a>
+                    <a href="/events/" class="nav-link">Events</a>
+                    <a href="/lost-and-found/" class="nav-link">Lost & Found</a>
+                </nav>
+                <div class="header-icons">
+                    <a href="/dashboard/" aria-label="Dashboard"><i class="fas fa-user"></i></a>
+                    <button class="hamburger-menu" aria-label="Open menu">&#9776;</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="mobile-nav">
+        <div class="mobile-nav-header">Kabale Online</div>
+        <div class="mobile-nav-links">
+            <a href="/shop/" class="nav-link"><i class="fa-solid fa-store"></i> All Items</a>
+            <a href="https://services.kabaleonline.com" class="nav-link service-link"><i class="fa-solid fa-screwdriver-wrench"></i> Services</a>
+            <a href="/events/" class="nav-link"><i class="fa-solid fa-calendar-days"></i> Events</a>
+            <a href="/rentals/" class="nav-link"><i class="fa-solid fa-building"></i> Hostels & Rentals</a>
+            <a href="/lost-and-found/" class="nav-link"><i class="fa-solid fa-magnifying-glass-plus"></i> Lost & Found</a>
+            <a href="/dashboard/" class="nav-link"><i class="fa-solid fa-user-circle"></i> My Dashboard</a>
+            <a href="/inbox.html" class="nav-link"><i class="fa-solid fa-inbox"></i> My Inbox</a>
+        </div>
+    </nav>
+    <div class="mobile-nav-overlay"></div>
+
+    <main class="container">
+        <div class="page-header">
+            <h1>Help & FAQ</h1>
+            <p>Your guide to buying, selling, and connecting on Kabale Online.</p>
+        </div>
+
+        <div class="faq-section" id="faq-accordion">
+            <h2>General Questions</h2>
+            <div class="accordion-item">
+                <div class="accordion-header"><h3>What is Kabale Online?</h3><i class="fas fa-chevron-down accordion-icon"></i></div>
+                <div class="accordion-content"><div class="accordion-content-inner"><p>Kabale Online is a multi-purpose platform built for the Kabale and Kigezi community, especially students. It combines a marketplace to buy and sell items, a directory for hostels and rentals, a hub for local services, an event calendar, and a lost & found board.</p></div></div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header"><h3>Is it free to use?</h3><i class="fas fa-chevron-down accordion-icon"></i></div>
+                <div class="accordion-content"><div class="accordion-content-inner"><p>Yes! Creating an account, browsing listings, and posting items, services, or jobs is completely free. We do not charge any commission fees. All transactions are handled directly between users.</p></div></div>
+            </div>
+
+            <h2>Buying & Selling</h2>
+            <div class="accordion-item">
+                <div class="accordion-header"><h3>How do I sell an item?</h3><i class="fas fa-chevron-down accordion-icon"></i></div>
+                <div class="accordion-content"><div class="accordion-content-inner"><p>After logging in, go to your dashboard and click "Upload an Item". You'll need to provide clear photos, a title, a description, and a price. Once submitted, your item will be live on the <a href="/shop/">Shop</a> page.</p></div></div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header"><h3>How do I buy an item?</h3><i class="fas fa-chevron-down accordion-icon"></i></div>
+                <div class="accordion-content"><div class="accordion-content-inner"><p>When you find an item you want, click on it to see the details. You will find the seller's contact information (usually a phone number) on the product page. You must contact them directly to arrange payment and a safe, convenient meetup for delivery.</p></div></div>
+            </div>
+            
+            <h2>Services & Gigs</h2>
+             <div class="accordion-item">
+                <div class="accordion-header"><h3>How do I offer a service?</h3><i class="fas fa-chevron-down accordion-icon"></i></div>
+                <div class="accordion-content"><div class="accordion-content-inner"><p>To offer a skill (like tutoring, graphic design, etc.), visit our dedicated <a href="https://services.kabaleonline.com">Services Platform</a>. You can create a detailed profile and list each service you offer. Clients can then find and contact you directly through that platform.</p></div></div>
+            </div>
+
+            <h2>Hostels & Rentals</h2>
+             <div class="accordion-item">
+                <div class="accordion-header"><h3>How do I list a rental or hostel?</h3><i class="fas fa-chevron-down accordion-icon"></i></div>
+                <div class="accordion-content"><div class="accordion-content-inner"><p>If you are a landlord or agent, you can list a property by going to your dashboard and selecting "List a Rental". You will be asked for details like location, price, amenities, and photos to help students find their next home.</p></div></div>
+            </div>
+
+            <h2>Lost & Found</h2>
+             <div class="accordion-item">
+                <div class="accordion-header"><h3>I lost my ID/phone. What should I do?</h3><i class="fas fa-chevron-down accordion-icon"></i></div>
+                <div class="accordion-content"><div class="accordion-content-inner"><p>Go to the <a href="/lost-and-found/">Lost & Found</a> page and post a notice with details of your lost item. If someone finds it, they can contact you through the information you provide. We also encourage you to check this page regularly if you have found someone else's property.</p></div></div>
+            </div>
+
+            <h2>Safety & Trust</h2>
+            <div class="accordion-item">
+                <div class="accordion-header"><h3>How do I stay safe when meeting a buyer or seller?</h3><i class="fas fa-chevron-down accordion-icon"></i></div>
+                <div class="accordion-content"><div class="accordion-content-inner"><p>We strongly recommend following these safety tips:
+                    <ul>
+                        <li>Always meet in a public, well-lit place (e.g., outside the university library, a popular cafe).</li>
+                        <li>Tell a friend where you are going and who you are meeting.</li>
+                        <li>Inspect items thoroughly before paying.</li>
+                        <li>Use cash or mobile money for payments; avoid sharing sensitive financial information.</li>
+                    </ul>
+                </p></div></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-logo">Kabale <span>Online</span></div>
+            <div class="footer-links">
+                <a href="/about.html">About</a>
+                <a href="/terms.html">Terms</a>
+                <a href="/contact.html">Contact</a>
+            </div>
+            <p class="footer-copyright">&copy; 2025 Kabale Online. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="theme.js" defer></script>
+    <script src="global-auth.js" type="module"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // --- Mobile Menu Toggle ---
+            const hamburger = document.querySelector('.hamburger-menu');
+            const mobileNav = document.querySelector('.mobile-nav');
+            const overlay = document.querySelector('.mobile-nav-overlay');
+            hamburger.addEventListener('click', () => {
+                mobileNav.classList.add('active');
+                overlay.classList.add('active');
+            });
+            overlay.addEventListener('click', () => {
+                mobileNav.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+
+            // --- FAQ Accordion Logic ---
+            const accordion = document.getElementById('faq-accordion');
+            if (accordion) {
+                accordion.addEventListener('click', (e) => {
+                    const header = e.target.closest('.accordion-header');
+                    if (header) {
+                        const item = header.parentElement;
+                        // Optional: Close other open items
+                        // const allItems = accordion.querySelectorAll('.accordion-item');
+                        // allItems.forEach(i => { if (i !== item) i.classList.remove('active'); });
+                        item.classList.toggle('active');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
