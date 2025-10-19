@@ -137,6 +137,32 @@
         .footer-links a { color: var(--text-secondary); text-decoration: none; }
         .footer-links ul li i { margin-right: 10px; color: var(--accent-primary); }
         .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid var(--border-color); color: var(--text-secondary); }
+
+/* Add this to your <style> block in profile.html */
+
+.profile-name-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center on mobile */
+    gap: 15px;
+    flex-wrap: wrap; /* Allow badge to wrap on small screens */
+}
+
+@media (min-width: 768px) {
+    .profile-name-wrapper {
+        justify-content: flex-start; /* Align left on desktop */
+    }
+}
+
+.badge {
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 50px;
+    background-color: var(--accent-secondary); /* Yellow accent color */
+    color: #333; /* Dark text for readability on yellow */
+    vertical-align: middle;
+}
     </style>
 </head>
 <body class="dark-mode">
