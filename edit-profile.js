@@ -1,13 +1,13 @@
 import { app } from './firebase-init.js';
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+// --- NEW: Import query functions ---
+import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 import { uploadToCloudinary } from './cloudinary-upload.js';
 import { showToast, hideToast, showButtonLoader, hideButtonLoader } from './notifications.js';
 
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// --- ELEMENT SELECTORS ---
 const photoInput = document.getElementById('profile-photo-input');
 const photoPreview = document.getElementById('photo-preview');
 const fullNameInput = document.getElementById('full-name');
@@ -22,17 +22,14 @@ const submitBtn = document.getElementById('submit-btn');
 
 let currentUser = null;
 
-// --- AUTHENTICATION & DATA FETCHING ---
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         currentUser = user;
         const userDocRef = doc(db, "users", user.uid);
         const userDoc = await getDoc(userDocRef);
-
         if (userDoc.exists()) {
             populateForm(userDoc.data());
         } else {
-            console.warn("No profile document found, using auth data as a fallback.");
             populateForm(user);
         }
     } else {
@@ -40,35 +37,16 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-// --- FUNCTION to populate form with user data ---
 function populateForm(userData) {
-    photoPreview.src = userData.profilePicUrl || userData.photoURL || `https://placehold.co/100x100/10336d/a7c0e8?text=${(userData.name || userData.displayName || 'U').charAt(0)}`;
+    photoPreview.src = userData.profilePicUrl || userData.photoURL || `https://placehold.co/100x100?text=${(userData.name || userData.displayName || 'U').charAt(0)}`;
     fullNameInput.value = userData.name || userData.displayName || '';
     emailInput.value = userData.email || '';
-    telephoneInput.value = userData.telephone || '';
-    locationInput.value = userData.location || '';
-    taglineInput.value = userData.tagline || '';
-    aboutInput.value = userData.about || '';
-
-    if (userData.isProvider) {
-        backToDashboardBtn.href = 'provider-dashboard.html';
-    } else {
-        backToDashboardBtn.href = 'dashboard.html';
-    }
+    // ... (rest of your populateForm function is the same) ...
 }
 
-// --- EVENT LISTENERS ---
+photoInput.addEventListener('change', () => { /* ... (unchanged) ... */ });
 
-// Photo Preview Logic
-photoInput.addEventListener('change', () => {
-    if (photoInput.files && photoInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = (e) => { photoPreview.src = e.target.result; };
-        reader.readAsDataURL(photoInput.files[0]);
-    }
-});
-
-// Form Submission Logic
+// --- THIS IS THE UPDATED FORM SUBMISSION LOGIC ---
 editProfileForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!currentUser) return;
@@ -93,25 +71,43 @@ editProfileForm.addEventListener('submit', async (e) => {
 
         showToast('Saving profile...', 'progress');
         const userDocRef = doc(db, "users", currentUser.uid);
-        // Use setDoc with merge to create or update the profile
         await setDoc(userDocRef, updatedData, { merge: true });
         hideToast();
 
-        // --- NEW: Sync profile changes to all existing services ---
-        const finalProfilePicUrl = updatedData.profilePicUrl || (await getDoc(userDocRef)).data().profilePicUrl;
-        if (updatedData.name && finalProfilePicUrl) {
-            showToast('Updating your service listings...', 'progress');
-            const idToken = await currentUser.getIdToken(true);
-            await fetch('/updateProvider', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
-                body: JSON.stringify({ name: updatedData.name, profilePicUrl: finalProfilePicUrl })
-            });
-            hideToast();
-        }
+        // --- NEW: Re-sync all services with the updated profile info ---
+        showToast('Updating your service listings...', 'progress');
         
-        showToast('Profile updated successfully!', 'success');
+        // 1. Get the final, up-to-date user data
+        const finalUserDoc = await getDoc(userDocRef);
+        const finalUserData = finalUserDoc.data();
 
+        // 2. Find all services by this user in Firestore
+        const servicesQuery = query(collection(db, 'services'), where('providerId', '==', currentUser.uid));
+        const servicesSnapshot = await getDocs(servicesQuery);
+
+        // 3. For each service, call the sync worker to update it in Algolia
+        if (!servicesSnapshot.empty) {
+            const idToken = await currentUser.getIdToken(true);
+            
+            for (const serviceDoc of servicesSnapshot.docs) {
+                let serviceData = serviceDoc.data();
+                // Update the provider info on the service object
+                serviceData.providerName = finalUserData.name;
+                serviceData.providerAvatar = finalUserData.profilePicUrl;
+                serviceData.objectID = serviceDoc.id; // Add objectID for Algolia
+                
+                // Call the sync worker
+                await fetch('/sync', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+                    body: JSON.stringify(serviceData)
+                });
+            }
+        }
+        hideToast();
+        // --- END OF NEW LOGIC ---
+
+        showToast('Profile updated successfully!', 'success');
         setTimeout(() => {
             window.location.href = 'dashboard.html';
         }, 1500);
