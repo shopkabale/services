@@ -13,19 +13,21 @@ let currentUser = null;
 
 onAuthStateChanged(auth, (user) => {
     currentUser = user;
-    // You could re-run loadFullProfile here if you need to update UI based on login state
+    // Reload profile if the user logs in/out, to update button states
+    if (providerId) {
+        loadFullProfile(providerId);
+    }
 });
 
 if (!providerId) {
     profileContainer.innerHTML = '<h1>Provider not found.</h1><p>No provider ID was specified in the URL.</p>';
-} else {
-    loadFullProfile(providerId);
 }
 
 async function loadFullProfile(providerId) {
     try {
         profileContainer.innerHTML = '<p>Loading profile...</p>';
 
+        // 1. Fetch the provider's main profile data
         const providerDocRef = doc(db, 'users', providerId);
         const providerDocSnap = await getDoc(providerDocRef);
 
@@ -35,10 +37,12 @@ async function loadFullProfile(providerId) {
         }
         const providerData = providerDocSnap.data();
 
+        // 2. Fetch all services offered by this provider
         const servicesQuery = query(collection(db, "services"), where("providerId", "==", providerId));
         const servicesSnapshot = await getDocs(servicesQuery);
         const services = servicesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
+        // 3. Fetch all reviews from all of the provider's services
         let allReviews = [];
         let totalRating = 0;
         for (const service of services) {
@@ -50,10 +54,12 @@ async function loadFullProfile(providerId) {
                 totalRating += reviewData.rating;
             });
         }
+        // Sort all collected reviews by date
         allReviews.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
 
         const averageRating = allReviews.length > 0 ? (totalRating / allReviews.length).toFixed(1) : "No ratings";
 
+        // 4. Render the entire page with the collected data
         renderFullPage(providerData, services, allReviews, averageRating);
 
     } catch (error) {
@@ -63,9 +69,15 @@ async function loadFullProfile(providerId) {
 }
 
 async function renderFullPage(provider, services, reviews, averageRating) {
-    profileContainer.innerHTML = ''; // Clear loading message
+    profileContainer.innerHTML = ''; // Clear "Loading..." message
 
-    // 1. Build Header
+    // --- Logic to create the Founding Member badge if applicable ---
+    let badgeHTML = '';
+    if (provider.isFoundingMember === true) {
+        badgeHTML = '<span class="badge">🏅 Founding Member</span>';
+    }
+
+    // 1. Build Header Card
     const headerCard = document.createElement('div');
     headerCard.className = 'profile-header-card';
     const contactBtnHref = currentUser && currentUser.uid === providerId ? '#' : `chat.html?recipientId=${providerId}`;
@@ -75,7 +87,10 @@ async function renderFullPage(provider, services, reviews, averageRating) {
     headerCard.innerHTML = `
         <img src="${provider.profilePicUrl || `https://placehold.co/140x140?text=${provider.name.charAt(0)}`}" alt="${provider.name}" class="profile-picture">
         <div class="profile-info">
-            <h1 class="profile-name">${provider.name}</h1>
+            <div class="profile-name-wrapper">
+                <h1 class="profile-name">${provider.name}</h1>
+                ${badgeHTML}
+            </div>
             <p class="profile-tagline">${provider.tagline || 'Service Provider'}</p>
             <div class="profile-meta">
                 <span class="meta-item"><i class="fas fa-map-marker-alt"></i> ${provider.location}</span>
@@ -124,7 +139,7 @@ async function renderFullPage(provider, services, reviews, averageRating) {
     reviewsSection.className = 'content-section';
     let reviewsHTML = '';
     if (reviews.length > 0) {
-        // Fetch reviewer names asynchronously
+        // Fetch reviewer names asynchronously to avoid slowing down the page
         const reviewPromises = reviews.map(async (review) => {
             const reviewerDoc = await getDoc(doc(db, 'users', review.reviewerId));
             const reviewerData = reviewerDoc.exists() ? reviewerDoc.data() : { name: 'Anonymous' };
