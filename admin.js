@@ -1,200 +1,126 @@
 import { app } from './firebase-init.js';
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { getFirestore, collection, doc, getDoc, getDocs, getCountFromServer, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+import { getFirestore, collection, doc, getDoc, getDocs, getCountFromServer } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// --- DOM ELEMENT REFERENCES ---
-const mainTitle = document.getElementById('main-title');
-const navLinks = document.querySelectorAll('.nav-link');
-const contentSections = document.querySelectorAll('.content-section');
-const deleteServiceModal = document.getElementById('delete-service-modal');
-const cancelDeleteServiceBtn = document.getElementById('cancel-delete-service-btn');
-const confirmDeleteServiceBtn = document.getElementById('confirm-delete-service-btn');
-const serviceToDeleteName = document.getElementById('service-to-delete-name');
-let serviceToDeleteId = null;
-
-// --- CRITICAL: AUTHENTICATION AND SECURITY CHECK ---
+// --- AUTHENTICATION AND SECURITY CHECK ---
 onAuthStateChanged(auth, async (user) => {
-    try {
-        if (user && user.emailVerified) {
-            const userDocRef = doc(db, "users", user.uid);
-            const userDoc = await getDoc(userDocRef);
+    if (user && user.emailVerified) {
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
 
-            if (userDoc.exists() && userDoc.data().isAdmin === true) {
-                // User is a confirmed admin, NOW we load all the data.
-                loadDashboardStats();
-                loadUsers();
-                loadServices();
-            } else {
-                console.warn("Access denied. User is not an admin.");
-                window.location.href = 'index.html';
-            }
+        if (userDoc.exists() && userDoc.data().role === 'admin') {
+            // User is a confirmed admin, proceed to load the dashboard
+            const userData = userDoc.data();
+            document.getElementById('admin-name').textContent = userData.name || 'Admin';
+            document.getElementById('admin-avatar').src = userData.profilePicUrl || `https://placehold.co/40x40?text=${(userData.name || 'A').charAt(0)}`;
+            
+            loadDashboardStats();
+            loadAllDataTables();
         } else {
-            console.warn("Access denied. User not logged in.");
-            window.location.href = 'auth.html';
+            // User is not an admin, show access denied message and redirect
+            document.body.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; text-align:center; padding:20px;"><h1>Access Denied</h1><p>You do not have permission. Redirecting...</p></div>`;
+            setTimeout(() => window.location.href = 'index.html', 3000);
         }
-    } catch (error) {
-        console.error("Authentication check failed:", error);
-        alert("An error occurred during authentication. Redirecting...");
-        window.location.href = 'index.html';
+    } else {
+        // User is not logged in
+        window.location.href = 'auth.html';
     }
 });
 
-// --- NAVIGATION LOGIC ---
-navLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const viewId = link.getAttribute('data-view');
-        if (!viewId) return;
-
-        navLinks.forEach(l => l.classList.remove('active'));
-        link.classList.add('active');
-        mainTitle.textContent = link.textContent;
-        contentSections.forEach(section => {
-            section.classList.toggle('active', section.id === viewId);
-        });
-    });
-});
-
-// --- DATA FETCHING FUNCTIONS ---
+// --- DATA FETCHING ---
 async function loadDashboardStats() {
     try {
-        const usersCol = collection(db, 'users');
-        const servicesCol = collection(db, 'services');
-        const jobsCol = collection(db, 'job_posts');
-
-        const userCount = (await getCountFromServer(usersCol)).data().count;
-        const serviceCount = (await getCountFromServer(servicesCol)).data().count;
-        const jobCount = (await getCountFromServer(jobsCol)).data().count;
-
+        const userCount = (await getCountFromServer(collection(db, 'users'))).data().count;
+        const serviceCount = (await getCountFromServer(collection(db, 'services'))).data().count;
+        const jobCount = (await getCountFromServer(collection(db, 'job_posts'))).data().count;
         document.getElementById('total-users').textContent = userCount;
         document.getElementById('total-services').textContent = serviceCount;
         document.getElementById('total-job-posts').textContent = jobCount;
-    } catch (error) {
-        console.error("Error loading dashboard stats:", error);
-        document.getElementById('total-users').textContent = 'Error';
-        document.getElementById('total-services').textContent = 'Error';
-        document.getElementById('total-job-posts').textContent = 'Error';
-    }
+    } catch (error) { console.error("Error loading stats:", error); }
 }
 
-async function loadUsers() {
+async function loadAllDataTables() {
+    // Fetch all data in parallel for speed
+    const [users, services, jobs] = await Promise.all([
+        getDocs(collection(db, 'users')),
+        getDocs(collection(db, 'services')),
+        getDocs(collection(db, 'job_posts'))
+    ]);
+
+    // Populate Users Table
     const usersTableBody = document.getElementById('users-table-body');
-    usersTableBody.innerHTML = '<tr><td colspan="3">Loading users...</td></tr>';
-    try {
-        const snapshot = await getDocs(collection(db, 'users'));
-        usersTableBody.innerHTML = '';
-        if (snapshot.empty) {
-            usersTableBody.innerHTML = '<tr><td colspan="3">No users found.</td></tr>';
-            return;
-        }
-        snapshot.forEach(doc => {
-            const user = doc.data();
-            const row = usersTableBody.insertRow();
-            row.innerHTML = `
-                <td><div class="name">${user.name || 'N/A'}</div></td>
-                <td>${user.email || 'N/A'}</td>
-                <td>${user.isProvider ? 'Provider' : 'User'}</td>
-            `;
-        });
-    } catch(error) {
-        console.error("Error loading users:", error);
-        usersTableBody.innerHTML = '<tr><td colspan="3">Could not load users.</td></tr>';
-    }
-}
+    usersTableBody.innerHTML = '';
+    users.forEach(doc => {
+        const user = doc.data();
+        const role = user.role === 'admin' ? 'Admin' : (user.isProvider ? 'Provider' : 'User');
+        const row = usersTableBody.insertRow();
+        row.innerHTML = `<td>${user.name||'N/A'}</td><td>${user.email||'N/A'}</td><td>${role}</td>`;
+    });
 
-async function loadServices() {
+    // Populate Services Table (with provider name caching)
     const servicesTableBody = document.getElementById('services-table-body');
-    servicesTableBody.innerHTML = '<tr><td colspan="5">Loading services...</td></tr>';
-    try {
-        const snapshot = await getDocs(collection(db, 'services'));
-        const providerCache = {}; 
-        servicesTableBody.innerHTML = '';
-        if (snapshot.empty) {
-            servicesTableBody.innerHTML = '<tr><td colspan="5">No services found.</td></tr>';
-            return;
-        }
-        for(const serviceDoc of snapshot.docs) { 
-            const service = { id: serviceDoc.id, ...serviceDoc.data() };
-            let providerName = '...';
-
-            if(service.providerId && !providerCache[service.providerId]) {
-                const userDocRef = doc(db, 'users', service.providerId);
-                const userDocSnap = await getDoc(userDocRef);
-                if(userDocSnap.exists()) {
-                    providerCache[service.providerId] = userDocSnap.data().name;
-                }
+    servicesTableBody.innerHTML = '';
+    const providerCache = {};
+    for (const serviceDoc of services.docs) {
+        const service = serviceDoc.data();
+        let providerName = providerCache[service.providerId];
+        if (!providerName && service.providerId) {
+            const userDocSnap = await getDoc(doc(db, 'users', service.providerId));
+            if (userDocSnap.exists()) {
+                providerName = userDocSnap.data().name;
+                providerCache[service.providerId] = providerName;
             }
-            providerName = providerCache[service.providerId] || 'Unknown';
-
-            const row = servicesTableBody.insertRow();
-            row.innerHTML = `
-                <td><div class="name">${service.title || 'N/A'}</div></td>
-                <td>${providerName}</td>
-                <td>${service.category || 'N/A'}</td>
-                <td>UGX ${service.price ? service.price.toLocaleString() : 'N/A'}</td>
-                <td>
-                    <button class="btn-danger delete-service-btn" data-id="${service.id}" data-name="${service.title}">Delete</button>
-                </td>
-            `;
         }
-    } catch(error) {
-        console.error("Error loading services:", error);
-        servicesTableBody.innerHTML = '<tr><td colspan="5">Could not load services.</td></tr>';
+        providerName = providerName || 'Unknown';
+        const row = servicesTableBody.insertRow();
+        row.innerHTML = `<td>${service.title||'N/A'}</td><td>${providerName}</td><td>${service.category||'N/A'}</td><td>UGX ${service.price?service.price.toLocaleString():'N/A'}</td>`;
+    }
+
+    // Populate Jobs Table
+    const jobsTableBody = document.getElementById('jobs-table-body');
+    jobsTableBody.innerHTML = '';
+    for (const jobDoc of jobs.docs) {
+        const job = jobDoc.data();
+        let seekerName = providerCache[job.seekerId]; // Re-use the same cache
+        if (!seekerName && job.seekerId) {
+            const userDocSnap = await getDoc(doc(db, 'users', job.seekerId));
+            if (userDocSnap.exists()) {
+                seekerName = userDocSnap.data().name;
+                providerCache[job.seekerId] = seekerName;
+            }
+        }
+        seekerName = seekerName || 'Unknown';
+        const row = jobsTableBody.insertRow();
+        row.innerHTML = `<td>${job.title||'N/A'}</td><td>${seekerName}</td><td>UGX ${job.budget?job.budget.toLocaleString():'N/A'}</td>`;
     }
 }
 
-// --- DELETION LOGIC ---
-async function handleDeleteService() {
-    if (!serviceToDeleteId) return;
-    confirmDeleteServiceBtn.disabled = true;
-    confirmDeleteServiceBtn.textContent = 'Deleting...';
-
-    try {
-        // 1. Delete from Firestore
-        await deleteDoc(doc(db, "services", serviceToDeleteId));
-
-        // 2. Delete from Algolia using the Cloudflare Worker
-        const user = auth.currentUser;
-        if (!user) throw new Error("Authentication error: No user found.");
-        
-        const idToken = await user.getIdToken(true);
-        const response = await fetch('https://services.kabaleonline.com/sync', { // Your worker URL
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
-            body: JSON.stringify({ objectID: serviceToDeleteId }),
+// --- ACCORDION LOGIC ---
+const accordionItems = document.querySelectorAll('.accordion-item');
+accordionItems.forEach(item => {
+    const header = item.querySelector('.accordion-header');
+    header.addEventListener('click', () => {
+        // Close other open items
+        accordionItems.forEach(otherItem => {
+            if (otherItem !== item) {
+                otherItem.classList.remove('active');
+            }
         });
-        if (!response.ok) {
-            console.error('Algolia delete failed:', await response.text());
-        }
-        
-        console.log(`Service ${serviceToDeleteId} deleted successfully.`);
-        loadServices(); // Reload the services list to show the change
-    } catch (error) {
-        console.error("Error deleting service:", error);
-        alert('Failed to delete the service. Please try again.');
-    } finally {
-        serviceToDeleteId = null;
-        confirmDeleteServiceBtn.disabled = false;
-        confirmDeleteServiceBtn.textContent = 'Delete Service';
-        deleteServiceModal.classList.remove('show');
-    }
-}
-
-// --- EVENT LISTENERS FOR DELETION ---
-document.getElementById('services-table-body').addEventListener('click', (e) => {
-    if (e.target.classList.contains('delete-service-btn')) {
-        serviceToDeleteId = e.target.dataset.id;
-        serviceToDeleteName.textContent = `"${e.target.dataset.name}"`;
-        deleteServiceModal.classList.add('show');
-    }
+        // Toggle the clicked item
+        item.classList.toggle('active');
+    });
 });
 
-confirmDeleteServiceBtn.addEventListener('click', handleDeleteService);
-
-cancelDeleteServiceBtn.addEventListener('click', () => {
-    deleteServiceModal.classList.remove('show');
-    serviceToDeleteId = null;
+// --- LOGOUT BUTTON ---
+const logoutBtn = document.getElementById('logout-btn');
+logoutBtn.addEventListener('click', async () => {
+    try {
+        await signOut(auth);
+        window.location.href = 'index.html';
+    } catch (error) {
+        console.error("Error signing out:", error);
+    }
 });
