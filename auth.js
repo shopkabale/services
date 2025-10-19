@@ -20,6 +20,11 @@ import { showToast, hideToast, showButtonLoader, hideButtonLoader } from './noti
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// --- NEW: DEFINE THE LAUNCH CUTOFF DATE HERE ---
+// Anyone who signs up before this date is a founding member.
+// Set for one week from today (October 19, 2025).
+const launchCutoffDate = new Date('2025-10-26T23:59:59'); 
+
 // --- UI Elements ---
 const loginContainer = document.getElementById('login-form-container');
 const signupContainer = document.getElementById('signup-form-container');
@@ -215,14 +220,24 @@ signupForm.addEventListener('submit', async (e) => {
         if (photoFile) {
             profilePicUrl = await uploadToCloudinary(photoFile);
         }
+        
         const userProfile = { 
             uid: user.uid, name, email, role: 'user', isProvider: false,
             location, telephone, profilePicUrl, createdAt: new Date() 
         };
+
+        // --- NEW: AUTOMATED BADGE LOGIC ---
+        // Check if the current date is before the launch cutoff date.
+        if (new Date() < launchCutoffDate) {
+            userProfile.isFoundingMember = true;
+            console.log("Awarding Founding Member badge to new user!");
+        }
+
         await setDoc(doc(db, "users", user.uid), userProfile);
         const actionCodeSettings = { url: window.location.origin, handleCodeInApp: true };
         await sendEmailVerification(user, actionCodeSettings);
         showVerificationView(user); 
+
     } catch (error) {
         showToast(getFriendlyAuthError(error.code), "error");
     } finally {
