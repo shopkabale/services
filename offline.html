@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>You are Offline | KabaleOnline</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0d2857;
+            --bg-secondary: #10336d;
+            --text-primary: #ffffff;
+            --text-secondary: #a7c0e8;
+            --accent-primary: #007bff;
+            --border-color: #1f4287;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+        }
+        .offline-container {
+            background-color: var(--bg-secondary);
+            padding: 40px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            max-width: 500px;
+            width: 100%;
+        }
+        /* --- NEW: Style for your logo --- */
+        .logo {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent-primary);
+            text-decoration: none;
+            margin-bottom: 25px;
+        }
+        .icon {
+            font-size: 4rem;
+            color: var(--accent-primary);
+            margin-bottom: 20px;
+            animation: bounce 2s infinite ease-in-out;
+        }
+        h1 {
+            font-size: 2.5rem;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+        }
+        .description {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 30px;
+        }
+        .guidelines {
+            text-align: left;
+            margin-bottom: 30px;
+        }
+        .guidelines h3 {
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        .guidelines ul {
+            list-style: none;
+            padding-left: 5px;
+        }
+        .guidelines li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        .guidelines li::before {
+            content: '✓';
+            color: var(--accent-primary);
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .btn-retry {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: var(--accent-primary);
+            color: #fff;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+        .btn-retry:hover {
+            transform: scale(1.05);
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <!-- --- NEW: Added your logo --- -->
+        <div class="logo">KabaleOnline</div>
+
+        <div class="icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-wifi-off" viewBox="0 0 16 16">
+                <path d="M10.706 3.294A12.545 12.545 0 0 0 8 3C5.259 3 2.723 3.882.663 5.379a.485.485 0 0 0-.048.736.518.518 0 0 0 .732-.048C3.17 4.545 5.522 4 8 4c1.551 0 3.001.26 4.294.706a.5.5 0 0 0 .707-.707Z"/>
+                <path d="M13.488 6.143a.5.5 0 0 0 .616-.764 15.355 15.355 0 0 0-11.208 0 .5.5 0 1 0 .616.764A14.357 14.357 0 0 1 8 6c1.905 0 3.68.36 5.232.993l.256.15Z"/>
+                <path d="M15.342 8.943a.5.5 0 0 0 .553-.822c-3.1-2.11-7.08-2.11-10.188 0a.5.5 0 1 0 .553.822c2.81-1.906 6.274-1.906 9.082 0Z"/>
+                <path d="M8 10a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"/>
+                <path d="M.918 8.163A.5.5 0 0 0 1.5 8.5c1.801 1.026 4.79 1.026 6.588 0a.5.5 0 1 0-.582-.837C5.9 8.688 2.68 8.688.918 8.163ZM11.162 13.524a.5.5 0 0 0 .707 0l2.5-2.5a.5.5 0 0 0-.707-.707l-2.5 2.5a.5.5 0 0 0 0 .707Z"/>
+                <path d="M1.5 13.5a.5.5 0 0 0 0-.707L.207 11.5a.5.5 0 0 0-.707.707l1.293 1.293a.5.5 0 0 0 .707 0Z"/>
+                <path d="m2.914 12.086 7.778-7.778.707.707-7.778 7.778-.707-.707Z"/>
+            </svg>
+        </div>
+        <h1>You're Currently Offline</h1>
+        <p class="description">It seems there's a problem with your internet connection. Please check it and try again.</p>
+        
+        <div class="guidelines">
+            <h3>Quick Checks:</h3>
+            <ul>
+                <li>Ensure you have an active data plan.</li>
+                <li>Make sure Wi-Fi or Mobile Data is turned on.</li>
+                <li>Check your router or try moving to a different location.</li>
+            </ul>
+        </div>
+        
+        <button class="btn-retry" onclick="window.location.reload();">
+            <i class="fas fa-redo"></i> Retry Connection
+        </button>
+    </div>
+</body>
+</html>
+
