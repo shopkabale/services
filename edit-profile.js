@@ -1,9 +1,8 @@
 import { app } from './firebase-init.js';
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 import { uploadToCloudinary } from './cloudinary-upload.js';
 import { showToast, hideToast, showButtonLoader, hideButtonLoader } from './notifications.js';
-
 
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -27,19 +26,16 @@ let currentUser = null;
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         currentUser = user;
-        // Fetch and populate the form with existing user data
         const userDocRef = doc(db, "users", user.uid);
         const userDoc = await getDoc(userDocRef);
 
         if (userDoc.exists()) {
             populateForm(userDoc.data());
         } else {
-            // This can happen for a brand new Google user
             console.warn("No profile document found, using auth data as a fallback.");
-            populateForm(user); // Populate with basic data from auth
+            populateForm(user);
         }
     } else {
-        // Not logged in, redirect
         window.location.href = 'auth.html';
     }
 });
@@ -54,7 +50,6 @@ function populateForm(userData) {
     taglineInput.value = userData.tagline || '';
     aboutInput.value = userData.about || '';
 
-    // Set back button based on role
     if (userData.isProvider) {
         backToDashboardBtn.href = 'provider-dashboard.html';
     } else {
@@ -68,9 +63,7 @@ function populateForm(userData) {
 photoInput.addEventListener('change', () => {
     if (photoInput.files && photoInput.files[0]) {
         const reader = new FileReader();
-        reader.onload = (e) => {
-            photoPreview.src = e.target.result;
-        };
+        reader.onload = (e) => { photoPreview.src = e.target.result; };
         reader.readAsDataURL(photoInput.files[0]);
     }
 });
@@ -91,26 +84,37 @@ editProfileForm.addEventListener('submit', async (e) => {
             about: aboutInput.value,
         };
 
-        // Check if a new photo was uploaded
         const photoFile = photoInput.files[0];
         if (photoFile) {
             showToast('Uploading photo...', 'progress');
-            const imageUrl = await uploadToCloudinary(photoFile);
-            updatedData.profilePicUrl = imageUrl;
+            updatedData.profilePicUrl = await uploadToCloudinary(photoFile);
             hideToast();
         }
 
-        // Update the user's document in Firestore
         showToast('Saving profile...', 'progress');
         const userDocRef = doc(db, "users", currentUser.uid);
-        await updateDoc(userDocRef, updatedData);
+        // Use setDoc with merge to create or update the profile
+        await setDoc(userDocRef, updatedData, { merge: true });
         hideToast();
+
+        // --- NEW: Sync profile changes to all existing services ---
+        const finalProfilePicUrl = updatedData.profilePicUrl || (await getDoc(userDocRef)).data().profilePicUrl;
+        if (updatedData.name && finalProfilePicUrl) {
+            showToast('Updating your service listings...', 'progress');
+            const idToken = await currentUser.getIdToken(true);
+            await fetch('/updateProvider', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+                body: JSON.stringify({ name: updatedData.name, profilePicUrl: finalProfilePicUrl })
+            });
+            hideToast();
+        }
+        
         showToast('Profile updated successfully!', 'success');
 
-        // After saving, send the user to their dashboard.
         setTimeout(() => {
             window.location.href = 'dashboard.html';
-        }, 1500); // Wait 1.5 seconds to allow user to see success message
+        }, 1500);
 
     } catch (error) {
         hideToast();
