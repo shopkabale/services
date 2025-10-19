@@ -4,13 +4,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebas
 // --- IMPORTANT: PASTE YOUR FIREBASE CONFIGURATION KEYS HERE ---
 // Replace the placeholder values below with the actual keys from your Firebase project settings.
 const firebaseConfig = {
-  apiKey: "AIzaSyBLf0fZUFGXS9NMS3rMr8Iisy-siAAiIyI",
-  authDomain: "kabale-20ec4.firebaseapp.com",
-  projectId: "kabale-20ec4",
-  storageBucket: "kabale-20ec4.firebasestorage.app",
-  messagingSenderId: "792218710477",
-  appId: "1:792218710477:web:5a32cc3177ddba98ff5484",
-  measurementId: "G-5XQRYNC9TW"
+  apiKey: "AIzaSyAQsTpibEtyPOEztSK8uMWSK97ehJ7J-Bc",
+  authDomain: "kabale-online.firebaseapp.com",
+  projectId: "kabale-online",
+  storageBucket: "kabale-online.firebasestorage.app",
+  messagingSenderId: "773630007249",
+  appId: "1:773630007249:web:99727d36a517b5ff3632f0"
 };
 
 
