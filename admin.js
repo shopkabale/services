@@ -1,5 +1,5 @@
 import { app } from './firebase-init.js';
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { getFirestore, collection, doc, getDoc, getDocs, getCountFromServer, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 const auth = getAuth(app);
@@ -22,126 +22,179 @@ onAuthStateChanged(auth, async (user) => {
             const userDocRef = doc(db, "users", user.uid);
             const userDoc = await getDoc(userDocRef);
 
-            // --- THIS IS THE FIX ---
-            // We now check for `role === 'admin'` to match your database structure.
-            if (userDoc.exists() && userDoc.data().role === 'admin') {
-                // SUCCESS: User is a confirmed admin. Load all dashboard data.
-                document.getElementById('admin-name').textContent = userDoc.data().name || 'Admin';
-                document.getElementById('admin-avatar').src = userDoc.data().profilePicUrl || `https://placehold.co/40x40?text=A`;
-                
+            if (userDoc.exists() && userDoc.data().isAdmin === true) {
+                // User is a confirmed admin, NOW we load all the data.
                 loadDashboardStats();
-                loadAllDataTables();
+                loadUsers();
+                loadServices();
             } else {
-                // --- ACCESS DENIED: User is NOT an admin ---
-                // Show a clear access denied message with a redirect countdown.
-                document.body.innerHTML = `
-                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; padding: 20px; color: var(--text-primary); background-color: var(--bg-primary);">
-                        <h1 style="font-size: 2.5rem;">🔒 Access Denied</h1>
-                        <p style="font-size: 1.2rem; margin-top: 10px;">You do not have permission to view this page.</p>
-                        <p style="margin-top: 30px;">Redirecting you to the homepage in <span id="countdown">5</span> seconds...</p>
-                    </div>
-                `;
-                
-                let countdown = 5;
-                const countdownElement = document.getElementById('countdown');
-                const interval = setInterval(() => {
-                    countdown--;
-                    if (countdownElement) countdownElement.textContent = countdown;
-                    if (countdown <= 0) {
-                        clearInterval(interval);
-                        window.location.href = 'index.html';
-                    }
-                }, 1000);
+                console.warn("Access denied. User is not an admin.");
+                window.location.href = 'index.html';
             }
         } else {
-            // User is not logged in.
             console.warn("Access denied. User not logged in.");
             window.location.href = 'auth.html';
         }
     } catch (error) {
         console.error("Authentication check failed:", error);
+        alert("An error occurred during authentication. Redirecting...");
         window.location.href = 'index.html';
     }
+});
+
+// --- NAVIGATION LOGIC ---
+navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const viewId = link.getAttribute('data-view');
+        if (!viewId) return;
+
+        navLinks.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+        mainTitle.textContent = link.textContent;
+        contentSections.forEach(section => {
+            section.classList.toggle('active', section.id === viewId);
+        });
+    });
 });
 
 // --- DATA FETCHING FUNCTIONS ---
 async function loadDashboardStats() {
     try {
-        const userCount = (await getCountFromServer(collection(db, 'users'))).data().count;
-        const serviceCount = (await getCountFromServer(collection(db, 'services'))).data().count;
-        const jobCount = (await getCountFromServer(collection(db, 'job_posts'))).data().count;
+        const usersCol = collection(db, 'users');
+        const servicesCol = collection(db, 'services');
+        const jobsCol = collection(db, 'job_posts');
+
+        const userCount = (await getCountFromServer(usersCol)).data().count;
+        const serviceCount = (await getCountFromServer(servicesCol)).data().count;
+        const jobCount = (await getCountFromServer(jobsCol)).data().count;
+
         document.getElementById('total-users').textContent = userCount;
         document.getElementById('total-services').textContent = serviceCount;
         document.getElementById('total-job-posts').textContent = jobCount;
-    } catch (error) { console.error("Error loading stats:", error); }
+    } catch (error) {
+        console.error("Error loading dashboard stats:", error);
+        document.getElementById('total-users').textContent = 'Error';
+        document.getElementById('total-services').textContent = 'Error';
+        document.getElementById('total-job-posts').textContent = 'Error';
+    }
 }
 
-async function loadAllDataTables() {
-    const [users, services, jobs] = await Promise.all([
-        getDocs(collection(db, 'users')),
-        getDocs(collection(db, 'services')),
-        getDocs(collection(db, 'job_posts'))
-    ]);
-
+async function loadUsers() {
     const usersTableBody = document.getElementById('users-table-body');
-    usersTableBody.innerHTML = '';
-    users.forEach(doc => {
-        const user = doc.data();
-        const role = user.role === 'admin' ? 'Admin' : (user.isProvider ? 'Provider' : 'User');
-        usersTableBody.insertRow().innerHTML = `<td>${user.name||'N/A'}</td><td>${user.email||'N/A'}</td><td>${role}</td>`;
-    });
-
-    const servicesTableBody = document.getElementById('services-table-body');
-    servicesTableBody.innerHTML = '';
-    const providerCache = {};
-    for (const serviceDoc of services.docs) {
-        const service = serviceDoc.data();
-        let providerName = providerCache[service.providerId];
-        if (!providerName && service.providerId) {
-            const userDocSnap = await getDoc(doc(db, 'users', service.providerId));
-            if (userDocSnap.exists()) {
-                providerName = userDocSnap.data().name;
-                providerCache[service.providerId] = providerName;
-            }
+    usersTableBody.innerHTML = '<tr><td colspan="3">Loading users...</td></tr>';
+    try {
+        const snapshot = await getDocs(collection(db, 'users'));
+        usersTableBody.innerHTML = '';
+        if (snapshot.empty) {
+            usersTableBody.innerHTML = '<tr><td colspan="3">No users found.</td></tr>';
+            return;
         }
-        providerName = providerName || 'Unknown';
-        servicesTableBody.insertRow().innerHTML = `<td>${service.title||'N/A'}</td><td>${providerName}</td><td>${service.category||'N/A'}</td><td>UGX ${service.price?service.price.toLocaleString():'N/A'}</td>`;
-    }
-
-    const jobsTableBody = document.getElementById('jobs-table-body');
-    jobsTableBody.innerHTML = '';
-    for (const jobDoc of jobs.docs) {
-        const job = jobDoc.data();
-        let seekerName = providerCache[job.seekerId];
-        if (!seekerName && job.seekerId) {
-            const userDocSnap = await getDoc(doc(db, 'users', job.seekerId));
-            if (userDocSnap.exists()) {
-                seekerName = userDocSnap.data().name;
-                providerCache[job.seekerId] = seekerName;
-            }
-        }
-        seekerName = seekerName || 'Unknown';
-        jobsTableBody.insertRow().innerHTML = `<td>${job.title||'N/A'}</td><td>${seekerName}</td><td>UGX ${job.budget?job.budget.toLocaleString():'N/A'}</td>`;
+        snapshot.forEach(doc => {
+            const user = doc.data();
+            const row = usersTableBody.insertRow();
+            row.innerHTML = `
+                <td><div class="name">${user.name || 'N/A'}</div></td>
+                <td>${user.email || 'N/A'}</td>
+                <td>${user.isProvider ? 'Provider' : 'User'}</td>
+            `;
+        });
+    } catch(error) {
+        console.error("Error loading users:", error);
+        usersTableBody.innerHTML = '<tr><td colspan="3">Could not load users.</td></tr>';
     }
 }
 
-// --- ACCORDION LOGIC ---
-const accordionItems = document.querySelectorAll('.accordion-item');
-accordionItems.forEach(item => {
-    const header = item.querySelector('.accordion-header');
-    header.addEventListener('click', () => {
-        accordionItems.forEach(otherItem => { if (otherItem !== item) otherItem.classList.remove('active'); });
-        item.classList.toggle('active');
-    });
+async function loadServices() {
+    const servicesTableBody = document.getElementById('services-table-body');
+    servicesTableBody.innerHTML = '<tr><td colspan="5">Loading services...</td></tr>';
+    try {
+        const snapshot = await getDocs(collection(db, 'services'));
+        const providerCache = {}; 
+        servicesTableBody.innerHTML = '';
+        if (snapshot.empty) {
+            servicesTableBody.innerHTML = '<tr><td colspan="5">No services found.</td></tr>';
+            return;
+        }
+        for(const serviceDoc of snapshot.docs) { 
+            const service = { id: serviceDoc.id, ...serviceDoc.data() };
+            let providerName = '...';
+
+            if(service.providerId && !providerCache[service.providerId]) {
+                const userDocRef = doc(db, 'users', service.providerId);
+                const userDocSnap = await getDoc(userDocRef);
+                if(userDocSnap.exists()) {
+                    providerCache[service.providerId] = userDocSnap.data().name;
+                }
+            }
+            providerName = providerCache[service.providerId] || 'Unknown';
+
+            const row = servicesTableBody.insertRow();
+            row.innerHTML = `
+                <td><div class="name">${service.title || 'N/A'}</div></td>
+                <td>${providerName}</td>
+                <td>${service.category || 'N/A'}</td>
+                <td>UGX ${service.price ? service.price.toLocaleString() : 'N/A'}</td>
+                <td>
+                    <button class="btn-danger delete-service-btn" data-id="${service.id}" data-name="${service.title}">Delete</button>
+                </td>
+            `;
+        }
+    } catch(error) {
+        console.error("Error loading services:", error);
+        servicesTableBody.innerHTML = '<tr><td colspan="5">Could not load services.</td></tr>';
+    }
+}
+
+// --- DELETION LOGIC ---
+async function handleDeleteService() {
+    if (!serviceToDeleteId) return;
+    confirmDeleteServiceBtn.disabled = true;
+    confirmDeleteServiceBtn.textContent = 'Deleting...';
+
+    try {
+        // 1. Delete from Firestore
+        await deleteDoc(doc(db, "services", serviceToDeleteId));
+
+        // 2. Delete from Algolia using the Cloudflare Worker
+        const user = auth.currentUser;
+        if (!user) throw new Error("Authentication error: No user found.");
+        
+        const idToken = await user.getIdToken(true);
+        const response = await fetch('https://services.kabaleonline.com/sync', { // Your worker URL
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+            body: JSON.stringify({ objectID: serviceToDeleteId }),
+        });
+        if (!response.ok) {
+            console.error('Algolia delete failed:', await response.text());
+        }
+        
+        console.log(`Service ${serviceToDeleteId} deleted successfully.`);
+        loadServices(); // Reload the services list to show the change
+    } catch (error) {
+        console.error("Error deleting service:", error);
+        alert('Failed to delete the service. Please try again.');
+    } finally {
+        serviceToDeleteId = null;
+        confirmDeleteServiceBtn.disabled = false;
+        confirmDeleteServiceBtn.textContent = 'Delete Service';
+        deleteServiceModal.classList.remove('show');
+    }
+}
+
+// --- EVENT LISTENERS FOR DELETION ---
+document.getElementById('services-table-body').addEventListener('click', (e) => {
+    if (e.target.classList.contains('delete-service-btn')) {
+        serviceToDeleteId = e.target.dataset.id;
+        serviceToDeleteName.textContent = `"${e.target.dataset.name}"`;
+        deleteServiceModal.classList.add('show');
+    }
 });
 
-// --- LOGOUT BUTTON ---
-const logoutBtn = document.getElementById('logout-btn');
-logoutBtn.addEventListener('click', async () => {
-    try {
-        await signOut(auth);
-        window.location.href = 'index.html';
-    } catch (error) {
-        console.error("Error signing out:", error);
-    }
+confirmDeleteServiceBtn.addEventListener('click', handleDeleteService);
+
+cancelDeleteServiceBtn.addEventListener('click', () => {
+    deleteServiceModal.classList.remove('show');
+    serviceToDeleteId = null;
 });
