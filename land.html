@@ -3,463 +3,394 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>KabaleOnline Services | Find Local Pros in Kabale & Kigezi</title>
-    <meta name="description" content="The #1 marketplace to find and offer services in Kabale, Uganda.">
-    
+    <meta name="description" content="The #1 marketplace to find and offer services in Kabale, Uganda. Connect with trusted local plumbers, developers, photographers, tutors, and more. Post a job or grow your business in the Kigezi region.">
+    <meta name="keywords" content="services in kabale, find a job kabale, local professionals kigezi, kabale uganda marketplace, hire someone kabale, photographers kabale, plumbers kabale, web developers kabale">
+    <meta name="author" content="KabaleOnline">
+    <link rel="canonical" href="https://services.kabaleonline.com/">
+
+    <link rel="icon" href="favicon.webp" type="image/webp">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://services.kabaleonline.com/">
+    <meta property="og:title" content="KabaleOnline Services | Find Local Pros in Kabale & Kigezi">
+    <meta property="og:description" content="The #1 marketplace to connect with trusted local plumbers, developers, photographers, tutors, and more in the Kigezi region.">
+    <meta property="og:image" content="https://services.kabaleonline.com/social-share.jpg">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://services.kabaleonline.com/">
+    <meta property="twitter:title" content="KabaleOnline Services | Find Local Pros in Kabale & Kigezi">
+    <meta property="twitter:description" content="The #1 marketplace to connect with trusted local plumbers, developers, photographers, tutors, and more in the Kigezi region.">
+    <meta property="twitter:image" content="https://services.kabaleonline.com/social-share.jpg">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script type="application/ld+json">{ /* Your existing JSON-LD script */ }</script>
+    <script type="application/ld+json">{ /* Your existing JSON-LD script */ }</script>
+
     <style>
+        /* --- THEME-AWARE CSS VARIABLES --- */
         :root {
-            --bg-primary: #0d2857; --bg-secondary: #10336d; --bg-card: #0a214d;
-            --text-primary: #ffffff; --text-secondary: #a7c0e8; --accent-primary: #007bff;
-            --border-color: #1f4287; --transition-speed: 0.3s;
+            --ko-primary: #007aff;
+            --ko-primary-rgb: 0, 122, 255;
+            --ko-accent: #ffc107;
+            
+            --bg-light: #f0f4f9;
+            --bg-card-light: #ffffff;
+            --text-main-light: #0d2857;
+            --text-secondary-light: #6c757d;
+            --border-color-light: #dee2e6;
+            
+            --bg-dark: #0d2857;
+            --bg-card-dark: #0a214d;
+            --text-main-dark: #ffffff;
+            --text-secondary-dark: #a7c0e8;
+            --border-color-dark: #1f4287;
+            
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --border-radius: 12px;
         }
+
+        /* --- THEME-SWITCHING LOGIC --- */
         body.light-mode {
-            --bg-primary: #f0f4f9; --bg-secondary: #ffffff; --bg-card: #ffffff;
-            --text-primary: #0d2857; --text-secondary: #6c757d; --border-color: #dee2e6;
+            --bg-main: var(--bg-light);
+            --bg-card: var(--bg-card-light);
+            --text-main: var(--text-main-light);
+            --text-secondary: var(--text-secondary-light);
+            --border-color: var(--border-color-light);
         }
+
+        body.dark-mode {
+            --bg-main: var(--bg-dark);
+            --bg-card: var(--bg-card-dark);
+            --text-main: var(--text-main-dark);
+            --text-secondary: var(--text-secondary-dark);
+            --border-color: var(--border-color-dark);
+        }
+
+        /* --- GENERAL & HEADER STYLES --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-primary); color: var(--text-secondary); }
-        .container { max-width: 1100px; margin: 0 auto; padding: 0 15px; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-main); color: var(--text-secondary); transition: background-color 0.3s, color 0.3s; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
         section { padding: 80px 0; overflow-x: hidden; }
-        .section-title { font-size: 2.5rem; text-align: center; margin-bottom: 1rem; color: var(--text-primary); }
-        .section-subtitle { text-align: center; color: var(--accent-primary); font-weight: 600; text-transform: uppercase; }
+        h2 { font-size: 2.5rem; text-align: center; margin-bottom: 1rem; color: var(--text-main); }
+        .section-subtitle { text-align: center; color: var(--ko-accent); font-weight: 600; text-transform: uppercase; }
         .section-description { text-align: center; max-width: 700px; margin: 0 auto 50px auto; }
-        .btn { display: inline-block; padding: 12px 28px; background-color: var(--accent-primary); color: #ffffff; border-radius: 50px; text-decoration: none; font-weight: 600; transition: transform var(--transition-speed), background-color var(--transition-speed); }
-        .btn:hover { transform: translateY(-3px); background-color: #0069d9; }
-        .btn-secondary { background-color: transparent; border: 2px solid var(--border-color); }
-        .btn-secondary:hover { background-color: var(--bg-secondary); border-color: var(--bg-secondary); }
-
-        /* --- ON-SCROLL ANIMATION STYLES --- */
-        .animated-section { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
-        .animated-section.visible { opacity: 1; transform: translateY(0); }
-
-        /* --- HEADER WITH FULL NAVIGATION --- */
-        .header { position: sticky; top: 0; z-index: 1000; background-color: var(--bg-secondary); padding: 15px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .navbar { display: flex; justify-content: space-between; align-items: center; }
-        .nav-logo { font-size: 1.6rem; font-weight: 800; color: var(--accent-primary); text-decoration: none; }
-        .nav-links { display: none; list-style: none; gap: 25px; }
-        .nav-links a { color: var(--text-secondary); text-decoration: none; font-weight: 500; position: relative; }
-        .nav-links a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background-color: var(--accent-primary); transition: width var(--transition-speed); }
-        .nav-links a:hover::after { width: 100%; }
-        .nav-actions { display: flex; align-items: center; gap: 15px; }
-        .btn-header { display: inline-flex; align-items: center; padding: 8px 20px; font-size: 0.9rem; background-color: var(--accent-primary); color: #ffffff; border-radius: 50px; text-decoration: none; font-weight: 600; }
-        .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; }
-        .mobile-menu-btn { display: none; background: none; border: none; color: var(--text-primary); font-size: 1.8rem; cursor: pointer; z-index: 1001; }
-
-        @media (min-width: 992px) { .nav-links { display: flex; } }
-        @media (max-width: 991px) {
-            .mobile-menu-btn { display: block; }
-            .nav-links { position: fixed; top: 0; right: -100%; width: 250px; height: 100vh; background-color: var(--bg-card); flex-direction: column; padding-top: 100px; align-items: center; transition: right 0.5s ease-in-out; }
-            .nav-links.active { right: 0; }
-        }
-
-        /* --- NEW HERO SECTION BASED ON EXAMPLE IMAGE --- */
-        .hero {
-            position: relative;
-            min-height: 85vh; /* Adjust height as needed */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 80px 0; /* Padding for mobile */
-            color: var(--text-primary);
-            overflow: hidden; /* Important for curved background */
-            background-color: var(--bg-primary); /* Fallback */
-            border-bottom-left-radius: 50px; /* Curve bottom left */
-            border-bottom-right-radius: 50px; /* Curve bottom right */
-            margin-bottom: 40px; /* Space between hero and next section */
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('https://images.unsplash.com/photo-1556740714-a8395b3bf30f?q=80&w=2070&auto=format&fit=crop'); /* Your main background image */
-            background-size: cover;
-            background-position: center;
-            opacity: 0.3; /* Subtle overlay for text readability */
-            z-index: 1;
-        }
-
-        .hero-content-wrapper {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            flex-direction: column; /* Stack on mobile */
-            gap: 40px;
-            align-items: center;
-            max-width: 1200px;
-            width: 100%;
-            padding: 0 15px;
-        }
-
-        @media (min-width: 768px) {
-            .hero-content-wrapper {
-                flex-direction: row; /* Two columns on desktop */
-                text-align: left;
-                justify-content: space-between;
-            }
-        }
-
-        .hero-left {
-            flex: 1;
-            max-width: 600px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
+        .btn { display: inline-block; padding: 12px 28px; background-color: var(--ko-accent); color: #0d2857; border-radius: 50px; text-decoration: none; font-weight: 600; border: 2px solid var(--ko-accent); margin: 5px; }
+        .btn-secondary { background-color: transparent; border-color: var(--ko-accent); color: var(--ko-accent); }
         
-        @media (min-width: 768px) {
-            .hero-left {
-                align-items: flex-start;
-                text-align: left;
-                padding-right: 30px;
-            }
+        /* --- Standardized Header --- */
+        .sticky-header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background-color: rgba(var(--bg-card-rgb, 10, 33, 77), 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); }
+        body.light-mode .sticky-header { --bg-card-rgb: 255, 255, 255; }
+        body.dark-mode .sticky-header { --bg-card-rgb: 10, 33, 77; }
+        .header-content { display: flex; align-items: center; justify-content: space-between; height: 70px; }
+        .site-title { text-decoration: none; color: var(--text-main); font-size: 1.5em; font-weight: 700; }
+        .site-title span { color: var(--ko-accent); }
+        .hamburger-menu { font-size: 24px; background: none; border: none; cursor: pointer; color: var(--text-main); display: block; }
+        .header-icons { display: flex; align-items: center; gap: 20px; }
+        #theme-toggle { background: none; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer; }
+        .desktop-nav { display: none; }
+        @media (min-width: 1024px) { /* Other pages used this breakpoint */
+            .hamburger-menu { display: none; }
+            .desktop-nav { display: flex; align-items: center; gap: 25px; list-style: none; }
+            .desktop-nav a { text-decoration: none; color: var(--text-secondary); font-weight: 500; transition: color 0.3s; }
+            .desktop-nav a:hover { color: var(--ko-accent); }
         }
 
-        .hero-left h1 {
-            font-size: 3.5rem;
-            font-weight: 800;
-            line-height: 1.2;
-            color: var(--text-primary);
-            margin-bottom: 20px;
-        }
-        .hero-left .description {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin-bottom: 30px;
-            max-width: 500px; /* Constrain width for readability */
-        }
-        .hero-buttons {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap; /* Allow buttons to wrap on small screens */
-            justify-content: center; /* Center buttons on mobile */
-        }
-        @media (min-width: 768px) {
-            .hero-buttons {
-                justify-content: flex-start; /* Align left on desktop */
-            }
-        }
+        /* --- Standardized Mobile Nav --- */
+        .mobile-nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1090; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s; }
+        .mobile-nav-overlay.active { opacity: 1; visibility: visible; }
+        .mobile-nav { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background-color: var(--bg-card); box-shadow: 2px 0 10px rgba(0,0,0,0.1); z-index: 1100; transition: transform 0.3s ease; display: flex; flex-direction: column; transform: translateX(0); }
+        .mobile-nav.active { transform: translateX(280px); }
+        .mobile-nav a { display: block; padding: 15px 20px; color: var(--text-main); text-decoration: none; border-bottom: 1px solid var(--border-color); }
 
-        .hero-right {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 300px; /* Ensure it has height on mobile */
-            position: relative;
-        }
+        /* --- NEW HERO SECTION WITH TYPING ANIMATION --- */
+        .hero { min-height: 90vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 120px 0 80px; background-image: linear-gradient(rgba(13, 40, 87, 0.8), rgba(13, 40, 87, 0.8)), url('https://images.unsplash.com/photo-1521791136064-7986c2920216?q=80&w=2070&auto=format&fit=crop'); background-size: cover; background-position: center; }
+        body.light-mode .hero { background-image: linear-gradient(rgba(240, 244, 249, 0.8), rgba(240, 244, 249, 0.8)), url('https://images.unsplash.com/photo-1521791136064-7986c2920216?q=80&w=2070&auto=format&fit=crop'); }
+        .hero-content h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.2; margin-bottom: 20px; color: var(--text-main); }
+        #typing-text { color: var(--ko-accent); }
+        .hero-subtitle { font-size: 1.2rem; margin-bottom: 30px; max-width: 700px; margin-left: auto; margin-right: auto; }
+        .hero-search-form { display: flex; max-width: 600px; margin: 40px auto 30px; }
+        #hero-search-input { flex-grow: 1; border: 1px solid var(--border-color); background: var(--bg-card); padding: 15px 25px; font-size: 1em; color: var(--text-main); border-radius: 50px 0 0 50px; }
+        #hero-search-input:focus { outline: none; border-color: var(--ko-accent); }
+        .hero-search-form button { border: none; background: var(--ko-accent); color: #0d2857; padding: 0 30px; font-size: 1.1em; cursor: pointer; border-radius: 0 50px 50px 0; }
+        
+        /* --- NEW HOW IT WORKS SECTION --- */
+        #how-it-works { background-color: var(--bg-card); }
+        .how-it-works-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        .how-it-works-card { text-align: center; padding: 20px; transition: transform 0.3s; }
+        .how-it-works-card:hover { transform: translateY(-10px); }
+        .how-it-works-card .icon { font-size: 3rem; color: var(--ko-accent); margin-bottom: 20px; }
+        .how-it-works-card h3 { font-size: 1.3rem; margin-bottom: 10px; color: var(--text-main); }
+        .step-number { font-size: 4rem; font-weight: 800; color: var(--border-color); position: absolute; top: -20px; left: -10px; z-index: -1; }
+        .how-it-works-card .content { position: relative; z-index: 1; }
 
-        /* --- Placeholder for your visual element --- */
-        .hero-visual-element {
-            width: 100%;
-            height: 350px; /* Fixed height for consistency */
-            background-image: url('https://placehold.co/400x350/a7c0e8/0a214d?text=Dynamic+Visual+Here'); /* Replace with your actual image or SVG */
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            position: relative;
-            transition: transform 0.8s ease-out; /* Animation for subtle movement */
-            animation: floatEffect 4s ease-in-out infinite; /* Continuous subtle float */
-        }
+        /* --- ENHANCED SECTION STYLES WITH HOVER --- */
+        .feature-card, .category-card, .provider-card, .testimonial-card { transition: transform 0.3s, box-shadow 0.3s; }
+        .feature-card:hover, .category-card:hover, .provider-card:hover, .testimonial-card:hover { transform: translateY(-10px); box-shadow: var(--shadow); }
 
-        @keyframes floatEffect {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
+        #why-us { background-color: var(--bg-main); }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+        .feature-card { background: var(--bg-card); padding: 30px; border-radius: 12px; text-align: center; border-bottom: 4px solid var(--ko-accent); }
+        .feature-card .icon { font-size: 3rem; color: var(--ko-accent); margin-bottom: 20px; }
+        .feature-card h3 { font-size: 1.3rem; margin-bottom: 10px; color: var(--text-main); }
 
-        /* --- Optional: Add some overlays like in the example --- */
-        .hero-overlay-card {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 10px;
-            padding: 10px 15px;
-            color: var(--text-primary);
-            font-size: 0.85rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            opacity: 0; /* Hidden by default */
-            animation: fadeIn 1s ease-out forwards;
-        }
-
-        .hero-overlay-card:nth-child(1) { top: 10%; left: 10%; animation-delay: 0.5s; }
-        .hero-overlay-card:nth-child(2) { bottom: 15%; right: 15%; animation-delay: 1s; }
-
-        @keyframes fadeIn {
-            to { opacity: 1; }
-        }
-
-        /* --- HOW IT WORKS & WHY US SECTIONS (PREVIOUSLY ANIMATED) --- */
-        #how-it-works, #why-us, #providers { background-color: var(--bg-secondary); }
-        .steps-grid, .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
-        .step-card, .feature-card { background: var(--bg-primary); padding: 30px; border-radius: 12px; text-align: center; transition: transform var(--transition-speed); }
-        .step-card:hover, .feature-card:hover { transform: translateY(-5px); }
-        .icon { font-size: 3rem; color: var(--accent-primary); margin-bottom: 20px; }
-        h3 { font-size: 1.3rem; margin-bottom: 10px; color: var(--text-primary); }
-
-        /* --- CATEGORIES & PROVIDERS SECTIONS --- */
         .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; text-align: center; }
-        .category-card { background: var(--bg-secondary); padding: 25px; border-radius: 12px; text-decoration: none; color: var(--text-primary); transition: transform var(--transition-speed); }
-        .category-card:hover { transform: translateY(-5px); }
-        .category-card .icon { font-size: 2.5rem; }
-        .category-card span { font-weight: 500; }
-        .provider-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
-        .provider-card { background: var(--bg-card); border-radius: 12px; text-align: center; padding: 30px; }
-        .provider-card img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid var(--accent-primary); margin-bottom: 15px; }
-        .provider-card h3 { color: var(--text-primary); }
-        .provider-card .role { color: var(--accent-primary); font-weight: 500; margin-bottom: 5px; }
+        .category-card { background: var(--bg-card); padding: 25px; border-radius: 12px; text-decoration: none; color: var(--text-main); border: 1px solid var(--border-color); }
+        .category-card .icon { font-size: 2.5rem; color: var(--ko-accent); margin-bottom: 15px; }
 
-        /* --- TESTIMONIALS SECTION --- */
-        .testimonial-card { background: var(--bg-card); padding: 30px; border-radius: 12px; }
+        #providers { background-color: var(--bg-main); }
+        .provider-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+        .provider-card { background: var(--bg-card); border-radius: 12px; text-align: center; padding: 30px; border: 1px solid var(--border-color); }
+        .provider-card img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid var(--ko-accent); margin-bottom: 15px; }
+        .provider-card h3 { color: var(--text-main); }
+        .provider-card .role { color: var(--ko-accent); font-weight: 500; margin-bottom: 5px; }
+
+        .testimonial-card { background: var(--bg-card); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); }
         .testimonial-card p { font-style: italic; font-size: 1.1rem; margin-bottom: 20px; }
         .testimonial-author { display: flex; align-items: center; gap: 15px; }
         .testimonial-author img { width: 50px; height: 50px; border-radius: 50%; }
-        .testimonial-author h4 { color: var(--text-primary); font-size: 1rem; margin: 0; }
+        .testimonial-author h4 { color: var(--text-main); font-size: 1rem; margin: 0; }
 
-        /* --- FOOTER STYLES --- */
-        footer { background-color: var(--bg-card); color: var(--text-primary); padding: 60px 0 20px 0; border-top: 1px solid var(--border-color); }
-        .footer-grid { display: grid; grid-template-columns: 1fr; gap: 40px; margin-bottom: 40px; text-align: center; }
-        @media (min-width: 768px) { .footer-grid { grid-template-columns: 2fr 1fr 1fr 1fr; } }
-        .footer-grid h4 { color: var(--text-primary); font-size: 1.2rem; margin-bottom: 20px; }
-        .footer-about p { color: var(--text-secondary); margin-bottom: 20px; }
-        .footer-socials a { color: var(--text-primary); font-size: 1.3rem; margin: 0 10px; transition: color 0.3s; }
-        .footer-socials a:hover { color: var(--accent-primary); }
-        .footer-links ul { list-style: none; padding: 0; }
-        .footer-links li { margin-bottom: 12px; }
-        .footer-links a { color: var(--text-secondary); text-decoration: none; transition: all 0.3s; }
-        .footer-links a:hover { color: var(--accent-primary); padding-left: 5px; }
-        .footer-links ul li i { margin-right: 10px; color: var(--accent-primary); }
-        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid var(--border-color); color: var(--text-secondary); }
+        /* --- Standardized Footer --- */
+        footer { background-color: #0f172a; color: #e2e8f0; padding: 40px 15px 20px; text-align: center; }
+        .footer-logo { font-size: 1.8em; font-weight: bold; margin-bottom: 10px; }
+        .footer-logo span { color: var(--ko-accent); }
+        .footer-links { margin: 25px 0; }
+        .footer-links a { color: #94a3b8; margin: 0 10px; text-decoration: none; }
+        .footer-copyright { font-size: 0.9em; color: #64748b; }
     </style>
 </head>
 <body class="dark-mode">
-
-    <header class="header">
-        <nav class="navbar container">
-            <a href="index.html" class="nav-logo">KabaleOnline</a>
-            <ul class="nav-links" id="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="services.html">Browse Services</a></li>
-                <li><a href="browse-jobs.html">Find Jobs</a></li>
-                <li><a href="#how-it-works">How It Works</a></li>
-                <li><a href="#about-us">About Us</a></li> <li><a href="#contact">Contact</a></li> </ul>
-            <div class="nav-actions">
-                <a href="auth.html" class="btn-header" id="login-link">Login</a>
-                <a href="dashboard.html" class="btn-header" id="dashboard-link" style="display: none;">Dash</a>
-                <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
-                <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open Menu"><i class="fas fa-bars"></i></button>
+    <header class="sticky-header">
+        <div class="header-content container">
+            <a href="/" class="site-title">KabaleOnline <span>Services</span></a>
+            <nav class="desktop-nav">
+                <a href="#categories">Categories</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#why-us">Why Us</a>
+            </nav>
+            <div class="header-icons">
+                 <button id="theme-toggle" class="theme-toggle" title="Toggle theme"></button>
+                 <button class="hamburger-menu" aria-label="Open menu">&#9776;</button>
             </div>
-        </nav>
+        </div>
     </header>
 
+    <nav class="mobile-nav">
+        <a href="#categories">Categories</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#why-us">Why Us</a>
+        <a href="auth.html">Login / Register</a>
+    </nav>
+    <div class="mobile-nav-overlay"></div>
+
     <main>
-        <section id="hero" class="hero">
-            <div class="hero-content-wrapper container">
-                <div class="hero-left">
-                    <h1>Connecting Kabale: <br>Your Local Service Hub</h1>
-                    <p class="description">The #1 marketplace to discover and offer services right here in Kabale and the Kigezi region. Connect with trusted local plumbers, web developers, photographers, tutors, and more. Post a job or grow your business today!</p>
-                    <div class="hero-buttons">
-                        <a href="services.html" class="btn">Find a Service</a>
-                        <a href="auth.html" class="btn btn-secondary">Offer a Service</a>
-                    </div>
-                </div>
-                <div class="hero-right">
-                    <div class="hero-visual-element">
-                         </div>
-                    <div class="hero-overlay-card" style="top: 15%; left: 5%;">Local Matchmaking <i class="fas fa-search"></i></div>
-                    <div class="hero-overlay-card" style="bottom: 20%; right: 10%;">Community Growth <i class="fas fa-users"></i></div>
+        <section class="hero">
+            <div class="hero-content container">
+                <h1>Find Local Pros for <span id="typing-text"></span></h1>
+                <p class="hero-subtitle">The #1 marketplace to find and offer services in Kabale. Connect with trusted local plumbers, developers, photographers, tutors, and more.</p>
+                <form class="hero-search-form" action="services.html" method="get">
+                    <input type="search" name="q" id="hero-search-input" aria-label="Search for a service">
+                    <button type="submit" aria-label="Submit search"><i class="fas fa-search"></i></button>
+                </form>
+                <div>
+                    <a href="services.html" class="btn">Find a Service</a>
+                    <a href="auth.html" class="btn btn-secondary">Offer a Service</a>
                 </div>
             </div>
         </section>
-        
-        <section id="how-it-works" class="animated-section">
+
+        <section id="how-it-works">
             <div class="container">
-                <p class="section-subtitle">Our Process</p>
-                <h2 class="section-title">How It Works</h2>
-                <div class="steps-grid">
-                    <div class="step-card">
+                <p class="section-subtitle">Get Started in 3 Easy Steps</p>
+                <h2>How It Works</h2>
+                <div class="how-it-works-grid">
+                    <div class="how-it-works-card">
                         <div class="icon"><i class="fas fa-search"></i></div>
                         <h3>1. Search for a Service</h3>
-                        <p>Use our powerful search to find exactly what you need, from plumbing to graphic design.</p>
+                        <p>Use our search bar or browse categories to find the specific skill or professional you need for your project.</p>
                     </div>
-                    <div class="step-card">
+                    <div class="how-it-works-card">
                         <div class="icon"><i class="fas fa-comments"></i></div>
-                        <h3>2. Connect & Chat</h3>
-                        <p>Contact providers directly to discuss details and agree on a price.</p>
+                        <h3>2. Connect Directly</h3>
+                        <p>View profiles, read reviews, and contact providers directly through the platform to discuss your needs and get a quote.</p>
                     </div>
-                    <div class="step-card">
+                    <div class="how-it-works-card">
                         <div class="icon"><i class="fas fa-check-circle"></i></div>
                         <h3>3. Get It Done</h3>
-                        <p>Hire with confidence and get your project completed by a trusted member of the Kabale community.</p>
+                        <p>Hire with confidence and get your job done by a trusted local professional from our community.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="why-us" class="animated-section">
+        <section id="why-us">
             <div class="container">
                 <p class="section-subtitle">Why Choose Us?</p>
-                <h2 class="section-title">A Platform Built for the Kigezi Community</h2>
+                <h2>A Platform Built for the Kigezi Community</h2>
                 <div class="features-grid">
-                    <div class="feature-card"><div class="icon"><i class="fas fa-users"></i></div><h3>Support Local</h3><p>By hiring on KabaleOnline, you're directly supporting our own hustlers, technicians, and professionals, strengthening our community's economy.</p></div>
-                    <div class="feature-card"><div class="icon"><i class="fas fa-shield-alt"></i></div><h3>Trusted & Verified</h3><p>We encourage a community of trust with user reviews and profiles, so you can hire with confidence.</p></div>
-                    <div class="feature-card"><div class="icon"><i class="fas fa-comments"></i></div><h3>Direct Communication</h3><p>No middlemen. Connect and communicate directly with providers to discuss your needs and agree on terms.</p></div>
+                    <div class="feature-card"><div class="icon"><i class="fas fa-users"></i></div><h3>Support Local</h3><p>By hiring on KabaleOnline, you're directly supporting local hustlers and professionals, strengthening our community's economy.</p></div>
+                    <div class="feature-card"><div class="icon"><i class="fas fa-shield-alt"></i></div><h3>Trusted & Verified</h3><p>We foster a community of trust with user reviews and profiles, so you can hire with confidence.</p></div>
+                    <div class="feature-card"><div class="icon"><i class="fas fa-handshake"></i></div><h3>Direct Communication</h3><p>No middlemen. Connect directly with providers to discuss your needs and agree on terms.</p></div>
                 </div>
             </div>
         </section>
 
-        <section id="categories" class="animated-section">
+        <section id="categories">
             <div class="container">
                 <p class="section-subtitle">Explore</p>
-                <h2 class="section-title">A World of Services at Your Fingertips</h2>
+                <h2>A World of Services at Your Fingertips</h2>
                 <div class="services-grid">
-                    <a href="services.html" class="category-card"><div class="icon"><i class="fas fa-home"></i></div><span>Home Services</span></a>
-                    <a href="services.html" class="category-card"><div class="icon"><i class="fas fa-paint-brush"></i></div><span>Creative & Media</span></a>
-                    <a href="services.html" class="category-card"><div class="icon"><i class="fas fa-laptop-code"></i></div><span>Technical & IT</span></a>
-                    <a href="services.html" class="category-card"><div class="icon"><i class="fas fa-briefcase"></i></div><span>Professional</span></a>
-                    <a href="services.html" class="category-card"><div class="icon"><i class="fas fa-birthday-cake"></i></div><span>Events</span></a>
-                    <a href="services.html" class="category-card"><div class="icon"><i class="fas fa-graduation-cap"></i></div><span>Tutoring</span></a>
+                    <a href="services.html?category=home" class="category-card"><div class="icon"><i class="fas fa-home"></i></div><span>Home Services</span></a>
+                    <a href="services.html?category=creative" class="category-card"><div class="icon"><i class="fas fa-paint-brush"></i></div><span>Creative & Media</span></a>
+                    <a href="services.html?category=tech" class="category-card"><div class="icon"><i class="fas fa-laptop-code"></i></div><span>Technical & IT</span></a>
+                    <a href="services.html?category=professional" class="category-card"><div class="icon"><i class="fas fa-briefcase"></i></div><span>Professional</span></a>
+                    <a href="services.html?category=events" class="category-card"><div class="icon"><i class="fas fa-birthday-cake"></i></div><span>Events</span></a>
+                    <a href="services.html?category=tutoring" class="category-card"><div class="icon"><i class="fas fa-graduation-cap"></i></div><span>Tutoring</span></a>
                 </div>
             </div>
         </section>
 
-        <section id="providers" class="animated-section">
+        <section id="providers">
             <div class="container">
                 <p class="section-subtitle">Our Community</p>
-                <h2 class="section-title">Meet Some of Our Skilled Providers</h2>
+                <h2>Meet Some of Our Skilled Providers</h2>
                 <div class="provider-grid">
-                    <div class="provider-card"><img src="image/founder.webp" alt="Ampeire Samuel, Web Developer in Kabale"><h3 class="provider-name">Ampeire Samuel.</h3><p class="role">Web Developer</p><p>Web Developer and Founder of KabaleOnline Group — building digital solutions that connect businesses and communities across Uganda.</p></div>
-                    <div class="provider-card"><img src="image/zubic.webp" alt="Zubic Mal, Graphic Designer in Kabale"><h3 class="provider-name">Zubic mal.</h3><p class="role">Graphic Designer </p><p>Specializing in graphic design and poster creation for all events.</p></div>
-                    <div class="provider-card"><img src="image/mentor.webp" alt="Abaho Olivine, Tutor in Kabale"><h3 class="provider-name">Abaho Olivine.</h3><p class="role">Tutor</p><p>Reliable and professional Tutoring services available for any emergency.</p></div>
-                    <div class="provider-card"><img src="image/Logistician.webp" alt="Apollo Turanzomwe, Logistician in Kabale"><h3 class="provider-name">Apollo Turanzomwe.</h3><p class="role">Logistician</p><p>Passionate Logistician dedicated to optimizing supply chains and ensuring timely deliveries.</p></div>
+                    <div class="provider-card"><img src="image/founder.webp" alt="Provider"><h3 class="provider-name">Ampeire Samuel</h3><p class="role">Web Developer</p><p>Building digital solutions that connect businesses and communities across Uganda.</p></div>
+                    <div class="provider-card"><img src="image/zubic.webp" alt="Provider"><h3 class="provider-name">Zubic Mal</h3><p class="role">Graphic Designer</p><p>Specializing in graphic design and poster creation for all events.</p></div>
+                    <div class="provider-card"><img src="image/mentor.webp" alt="Provider"><h3 class="provider-name">Abaho Olivine</h3><p class="role">Tutor</p><p>Reliable and professional Tutoring services available for any emergency.</p></div>
+                    <div class="provider-card"><img src="image/Logistician.webp" alt="Provider"><h3 class="provider-name">Apollo Turanzomwe</h3><p class="role">Logistician</p><p>Passionate logistician dedicated to optimizing supply chains and ensuring timely deliveries.</p></div>
                 </div>
             </div>
         </section>
 
-        <section id="testimonials" class="animated-section">
+        <section id="testimonials">
             <div class="container">
                  <p class="section-subtitle">Testimonials</p>
-                 <h2 class="section-title">What Our Users Are Saying</h2>
+                 <h2>What Our Users Are Saying</h2>
                  <div class="features-grid">
                     <div class="testimonial-card">
                         <p>"I needed a quick graphic designer for my logistics company logo and found one on KabaleOnline. He was professional, fast, and did a great job. So much easier than asking around!"</p>
-                        <div class="testimonial-author"><img src="image/Logistician.webp" alt="Apollo Turanzomwe"><div><h4>Apollo Turanzomwe.</h4><span>Logistician</span></div></div>
+                        <div class="testimonial-author"><img src="image/Logistician.webp" alt="User"><div><h4>Apollo Turanzomwe</h4><span>Service User</span></div></div>
                     </div>
                      <div class="testimonial-card">
-                        <p>"As a freelance service provider, this platform has connected me with great local clients I wouldn't have found otherwise. It's been a huge boost for my business."</p>
-                        <div class="testimonial-author"><img src="image/mentor.webp" alt="Abaho Olivine"><div><h4>Abaho Olivine.</h4><span>Service Provider</span></div></div>
+                        <p>"As a freelance tutor, this platform has connected me with great local clients I wouldn't have found otherwise. It's been a huge boost for my business."</p>
+                        <div class="testimonial-author"><img src="image/mentor.webp" alt="User"><div><h4>Abaho Olivine</h4><span>Service Provider</span></div></div>
                     </div>
                  </div>
             </div>
         </section>
-
-        <section id="about-us" class="animated-section">
-            <div class="container">
-                <p class="section-subtitle">Our Story</p>
-                <h2 class="section-title">About KabaleOnline Services</h2>
-                <p class="section-description">KabaleOnline Services was founded with a clear vision: to empower our local community by creating a seamless connection between talented service providers and individuals or businesses in need of their skills. We believe in fostering local economic growth, building trust, and making everyday tasks easier for everyone in Kabale and the Kigezi region.</p>
-                <div style="text-align: center; margin-top: 40px;">
-                    <a href="about.html" class="btn btn-secondary">Learn More</a>
-                </div>
-            </div>
-        </section>
-
-        <section id="contact" class="animated-section" style="background-color: var(--bg-secondary);">
-            <div class="container">
-                <p class="section-subtitle">Get In Touch</p>
-                <h2 class="section-title">Contact Us</h2>
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
-                    <p><i class="fas fa-map-marker-alt" style="margin-right: 10px; color: var(--accent-primary);"></i> Kabale, Uganda</p>
-                    <p><i class="fas fa-phone-alt" style="margin-right: 10px; color: var(--accent-primary);"></i> +256 123 456789</p>
-                    <p><i class="fas fa-envelope" style="margin-right: 10px; color: var(--accent-primary);"></i> help@kabaleonline.com</p>
-                    <a href="contact.html" class="btn">Send us a Message</a>
-                </div>
-            </div>
-        </section>
-
     </main>
-    
+
     <footer>
         <div class="container">
-            <div class="footer-grid">
-                <div class="footer-about">
-                    <h4 class="nav-logo" style="font-size: 2rem;">KabaleOnline</h4>
-                    <p>Connecting our community by making it easy to find and offer skilled services across the Kigezi region.</p>
-                    <div class="footer-socials">
-                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    </div>
-                </div>
-                <div class="footer-links">
-                    <h4>Quick Links</h4>
-                    <ul id="footer-quick-links">
-                        <li><a href="services.html">Browse Services</a></li>
-                        <li><a href="browse-jobs.html">Browse Jobs</a></li>
-                        <li><a href="group-chat.html">Community Chat</a></li>
-                        <li><a href="#how-it-works">How It Works</a></li>
-                        </ul>
-                </div>
-                <div class="footer-links">
-                    <h4>Support</h4>
-                    <ul>
-                        <li><a href="#contact">Contact Us</a></li>
-                        <li><a href="#">Help & FAQ</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms of Service</a></li>
-                    </ul>
-                </div>
-                 <div class="footer-links">
-                    <h4>Contact Us</h4>
-                    <ul>
-                        <li><i class="fas fa-map-marker-alt"></i> Kabale, Uganda</li>
-                        <li><i class="fas fa-phone-alt"></i> +256 123 456789</li>
-                        <li><i class="fas fa-envelope"></i> help@kabaleonline.com</li>
-                    </ul>
-                </div>
+            <div class="footer-logo">KabaleOnline <span>Services</span></div>
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Help & FAQ</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact</a>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 KabaleOnline Services. All Rights Reserved.</p>
-            </div>
+            <p class="footer-copyright">&copy; 2025 KabaleOnline Services. All Rights Reserved.</p>
         </div>
     </footer>
 
-    <script src="theme.js" defer></script>
-    <script src="global-auth.js" type="module"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // --- Mobile Menu Toggle ---
-            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-            const navLinks = document.getElementById('nav-links');
-            mobileMenuBtn.addEventListener('click', () => {
-                navLinks.classList.toggle('active');
+            // --- Mobile Nav Toggle ---
+            const hamburger = document.querySelector('.hamburger-menu');
+            const mobileNav = document.querySelector('.mobile-nav');
+            const overlay = document.querySelector('.mobile-nav-overlay');
+            if (hamburger) {
+                hamburger.addEventListener('click', () => {
+                    mobileNav.classList.toggle('active');
+                    overlay.classList.toggle('active');
+                });
+            }
+            if (overlay) {
+                overlay.addEventListener('click', () => {
+                    mobileNav.classList.remove('active');
+                    overlay.classList.remove('active');
+                });
+            }
+
+            // --- Theme Toggler ---
+            const themeToggle = document.getElementById('theme-toggle');
+            const body = document.body;
+            const currentTheme = localStorage.getItem('theme') || 'dark-mode';
+            body.className = currentTheme;
+            themeToggle.innerHTML = body.classList.contains('dark-mode') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            themeToggle.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                body.classList.toggle('light-mode');
+                const newTheme = body.classList.contains('dark-mode') ? 'dark-mode' : 'light-mode';
+                localStorage.setItem('theme', newTheme);
+                themeToggle.innerHTML = newTheme === 'dark-mode' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
             });
             
-            // --- On-Scroll Reveal Animation ---
-            const animatedSections = document.querySelectorAll('.animated-section');
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                        observer.unobserve(entry.target); // Stop observing once visible
+            // --- Hero Heading Typing Animation ---
+            const typingTextElement = document.getElementById('typing-text');
+            if (typingTextElement) {
+                const words = ["Anything.", "Plumbers.", "Tutors.", "Designers.", "Developers."];
+                let wordIndex = 0, charIndex = 0, isDeleting = false;
+                function type() {
+                    const currentWord = words[wordIndex];
+                    const speed = isDeleting ? 100 : 150;
+                    if (isDeleting) {
+                        typingTextElement.textContent = currentWord.substring(0, charIndex - 1);
+                        charIndex--;
+                    } else {
+                        typingTextElement.textContent = currentWord.substring(0, charIndex + 1);
+                        charIndex++;
                     }
-                });
-            }, {
-                threshold: 0.15 // Trigger when 15% of the section is visible
-            });
+                    if (!isDeleting && charIndex === currentWord.length) {
+                        setTimeout(() => isDeleting = true, 2000);
+                    } else if (isDeleting && charIndex === 0) {
+                        isDeleting = false;
+                        wordIndex = (wordIndex + 1) % words.length;
+                    }
+                    setTimeout(type, speed);
+                }
+                type();
+            }
 
-            animatedSections.forEach(section => {
-                observer.observe(section);
-            });
+            // --- Hero Search Bar Placeholder Typing Animation ---
+            const searchBar = document.getElementById('hero-search-input');
+            if (searchBar) {
+                const placeholderPhrases = ["e.g., 'plumber near me'", "try 'logo design'", "search for 'math tutor'"];
+                let phraseIndex = 0, charIndex = 0, isDeleting = false;
+                function typePlaceholder() {
+                    const currentPhrase = placeholderPhrases[phraseIndex];
+                    let displayText = '';
+                    if (isDeleting) {
+                        displayText = currentPhrase.substring(0, charIndex - 1);
+                        charIndex--;
+                    } else {
+                        displayText = currentPhrase.substring(0, charIndex + 1);
+                        charIndex++;
+                    }
+                    searchBar.placeholder = displayText;
+                    if (!isDeleting && charIndex === currentPhrase.length) {
+                        isDeleting = true;
+                        setTimeout(typePlaceholder, 1500);
+                        return;
+                    } else if (isDeleting && charIndex === 0) {
+                        isDeleting = false;
+                        phraseIndex = (phraseIndex + 1) % placeholderPhrases.length;
+                        setTimeout(typePlaceholder, 500);
+                        return;
+                    }
+                    setTimeout(typePlaceholder, isDeleting ? 75 : 120);
+                }
+                typePlaceholder();
+            }
         });
     </script>
 </body>
