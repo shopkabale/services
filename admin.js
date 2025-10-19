@@ -1,36 +1,70 @@
 import { app } from './firebase-init.js';
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { getFirestore, collection, doc, getDoc, getDocs, getCountFromServer } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDoc, getDocs, getCountFromServer, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// --- AUTHENTICATION AND SECURITY CHECK ---
-onAuthStateChanged(auth, async (user) => {
-    if (user && user.emailVerified) {
-        const userDocRef = doc(db, "users", user.uid);
-        const userDoc = await getDoc(userDocRef);
+// --- DOM ELEMENT REFERENCES ---
+const mainTitle = document.getElementById('main-title');
+const navLinks = document.querySelectorAll('.nav-link');
+const contentSections = document.querySelectorAll('.content-section');
+const deleteServiceModal = document.getElementById('delete-service-modal');
+const cancelDeleteServiceBtn = document.getElementById('cancel-delete-service-btn');
+const confirmDeleteServiceBtn = document.getElementById('confirm-delete-service-btn');
+const serviceToDeleteName = document.getElementById('service-to-delete-name');
+let serviceToDeleteId = null;
 
-        if (userDoc.exists() && userDoc.data().role === 'admin') {
-            // User is a confirmed admin, proceed to load the dashboard
-            const userData = userDoc.data();
-            document.getElementById('admin-name').textContent = userData.name || 'Admin';
-            document.getElementById('admin-avatar').src = userData.profilePicUrl || `https://placehold.co/40x40?text=${(userData.name || 'A').charAt(0)}`;
-            
-            loadDashboardStats();
-            loadAllDataTables();
+// --- CRITICAL: AUTHENTICATION AND SECURITY CHECK ---
+onAuthStateChanged(auth, async (user) => {
+    try {
+        if (user && user.emailVerified) {
+            const userDocRef = doc(db, "users", user.uid);
+            const userDoc = await getDoc(userDocRef);
+
+            // --- THIS IS THE FIX ---
+            // We now check for `role === 'admin'` to match your database structure.
+            if (userDoc.exists() && userDoc.data().role === 'admin') {
+                // SUCCESS: User is a confirmed admin. Load all dashboard data.
+                document.getElementById('admin-name').textContent = userDoc.data().name || 'Admin';
+                document.getElementById('admin-avatar').src = userDoc.data().profilePicUrl || `https://placehold.co/40x40?text=A`;
+                
+                loadDashboardStats();
+                loadAllDataTables();
+            } else {
+                // --- ACCESS DENIED: User is NOT an admin ---
+                // Show a clear access denied message with a redirect countdown.
+                document.body.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; padding: 20px; color: var(--text-primary); background-color: var(--bg-primary);">
+                        <h1 style="font-size: 2.5rem;">🔒 Access Denied</h1>
+                        <p style="font-size: 1.2rem; margin-top: 10px;">You do not have permission to view this page.</p>
+                        <p style="margin-top: 30px;">Redirecting you to the homepage in <span id="countdown">5</span> seconds...</p>
+                    </div>
+                `;
+                
+                let countdown = 5;
+                const countdownElement = document.getElementById('countdown');
+                const interval = setInterval(() => {
+                    countdown--;
+                    if (countdownElement) countdownElement.textContent = countdown;
+                    if (countdown <= 0) {
+                        clearInterval(interval);
+                        window.location.href = 'index.html';
+                    }
+                }, 1000);
+            }
         } else {
-            // User is not an admin, show access denied message and redirect
-            document.body.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; text-align:center; padding:20px;"><h1>Access Denied</h1><p>You do not have permission. Redirecting...</p></div>`;
-            setTimeout(() => window.location.href = 'index.html', 3000);
+            // User is not logged in.
+            console.warn("Access denied. User not logged in.");
+            window.location.href = 'auth.html';
         }
-    } else {
-        // User is not logged in
-        window.location.href = 'auth.html';
+    } catch (error) {
+        console.error("Authentication check failed:", error);
+        window.location.href = 'index.html';
     }
 });
 
-// --- DATA FETCHING ---
+// --- DATA FETCHING FUNCTIONS ---
 async function loadDashboardStats() {
     try {
         const userCount = (await getCountFromServer(collection(db, 'users'))).data().count;
@@ -43,24 +77,20 @@ async function loadDashboardStats() {
 }
 
 async function loadAllDataTables() {
-    // Fetch all data in parallel for speed
     const [users, services, jobs] = await Promise.all([
         getDocs(collection(db, 'users')),
         getDocs(collection(db, 'services')),
         getDocs(collection(db, 'job_posts'))
     ]);
 
-    // Populate Users Table
     const usersTableBody = document.getElementById('users-table-body');
     usersTableBody.innerHTML = '';
     users.forEach(doc => {
         const user = doc.data();
         const role = user.role === 'admin' ? 'Admin' : (user.isProvider ? 'Provider' : 'User');
-        const row = usersTableBody.insertRow();
-        row.innerHTML = `<td>${user.name||'N/A'}</td><td>${user.email||'N/A'}</td><td>${role}</td>`;
+        usersTableBody.insertRow().innerHTML = `<td>${user.name||'N/A'}</td><td>${user.email||'N/A'}</td><td>${role}</td>`;
     });
 
-    // Populate Services Table (with provider name caching)
     const servicesTableBody = document.getElementById('services-table-body');
     servicesTableBody.innerHTML = '';
     const providerCache = {};
@@ -75,16 +105,14 @@ async function loadAllDataTables() {
             }
         }
         providerName = providerName || 'Unknown';
-        const row = servicesTableBody.insertRow();
-        row.innerHTML = `<td>${service.title||'N/A'}</td><td>${providerName}</td><td>${service.category||'N/A'}</td><td>UGX ${service.price?service.price.toLocaleString():'N/A'}</td>`;
+        servicesTableBody.insertRow().innerHTML = `<td>${service.title||'N/A'}</td><td>${providerName}</td><td>${service.category||'N/A'}</td><td>UGX ${service.price?service.price.toLocaleString():'N/A'}</td>`;
     }
 
-    // Populate Jobs Table
     const jobsTableBody = document.getElementById('jobs-table-body');
     jobsTableBody.innerHTML = '';
     for (const jobDoc of jobs.docs) {
         const job = jobDoc.data();
-        let seekerName = providerCache[job.seekerId]; // Re-use the same cache
+        let seekerName = providerCache[job.seekerId];
         if (!seekerName && job.seekerId) {
             const userDocSnap = await getDoc(doc(db, 'users', job.seekerId));
             if (userDocSnap.exists()) {
@@ -93,8 +121,7 @@ async function loadAllDataTables() {
             }
         }
         seekerName = seekerName || 'Unknown';
-        const row = jobsTableBody.insertRow();
-        row.innerHTML = `<td>${job.title||'N/A'}</td><td>${seekerName}</td><td>UGX ${job.budget?job.budget.toLocaleString():'N/A'}</td>`;
+        jobsTableBody.insertRow().innerHTML = `<td>${job.title||'N/A'}</td><td>${seekerName}</td><td>UGX ${job.budget?job.budget.toLocaleString():'N/A'}</td>`;
     }
 }
 
@@ -103,13 +130,7 @@ const accordionItems = document.querySelectorAll('.accordion-item');
 accordionItems.forEach(item => {
     const header = item.querySelector('.accordion-header');
     header.addEventListener('click', () => {
-        // Close other open items
-        accordionItems.forEach(otherItem => {
-            if (otherItem !== item) {
-                otherItem.classList.remove('active');
-            }
-        });
-        // Toggle the clicked item
+        accordionItems.forEach(otherItem => { if (otherItem !== item) otherItem.classList.remove('active'); });
         item.classList.toggle('active');
     });
 });
