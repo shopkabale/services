@@ -52,6 +52,17 @@
         .footer-links a { color: var(--text-secondary); text-decoration: none; }
         .footer-links ul li i { margin-right: 10px; color: var(--accent-primary); }
         .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid var(--border-color); color: var(--text-secondary); }
+/* Add this to your <style> block */
+.badge {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 50px;
+    background-color: var(--accent-secondary); /* Yellow accent color */
+    color: #333; /* Dark text for readability on yellow */
+    vertical-align: middle;
+    margin-left: 10px;
+}
     </style>
 </head>
 <body class="dark-mode">
@@ -65,7 +76,7 @@
         <div class="container">
             <div class="profile-header">
                 <img src="https://placehold.co/120x120/10336d/a7c0e8?text=..." alt="Profile Picture" class="profile-picture" id="profile-picture">
-                <h1 class="profile-name" id="profile-name">Loading...</h1>
+                <h1 id="profile-name">Loading... <span id="founding-member-badge" class="badge" style="display: none;">🏅 Founding Member</span></h1>
                 <p class="welcome-message" id="welcome-message">Welcome to your dashboard!</p>
             </div>
 
