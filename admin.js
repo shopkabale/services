@@ -1,7 +1,7 @@
 import { app } from './firebase-init.js';
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { getFirestore, collection, doc, getDoc, getDocs, getCountFromServer, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-
+ 
 const auth = getAuth(app);
 const db = getFirestore(app);
 
