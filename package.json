@@ -1,0 +1,9 @@
+{
+  "name": "my-functions",
+  "version": "1.0.0",
+  "description": "Cloudflare functions for my project",
+  "main": "updateProvider.js",
+  "dependencies": {
+    "firebase-admin": "^11.11.1"
+  }
+}
