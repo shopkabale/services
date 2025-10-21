@@ -5,7 +5,7 @@ const searchButton = document.getElementById('search-button');
 const categoryFilters = document.getElementById('category-filters');
 const servicesGrid = document.getElementById('services-grid');
 const cardTemplate = document.getElementById('service-card-template');
-
+ 
 let currentQuery = '';
 let currentCategory = 'All';
 
