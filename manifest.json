@@ -8,12 +8,12 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "image/192x192.png",
+      "src": "https://services.kabaleonline.com/services/image/192x192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "image/512x512.png",
+      "src": "https://services.kabaleonline.com/services/image/512x512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
