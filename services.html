@@ -61,6 +61,54 @@
         .footer-links a:hover { color: var(--accent-primary); padding-left: 5px; }
         .footer-links ul li i { margin-right: 10px; color: var(--accent-primary); }
         .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid var(--border-color); color: var(--text-secondary); }
+/* --- NEW SECTION: Explore Platform --- */
+.explore-platform {
+    padding: 80px 15px;
+    background-color: var(--bg-card);
+}
+.explore-platform h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    color: var(--text-primary);
+    margin-bottom: 15px;
+}
+.explore-platform p.subtitle {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 50px auto;
+    font-size: 1.1rem;
+}
+.explore-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+.explore-card {
+    display: flex;
+    align-items: center;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    padding: 25px;
+    border-radius: 16px;
+    text-decoration: none;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.explore-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 25px var(--shadow-color);
+}
+.explore-card .icon {
+    font-size: 2.5rem;
+    color: var(--accent-primary);
+    margin-right: 20px;
+}
+.explore-card h3 {
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    margin: 0;
+}
     </style>
 </head>
 <body class="dark-mode">
@@ -131,7 +179,38 @@
         </div>
       </div>
     </template>
-
+<section class="explore-platform">
+    <div class="container">
+        <h2>Explore the Entire KabaleOnline Platform</h2>
+        <p class="subtitle">Our ecosystem is more than just services. Discover everything our community has to offer across our different platforms.</p>
+        <div class="explore-grid">
+            <a href="https://www.kabaleonline.com" target="_blank" class="explore-card">
+                <div class="icon"><i class="fas fa-shopping-basket"></i></div>
+                <div><h3>Sell Products</h3></div>
+            </a>
+            <a href="https://www.kabaleonline.com/events" target="_blank" class="explore-card">
+                <div class="icon"><i class="fas fa-calendar-alt"></i></div>
+                <div><h3>Find Local Events</h3></div>
+            </a>
+            <a href="https://www.kabaleonline.com/lost-and-found" target="_blank" class="explore-card">
+                <div class="icon"><i class="fas fa-search-location"></i></div>
+                <div><h3>Lost & Found</h3></div>
+            </a>
+            <a href="services.html" class="explore-card">
+                <div class="icon"><i class="fas fa-concierge-bell"></i></div>
+                <div><h3>Browse Services</h3></div>
+            </a>
+            <a href="browse-jobs.html" class="explore-card">
+                <div class="icon"><i class="fas fa-briefcase"></i></div>
+                <div><h3>Find Job Gigs</h3></div>
+            </a>
+            <a href="group-chat.html" class="explore-card">
+                <div class="icon"><i class="fas fa-comments"></i></div>
+                <div><h3>Community Chat</h3></div>
+            </a>
+        </div>
+    </div>
+</section>
     <footer>
         <div class="container">
             <div class="footer-grid">
