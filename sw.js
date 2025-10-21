@@ -1,10 +1,10 @@
 const CACHE_NAME = 'kabaleonline-pwa-v1.2'; // Increment version to force update
 const OFFLINE_URL = 'offline.html';
 
-// Add all your core HTML and JS files to the cache list.
+//  Add all your core HTML and JS files to the cache list.
 // This ensures the basic shell of your app works offline.
 const CORE_FILES_TO_CACHE = [
-  '/', 
+  '/',
   'index.html',
   'auth.html',
   'services.html',
