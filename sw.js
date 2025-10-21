@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kabaleonline-pwa-v1.3'; // Increment version to force update
+const CACHE_NAME = 'kabaleonline-pwa-v2.0'; // Increment version to force update
 const OFFLINE_URL = 'offline.html';
 
 //  Add all your core HTML and JS files to the cache list.
